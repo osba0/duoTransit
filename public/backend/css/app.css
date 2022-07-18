@@ -1,3 +1,4 @@
+@import url(https://fonts.googleapis.com/css?family=Saira Condensed);
 @import url(https://fonts.googleapis.com/css?family=Nunito); /*!
  *   AdminLTE v3.0.0-alpha
  *   Author: Abdullah Almsaeed
@@ -9042,7 +9043,7 @@ body,
     .main-footer,
     .main-header {
         transition: margin-left 0.3s ease-in-out;
-        margin-left: 250px;
+        margin-left: 150px;
         z-index: 3000;
     }
 }
@@ -9092,7 +9093,7 @@ body,
 .main-sidebar,
 .main-sidebar:before {
     transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
-    width: 250px;
+    width: 150px;
 }
 
 @media screen and (prefers-reduced-motion: reduce) {
@@ -9104,14 +9105,14 @@ body,
 
 .sidebar-collapse .main-sidebar,
 .sidebar-collapse .main-sidebar:before {
-    margin-left: -250px;
+    margin-left: 150px;
 }
 
 @media (max-width: 991.98px) {
     .main-sidebar,
     .main-sidebar:before {
         box-shadow: none !important;
-        margin-left: -250px;
+        margin-left: -150px;
     }
     .sidebar-open .main-sidebar,
     .sidebar-open .main-sidebar:before {
@@ -10737,7 +10738,7 @@ body,
         float: none;
     }
     .sidebar-mini.sidebar-collapse .main-sidebar:hover {
-        width: 250px;
+        width: 150px;
     }
     .sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel {
         text-align: left;
@@ -10823,8 +10824,8 @@ body,
 
 .control-sidebar,
 .control-sidebar:before {
-    width: 250px;
-    right: -250px;
+    width: 150px;
+    right: -150px;
     bottom: 0;
     transition: right 0.3s ease-in-out;
 }
@@ -10851,7 +10852,7 @@ body,
     }
     .control-sidebar-open .content-wrapper,
     .control-sidebar-open .main-footer {
-        margin-right: 250px;
+        margin-right: 150px;
     }
 }
 

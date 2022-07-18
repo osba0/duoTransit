@@ -1,0 +1,414 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+use App\Http\Resources\DossierRessource;
+use App\Http\Resources\ReceptionResource;
+
+use App\Models\TypeCommande;
+use App\Models\Client;
+use App\Models\Empotage;
+use App\Models\Fournisseur;
+use App\Models\DossierPrechargement;
+use App\Models\Contenaire;
+use App\Models\Reception;
+use App\Models\Entite;
+use App\Models\ChargementCreation;
+use App\Models\TypActivity;
+use App\Models\LogActivity;
+
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\UserRole;
+use App\Models\User;
+
+use Spatie\Activitylog\Contracts\Activity;
+
+class GestionController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth'); //If user is not logged in then he can't access this page
+       
+    }
+        /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $user = Auth::user();
+
+        if(!($user->hasRole(UserRole::ROLE_ADMIN) || $user->hasRole(UserRole::ROLE_ROOT))){
+             abort(401);
+        }
+
+        $entite = Entite::where('id', $user->entites_id)->get()->first();
+
+
+
+        $client = Client::where('slug', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+
+        if(!$client)  abort(404);
+
+        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get(); 
+
+        $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
+
+        $contenaires = Contenaire::whereIn('id',$entite->contenaires_id)->get(); 
+
+        $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
+
+        if(is_null($client)){
+            $data = ['logo' => '', 'id_client' => ''];
+        }else{
+            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client ,'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires, "entite" => $entite];
+        }
+
+        activity(TypActivity::LISTER)->performedOn($client)->log('Affichage validation préchargement');
+        $lastID = LogActivity::latest('id')->first();
+        $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $user->entites_id]);
+        
+        
+        return  view('backend.gestion.prechargement', $data);
+    }
+
+    public function create(Request $request)
+    {
+         $user = Auth::user();
+        // Check num dossier exist or not
+
+        $check = ChargementCreation::where('numDossier', request('numdossier'))->where('type_commandes_id', request('typeCmd'))->get();
+        
+        if(sizeof($check) > 0){
+            return response([
+                "code" => 1,
+                "message" => "Numéro dossier existe déja!"
+            ]);
+        }
+        try{    
+            ChargementCreation::setIDClient(request('clientID'), $user->entites_id); 
+
+            $store = ChargementCreation::create([
+                "numDossier"  => request('numdossier'),
+                "dateDebut"   => request('datedebut'),
+                "dateCloture" => request('datecloture'),
+                "clients_id"   => request('clientID'),
+                "users_id"    => $user->id,
+                "type_commandes_id"    => request('typeCmd'),
+                "reetat" => false
+            ]); 
+
+
+
+
+           
+
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        if($store){
+            return response([
+                "code" => 0,
+                "message" => "OK"
+            ]);
+        }else{
+            return response([
+                "code" => 1,
+                "message" => "KO"
+            ]);
+        }
+
+        
+    }
+
+     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function listing(Request $request)
+    {
+        $user = Auth::user();
+
+        $paginate = request('paginate');
+
+        $keyword = request('keysearch');
+        $typeCommande = request('typeCmd');
+        $etatFiltre = request('etatFiltre');
+
+        if (isset($paginate)) {
+
+            $pre = DB::table('chargement_creations')
+            ->leftJoin('receptions', 'receptions.dossier_id', '=', 'chargement_creations.numdossier')
+            ->leftJoin('users', 'chargement_creations.users_id', '=', 'users.id')
+            ->leftJoin('type_commandes', 'chargement_creations.type_commandes_id', '=', 'type_commandes.id')
+            ->groupBy('chargement_creations.id')
+            ->select('receptions.dossier_id', 
+                DB::raw('SUM(receptions.repoid) as total_poids'), 
+                DB::raw('SUM(receptions.revolu) as total_volume'), 
+                DB::raw('SUM(receptions.renbcl) as total_colis'), 
+                DB::raw('SUM(receptions.renbpl) as total_palette'), 
+                DB::raw('count(receptions.rencmd) as total_cmd'), 
+                'chargement_creations.numdossier', 
+                'chargement_creations.users_id', 
+                'chargement_creations.dateDebut',
+                'chargement_creations.dateCloture',
+                'chargement_creations.reetat as etat',
+                'chargement_creations.created_at as creation_dos',
+                'users.username as user',
+                'type_commandes.id as idTypeCmd',
+                'type_commandes.tcolor as tcolor',
+                'type_commandes.typcmd as typecmd')->where('chargement_creations.clients_id', request('id'))->orderBy('chargement_creations.created_at', 'desc');
+            if($keyword!=''){
+                $term = "%$keyword%";
+
+                $pre = $pre->where(function ($query) use ($term) {
+                    $query->where('numDossier', 'like', $term);
+                });
+            }
+            if($typeCommande!=''){
+                $pre = $pre->where('chargement_creations.type_commandes_id', $typeCommande);
+            }
+            if($etatFiltre!=''){
+                $pre = $pre->where('chargement_creations.reetat', $etatFiltre);
+            }
+
+            
+            $pre = $pre->paginate($paginate);
+        }else{
+          
+        }
+
+        
+      
+      
+        return DossierRessource::collection($pre);
+    }
+
+    public function listingReception()
+    {
+        $user = Auth::user();
+
+        $paginate = request('paginate');
+
+        if (isset($paginate)) {
+
+            $dries = Reception::where('clients_id', request('id'))->where(function($query){
+                            $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
+                        })
+            ->leftJoin('dossier_prechargements', 'dossier_prechargements.id', '=', 'receptions.dossier_prechargements_id')
+            ->leftJoin('users as a', 'dossier_prechargements.users_id', '=', 'a.id')
+            ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
+            ->select('*','b.username as user_created','a.username as prechargeur')->where('receptions.type_commandes_id', request('typecmd'))->paginate($paginate); 
+
+        }else{
+            $dries = Reception::where('clients_id', request('id'))->orderBy('redali', 'asc')->get();
+        }
+      
+        return ReceptionResource::collection($dries);
+
+    }
+
+
+     public function precharger()
+    {
+        $value=0;
+        if(request('ischecked')==1){
+            $value=request('idPrehargement');
+        }
+        Reception::where('reidre', request('idreception'))
+          ->update([
+            "dossier_id" => $value
+        ]);
+
+        $results = DB::table('chargement_creations')
+            ->leftJoin('receptions', 'receptions.dossier_id', '=', 'chargement_creations.numdossier')
+            ->leftJoin('users', 'chargement_creations.users_id', '=', 'users.id')
+            ->leftJoin('type_commandes', 'chargement_creations.type_commandes_id', '=', 'type_commandes.id')
+            ->groupBy('chargement_creations.id')
+            ->select('receptions.dossier_id', 
+                DB::raw('SUM(receptions.repoid) as total_poids'), 
+                DB::raw('SUM(receptions.revolu) as total_volume'), 
+                DB::raw('SUM(receptions.renbcl) as total_colis'), 
+                DB::raw('SUM(receptions.renbpl) as total_palette'), 
+                DB::raw('count(receptions.rencmd) as total_cmd'), 
+                'chargement_creations.numdossier', 
+                'chargement_creations.users_id', 
+                'chargement_creations.dateDebut',
+                'chargement_creations.dateCloture',
+                'chargement_creations.reetat as etat',
+                'chargement_creations.created_at as creation_dos',
+                'users.username as user',
+                'type_commandes.typcmd as typecmd')->where('chargement_creations.numdossier', request('idPrehargement'))->get(); 
+      
+        foreach ($results as $key) {
+           
+           $details[] = (object) ['total_poids'    => $key->total_poids,
+                                  'total_volume'   => $key->total_volume,
+                                  'total_palette'  => $key->total_palette,
+                                  'total_colis'    => $key->total_colis,
+                                  'total_cmd'      => $key->total_cmd
+                                  ];
+
+        }
+        return response([
+            "code" => 0,
+            "result" => $details
+        ]);
+    }
+    public function getCommande(){
+        $results = Reception::where('dossier_id',request('id'))->get(); 
+        $details=[];
+
+        foreach ($results as $key) {
+           
+           $details[] = (object) ['refere'         => $key->refere,
+                                  'reecvr'         => $key->reecvr,
+                                  'rencmd'         => $key->rencmd,
+                                  'repoid'         => $key->repoid,
+                                  'renufa'         => $key->renufa,
+                                  'renbcl'         => $key->renbcl,
+                                  'renbpl'         => $key->renbpl,
+                                  'revolu'         => $key->revolu,
+                                  'renufa'         => $key->renufa,
+                                  'fournisseurs'   => $key->fournisseur->fonmfo];
+   
+        }
+        return response([
+            "code" => 0,
+            "result" => $details
+        ]);
+    }
+
+    public function valider(){
+
+        $user = Auth::user();
+
+        $client = Client::where('id', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+        if(!$client){
+            abort(404);
+        }
+
+        $response = true;
+
+        if(sizeof(request('idsCmd')) > 0){
+
+            $cmds = Reception::whereIn('reidre',request('idsCmd'))->firstOrFail();
+
+
+            // Associer les commandes à un numero de dossier
+            
+            $cmds->update([
+                "dossier_id" => request('id_dossier')
+            ]);
+
+            activity(TypActivity::MODIFIER)->withProperties(request('idsCmd'))->performedOn($client)->log('Validation préchargement n°dossier'.request('id_dossier'));
+            $lastID = LogActivity::latest('id')->first();
+            $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $user->entites_id]);
+
+        }
+
+        
+
+        if($response){
+            if(sizeof(request('ignored')) > 0){
+                 $response = Reception::whereIn('reidre',request('ignored'))
+                  ->update([
+                    "dossier_id" => Null
+                ]);
+            }
+
+            $resp = ChargementCreation::where('numDossier',request('id_dossier'))
+              ->update([
+                "reetat" => true
+            ]);
+             return response([
+                "code" => 0,
+                "result" => 'Success'
+            ]);
+         }else{
+             return response([
+                "code" => 1,
+                "result" => $response
+            ]);
+         }
+    }
+
+    public function deletePre(Request $request)
+    {
+        $user = Auth::user();
+        $res = Empotage::select('id')->where('reference', request('id'))->get()->toArray();
+        $ids = [];
+
+        foreach($res as $item){
+            $ids[] = $item['id'];
+            
+        }
+
+        Reception::whereIn('dossier_empotage_id', $ids)->update([
+            "dossier_empotage_id" => ''
+        ]);
+
+        Reception::where('dossier_id', request('id'))->update([
+            "dossier_id" => ''
+        ]);
+
+
+        $dossier =  ChargementCreation::where('numDossier','=',request('id'))->firstOrFail(); 
+
+        ChargementCreation::setIDClient(request('clientID'), $user->entites_id); 
+
+        $dossier->delete();
+    
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+    }
+
+    /*************************** Empotage *********************************/
+     public function indexEmpotage()
+    {
+        $user = Auth::user();
+       
+        if(!($user->hasRole(UserRole::ROLE_ADMIN) || $user->hasRole(UserRole::ROLE_ROOT))){
+             abort(401);
+        }
+
+        $entite = Entite::where('id', $user->entites_id)->get()->first();
+
+
+
+        $client = Client::where('slug', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+        if(!$client)  abort(404);
+
+        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->get(); 
+
+        $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
+
+        $contenaires = Contenaire::whereIn('id',$entite->contenaires_id)->get(); 
+
+        $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
+
+        if(is_null($client)){
+            $data = ['logo' => '', 'id_client' => ''];
+        }else{
+            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client, 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires, 'client' => $client];
+        }
+        
+        return  view('backend.gestion.empotage', $data);
+    }
+
+}

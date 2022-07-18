@@ -36549,7 +36549,7 @@ Item.prototype.run = function () {
 };
 process.title = 'browser';
 process.browser = true;
-process.env = {};
+process.env = {'BUILD': '"dev"'}; 
 process.argv = [];
 process.version = ''; // empty string to avoid regexp issues
 process.versions = {};
