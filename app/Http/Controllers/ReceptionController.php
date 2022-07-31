@@ -8,6 +8,7 @@ use App\Http\Resources\TypeCommandeResource;
 use App\Models\Reception;
 use App\Models\TypeCommande;
 use App\Models\Client;
+use App\Models\Entrepot;
 use App\Models\Fournisseur;
 use App\Models\UserRole;
 use App\Models\TypActivity;
@@ -46,10 +47,12 @@ class ReceptionController extends Controller
 
         $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
 
+        $entrepots = Entrepot::get(); 
+
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
         }else{
-            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client'=>$client, 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis];
+            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client'=>$client, 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'entrepots' => $entrepots];
         }
 
         activity(TypActivity::LISTER)->performedOn($client)->log('Affichage de la page réception');
@@ -72,13 +75,15 @@ class ReceptionController extends Controller
 
         $keyword = request('keysearch');
 
+
         $dries = Reception::receptionsQuery();
+        
 
         if($keyword!=''){
             $dries = $dries->search($keyword); 
         }
 
-        $dries = $dries->where('clients_id', request('id'))->where('entites_id', $user->entites_id)->where(function($query){
+        $dries = $dries->where('receptions.clients_id', request('id'))->where('receptions.entites_id', $user->entites_id)->where(function($query){
                 $query->orWhere('dossier_id', NULL)->orWhere('dossier_id', 0);
             })->where(function($query){
                 $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', 0);
@@ -125,9 +130,9 @@ class ReceptionController extends Controller
 
         // Nbre jour moyen
         $diff_in_days = 0;
-        $today = \Carbon\Carbon::createFromFormat('Y-m-d H:s:i', date('Y-m-d'.' 23:59:59'));
+        $today = \Carbon\Carbon::createFromFormat('Y-m-d', date('Y-m-d'));
         foreach ($recep as $key) {
-            $from = \Carbon\Carbon::createFromFormat('Y-m-d H:s:i', $key->redali.' 00:00:00');
+            $from = \Carbon\Carbon::createFromFormat('Y-m-d', $key->redali);
             $diff_in_days += $today->diffInDays($from);
         }
       
@@ -306,4 +311,20 @@ class ReceptionController extends Controller
                 "message" => "OK"
             ]);
     }
+
+    public function setRate(Request $request)
+    {
+        $user = Auth::user();
+        $cmd =  Reception::where('reidre','=',request('idReception'))->firstOrFail(); 
+        
+        $cmd->update(["priorite" => request('rate')]);
+
+          return response([
+                "code" => 0,
+                "message" => "OK"
+            ]);
+    }
+
+
+    
 }

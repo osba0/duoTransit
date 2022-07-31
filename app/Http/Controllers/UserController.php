@@ -27,9 +27,15 @@ class UserController extends Controller
      */
     public function index()
     {
+        $user = Auth::user();
         
         $client = Client::get();
-        $roles = UserRole::getRoleList(); 
+        
+        if($user->hasRole(UserRole::ROLE_ADMIN)){
+            $roles = UserRole::getRoleAdminList(); 
+        }else{
+            $roles = UserRole::getRoleList(); 
+        }
 
         activity(TypActivity::LISTER)->log('Affichage page utilisateur');
 
@@ -43,10 +49,17 @@ class UserController extends Controller
      */
     public function list()
     {
+        $user = Auth::user();
+       
         $paginate = request('paginate');
 
         if (isset($paginate)) {
-            $users = User::orderBy('id', 'desc')->paginate($paginate);
+            if($user->hasRole(UserRole::ROLE_ADMIN)){
+                  $users = User::whereJsonContains("roles", $user->roles[0])->orderBy('id', 'desc')->paginate($paginate);
+            }else{
+                 $users = User::orderBy('id', 'desc')->paginate($paginate);
+            }
+           
         }else{
             $users = User::get();
         }

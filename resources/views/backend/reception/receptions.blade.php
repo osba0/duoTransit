@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-md-12">
             @if($id_client!='')
-                <reception id-client = {{$id_client}} :list-fournisseurs = "{{ json_encode($fournisseurs) }}" :type-cmd="{{ json_encode($typeCmd) }}"></reception>
+                <reception id-client = {{$id_client}} :list-fournisseurs = "{{ json_encode($fournisseurs) }}" :type-cmd="{{ json_encode($typeCmd) }}" :list-entrepots = "{{ json_encode($entrepots) }}"></reception>
             @else
                 <div class="badge badge-warning p-3">Client non autorisé ou inexistant!</div>
             @endif

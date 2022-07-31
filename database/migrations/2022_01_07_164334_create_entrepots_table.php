@@ -15,7 +15,11 @@ class CreateEntrepotsTable extends Migration
     {
         Schema::create('entrepots', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
+            $table->string('titulaire');
+            $table->string('telephone')->nullable();
+            $table->string('email');
+            $table->string('adresse')->nullable();
+            $table->string('nomEntrepot');
             $table->timestamps();
         });
     }

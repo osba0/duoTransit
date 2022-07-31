@@ -81,7 +81,7 @@ class ConfigurationController extends Controller
         }
 
 
-        LogActivity::addToLog('Liste page client.', 'Affichage de la page client', 'Admin'); 
+       // LogActivity::addToLog('Liste page client.', 'Affichage de la page client', 'Admin'); 
 
         foreach ($user->unreadNotifications as $notification) {
            $notification->markAsRead();
@@ -144,6 +144,7 @@ class ConfigurationController extends Controller
             }
             $new_client = [
                 "clnmcl" => request('nom'),
+                "clmail" => request('email'),
                 "slug"   => \Str::slug(request('nom')),
                 "cladcl" => request('adresse'),
                 "cltele" => request('telephone'),
@@ -199,6 +200,7 @@ class ConfigurationController extends Controller
         Client::where('id', request('id'))
               ->update([
                 "clnmcl" => request('nom'),
+                "clmail" => request('email'),
                 "cladcl" => request('adresse'),
                 "cltele" => request('telephone'),
                 'cllogo' => $filename,
@@ -239,6 +241,22 @@ class ConfigurationController extends Controller
 
         if(!is_null(request('logo')) || !empty(request('logo'))) File::delete("images/logo/".request('logo'));
 
+        $listClientAll = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
+
+        foreach($listClientAll as $client){
+
+                $tabFour = $client['clfocl'];
+
+                if (($key = array_search(request('id'), $tabFour)) !== false) {
+                    unset($tabFour[$key]);
+                }
+
+                Client::where('id', $client['id'])->update([
+                    "clfocl" => array_unique($tabFour)
+                ]);
+            
+        }
+
           return response([
                 "code" => 0,
                 "message" => "OK" 
@@ -259,7 +277,6 @@ class ConfigurationController extends Controller
                 $request->file->move("images/logo/", $filename);
             }
             
-            
             $store = Fournisseur::create([
                 "fonmfo" => request('nom'),
                 "foadrs" => request('adresse'),
@@ -267,6 +284,32 @@ class ConfigurationController extends Controller
                 'fologo' => $filename,
                 "foetat" => 1
             ]);
+
+            // get last ID 
+            
+            $lastIDFour = Fournisseur::latest('id')->first();
+            
+            $listClientSet = json_decode(request('listClientAjouter'));
+
+            $listClientAll = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
+
+            foreach($listClientAll as $client){
+
+                if (in_array($client['id'], $listClientSet)){
+
+                    $tabFour = $client['clfocl'];
+
+                    array_push($tabFour, $lastIDFour['id']);
+
+                    Client::where('id', $client['id'])
+                          ->update([
+                            "clfocl" => array_unique($tabFour)
+                      ]);
+                }
+            }
+           
+
+            //var_dump(json_decode(request('listClientAjouter'))); die();
         }catch(\Exceptions $e){
               return response([
                 "code" => 1,
@@ -312,6 +355,37 @@ class ConfigurationController extends Controller
                 "foetat" => 1
 
           ]);
+
+
+
+        $listClientSet = json_decode(request('listClientAjouter'));
+
+        $listClientAll = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
+
+        foreach($listClientAll as $client){
+
+            if (in_array($client['id'], $listClientSet)){
+
+                $tabFour = $client['clfocl'];
+
+                array_push($tabFour, intval(request('id')));
+
+                Client::where('id', $client['id'])->update([
+                    "clfocl" => array_unique($tabFour)
+                ]);
+            }else{
+
+                $tabFour = $client['clfocl'];
+
+                if (($key = array_search(request('id'), $tabFour)) !== false) {
+                    unset($tabFour[$key]);
+                }
+
+                Client::where('id', $client['id'])->update([
+                    "clfocl" => array_unique($tabFour)
+                ]);
+            }
+        }
 
         return response([
             "code" => 0,
@@ -463,10 +537,14 @@ class ConfigurationController extends Controller
 
     public function createEntrepot(Request $request){
          try{
-            
             $store = Entrepot::create([
-                "nom" => request('nom')
+                "nomEntrepot" => request('nomEntrepot'),
+                "titulaire" => request('titulaire'),
+                "email" => request('email'),
+                "telephone" => request('telephone'),
+                "adresse" => request('adresse')
             ]);
+
         }catch(\Exceptions $e){
               return response([
                 "code" => 1,
@@ -492,7 +570,11 @@ class ConfigurationController extends Controller
             
         Entrepot::where('id', request('id'))
               ->update([
-                "nom" => request('nom')
+                "nomEntrepot" => request('nomEntrepot'),
+                "titulaire" => request('titulaire'),
+                "email" => request('email'),
+                "telephone" => request('telephone'),
+                "adresse" => request('adresse')
 
           ]);
 

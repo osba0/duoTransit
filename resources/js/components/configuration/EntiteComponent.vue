@@ -34,7 +34,7 @@
                         <td class="p-2 align-middle">
                            <template v-for="entrepot in listEntrepots">
                                <template v-for="item in entite.entrepots">
-                                   <span v-if="entrepot.id==item" class="badge badge-info mr-2">{{ entrepot.nom }}</span>
+                                   <span v-if="entrepot.id==item" class="badge badge-info mr-2">{{ entrepot.nomEntrepot }}</span>
                                </template>
                            </template>
                         </td>
@@ -148,7 +148,7 @@
                                 <div class="col-12 my-3 d-flex flex-column align-items-center">
                                     <div class="w-100" :class="{ 'border-danger': submitted && !$v.entiteForm.entrepots.required }" >
                                          <label>Entrepôt</label>
-                                         <multiselect v-model="entiteForm.entrepots" :options="listEntrepots" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Choisir" label="nom" track-by="id" :preselect-first="false">
+                                         <multiselect v-model="entiteForm.entrepots" :options="listEntrepots" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Choisir" label="nomEntrepot" track-by="id" :preselect-first="false">
                                             <template slot="selection" slot-scope="{ values, search, isOpen }">
                                                 <span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} Entrepôt(s) selectionné(s)</span> 
                                             </template> 

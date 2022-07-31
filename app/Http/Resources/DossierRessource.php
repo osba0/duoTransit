@@ -16,14 +16,15 @@ class DossierRessource extends JsonResource
     public function toArray($request)
     {
         return [
-            "id" => $this->numdossier,
+            "identifiant"               => $this->id,
+            "id"                        => $this->numdossier,
             "total_poids"               => $this->total_poids!=''?$this->total_poids:0,
             "total_volume"              => $this->total_volume!=''?$this->total_volume:0,
             "total_colis"               => $this->total_colis!=''?$this->total_colis:0,
             "total_pallette"            => $this->total_palette!=''?$this->total_palette:0,
             "dateDebut"                 => Carbon::parse($this->dateDebut)->format('d/m/Y'),
             "dateCloture"               => Carbon::parse($this->dateCloture)->format('d/m/Y'),
-            "dateCrea"                  => $this->creation_dos,
+            "dateCrea"                  => isset($this->creation_dos) ? Carbon::parse($this->creation_dos)->format('d/m/Y H:i:s'):'',
             "user"                      => $this->user,
             "etat"                      => $this->etat,
             "typecmd"                   => $this->typecmd,

@@ -46,15 +46,15 @@ class ChargementCreation extends Model
         switch($eventName){
             case 'created': 
                 $activity->log_name = TypActivity::CREER;
-                $activity->description = "Création nouveau dossier";
+                $activity->description = "Création dossier préchargement";
             break;
             case 'updated': 
                 $activity->log_name = TypActivity::MODIFIER;
-                $activity->description = "Modification dossier";
+                $activity->description = "Modification dossier préchargement";
             break;
             case 'deleted': 
                 $activity->log_name = TypActivity::SUPPRIMER;
-                $activity->description = "Suppression dossier";
+                $activity->description = "Suppression dossier préchargement";
             break;
 
 

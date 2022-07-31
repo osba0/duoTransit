@@ -15,7 +15,9 @@
                 :type-cmd="{{ json_encode($typeCmd) }}"
                 :default-contenaire="{{ $defaultContenaire }}"
                 :list-contenaire="{{ json_encode($listContenaire) }}"
-                :client-current="{{ json_encode($client) }}"></empotage-entite>
+                :client-current="{{ json_encode($client) }}"
+                :current-entite="{{ json_encode($entite) }}"
+                :list-entrepots="{{ json_encode($entrepots) }}"></empotage-entite>
             @else
                 <div class="badge badge-warning p-3">Client non autorisé ou inexistant!</div>
             @endif

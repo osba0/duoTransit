@@ -18,7 +18,7 @@ class IncidentResource extends JsonResource
             "id"             => $this->id,
             "commandes"      => $this->commandes,
             "objet"          => $this->objet,
-            "commentaires"   => $this->commentaire,
+            "commentaires"   => isset($this->commentaire)? $this->commentaire : '' ,
             "photos"         => json_decode($this->photos),
             "user"           => $this->user->username,
             "clientID"       => $this->clients_id, 

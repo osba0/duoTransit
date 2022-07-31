@@ -25,7 +25,7 @@
                     <div class="d-flex align-items-center justify-content-between mb-3">
                          <ul class="legend mt-4 mb-2 pl-0 flex-1">
                             <li v-for="type in typeCmd" class="d-flex align-items-center">
-                                <span class="etat_T m-0 mr-1" :style="{'background': type.tcolor}"></span> 
+                                <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
                                 <label class="m-0 mr-2">{{type.typcmd}}</label>
                             </li>
                         </ul>
@@ -103,14 +103,14 @@
                                     <th class="p-2 border-right border-white h6">Type TC</th>
                                     <th class="p-2 border-right border-white h6">N°Plomb</th>
                                     <th class="p-2 border-right border-white h6">Etat</th>
-                                    <th class="text-nowrap p-2 border-right border-white h6">Date</th>
+                                    <th class="text-nowrap p-2 border-right border-white h6">Date de création</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
                                     <th class="text-nowrap p-2 border-right border-white h6 text-right pr-3">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="bgStripe preChargeTable" :class="[isLoading ? 'loader-line' : '']"> 
                                 <template v-if="!empotage.data || !empotage.data.length">
-                                    <tr><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
+                                    <tr v-if="checking"><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
                                 </template>
                                 <template v-else>
                                     <tr v-for="empo in empotage.data" :key="empotage.id" class="bg-white position-relative" :class="[{ 'rowActif': empo.id == selected.identifiant, 'rowInactif':empo.id != selected.identifiant }]">
@@ -136,16 +136,23 @@
                                         <td class="align-middle">{{ empo.date }}</td>
                                         <td class="align-middle">{{ empo.user }}</td>
                                         <td class="align-middle text-right">  
-                                            <button @click="showDossier(empo)" class="btn btn-info btn-sm">Ouvrir</button>
+                                             <!--a v-if="pre.etat==1" href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(empo)" data-toggle="modal" data-target="#openFacture">
+                                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                                </a-->
+                                            <a v-if="empo.etat==1" href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-danger"  @click="showRapport(empo)" data-toggle="modal" data-target="#openFacture">
+                                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                                </a>
+                                            <button v-if="empo.etat==0"  @click="showDossier(empo)" class="btn btn-info btn-sm">Ouvrir</button>
                                             <!--button title="Editer" href="#" class="btn btn-secondary btn-sm mx-2" v-on:click="editEmpotage(empotage)" data-toggle="modal" data-target="#newEmpotage">
                                                     <i class="fa fa-pencil" aria-hidden="true"></i> Modifier
                                             </button-->
-                                            <a title="Editer" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white"  data-toggle="modal" data-target="#newEmpotage" v-on:click="editEmpotage(empo)">
+                                            <a v-if="empo.etat==0"  title="Editer" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white"  data-toggle="modal" data-target="#newEmpotage" v-on:click="editEmpotage(empo)">
                                                 <i class="fa fa-pencil" aria-hidden="true"></i>
                                             </a>
-                                            <a title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1 bg-white" v-on:click="deleteEmpotage(empo)">
+                                            <a v-if="empo.etat==0"  title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1 bg-white" v-on:click="deleteEmpotage(empo)">
                                                 <i class="fa fa-close text-danger" aria-hidden="true"></i>
                                             </a>
+
                                             <!--button title="Supprimer" href="#" class="btn btn-sm btn-danger" v-on:click="deleteEmpotage(empotage)">
                                                 <i class="fa fa-close text-white" aria-hidden="true"></i> Supprimer
                                             </button-->
@@ -168,7 +175,7 @@
 
         </template>
         <template v-else>
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="mb-3 d-flex justify-content-between align-items-center">
                 <button class="btn btn-warning mb-3" @click="back()">
                     <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                 </button>
@@ -179,23 +186,32 @@
                 </div>
             </div>
            
-            <div class="mb-3 mb-3">
+            <div class="mb-3 mb-3 d-block">
                 
                 <table class="table table-bordered bg-white"> 
                 <tr>
-                    <th class="text-uppercase thead-blue py-1 w-50">Total</th>
+                    <th class="text-uppercase thead-blue py-1 w-60">Total
+                    <span class="ml-2 py-0 px-2 rounded text-lowercase bg-warning" v-if="selected.etat==0">En cours</span>
+                    <span class="ml-2 py-0 px-2 rounded text-lowercase bg-success" v-if="selected.etat==1">Validé</span>
+                    </th>
                     <th class="text-uppercase thead-blue py-1">Etat contenaire</th>
                 </tr>
                 <tr>
                     <td class="align-middle">
                         <div class="d-flex justify-content-between detailPrecharge position-relative">
+                            <ul class="w-100 legend m-0 p-0 position-absolute" style="top:-10px">
+                                <li class="w-100 text-center font-weight-bold">
+                                    <span class="float-none d-inline-block etat_T m-0 mr-1 border-0" :style="{'background': getColorTypeCmd(selected.idCmd)}"></span> 
+                                    {{ selected.typeCmd}}
+                                </li>
+                            </ul>
                             <table class="table m-0 mt-3 table-striped">
                                 <tbody> 
                                      <tr>
-                                        <th>Nbre Commande: {{ selected.nbrCmd }}</th>
-                                        <th>Nbre de colis empoté: {{ selected.nbrColis }}</th>
-                                        <th>Poids empoté: {{ selected.poids }} KG</th>
-                                        <th>Volume empoté: {{ selected.volume }} m<sup>3</sup></th>
+                                        <th>Nbre Commande: {{ format_nbr(selected.nbrCmd) }}</th>
+                                        <th>Nbre de colis empoté: {{ format_nbr(selected.nbrColis) }}</th>
+                                        <th>Poids empoté: {{ format_nbr(selected.poids) }} KG</th>
+                                        <th>Volume empoté: {{ format_nbr(selected.volume) }} m<sup>3</sup></th>
                                     </tr>
                               
                                 </tbody>
@@ -226,12 +242,7 @@
             </div>
             <div class="d-flex justify-content-between align-items-center mb-3 sucesss"> 
                 <button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button>
-                <div class="h5 mb-0 rounded bg-white py-2 px-3 border">{{ selected.typeCmd }}</div>
-             
-                <div class="h5 mb-0 rounded bg-white py-2 px-3 border">
-                    <span class="py-2 px-3 badge badge-warning" v-if="selected.etat==0">En cours</span>
-                    <span class="py-2 px-3 badge badge-success" v-if="selected.etat==1">Validé</span>
-                </div>
+    
                 <div>
                      <button class="btn btn-lg btn-secondary text-white mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button>
                     <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()">Valider</button>
@@ -241,15 +252,15 @@
             <hr>
                 
                 <table class="table">
-                    <thead class="thead-blue borderorange">
+                    <thead class="thead-blue">
                          <tr>
                             <th class="p-2 border-right border-white h6">N°CDE</th>
                             <th class="p-2 border-right border-white h6">N°FE</th>
                             <th class="p-2 border-right border-white h6">N°ECV</th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
-                            <th class="text-right p-2 border-right border-white h6">Poids</th>
-                            <th class="text-right p-2 border-right border-white h6">Volume</th>
+                            <th class="text-right p-2 border-right border-white h6">Poids (KG)</th>
+                            <th class="text-right p-2 border-right border-white h6">Volume (m<sup>3</sup>)</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Date livraison</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Crée par</th>
                             <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->
@@ -295,12 +306,15 @@
                          <td class="p-2 align-middle">
                               <img :class="'loader_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
                             
-                              <input class="text-center" type="text" v-model="douane[dry.reidre]" @focus="focusDoune(dry.reidre)" @blur="saveDouane(dry.reidre)" :placeholder="dry.douane"> 
+                              <input class="text-center val-douane" type="text" :data-id="dry.reidre" v-model="douane[dry.reidre]" @focus="focusDoune(dry.reidre)" @blur="saveDouane(dry)" :placeholder="dry.douane"> 
                          </td>
                         <td class="p-2 text-right">
                             <div class="d-flex justify-content-end align-items-center">
-                                <span v-if="dry.dossier_empotage_id > 0"><i class="fa fa-check-circle"></i></span>
-                                <label class="switch">
+                                <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                                <span v-if="dry.dossier_empotage_id > 0" class="d-none"><i class="fa fa-check-circle"></i></span>
+                                <label class="switch d-none">
                                     <template v-if="selected.etat==0">
                                         <input class="switch-input inputCmd" :checked="(selected.dossier == dry.dossier_id || dry.dossier_empotage_id > 0)" type="checkbox" :value="dry.reidre" v-on:change="empoter($event,dry)" /> 
                                         <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
@@ -361,7 +375,7 @@
                                         :class="{ 'border-danger': submitted && !$v.keyword.required }" />
                                          <ul class="dropdown-menu filterUl p-2" :class="{'d-block': showDropDown}" v-if="dossiers.length > 0">
                                             <li v-for="dossier in dossiers" :key="dossier.id" >
-                                                <a class="p-2" v-text="dossier.numDossier" v-on:click="say(dossier.numDossier)"></a>
+                                                <a class="p-2" v-text="dossier.numDossier+' '+getTypeCommande(dossier.type_commandes_id)" v-on:click="say(dossier.numDossier, dossier.type_commandes_id)"></a>
                                             </li>
                                         </ul>
                                     </div>
@@ -373,7 +387,7 @@
                                           Type Commande
                                         </label>
 
-                                        <select class="form-control mx-2" v-model="empotageForm.typeCmd">
+                                        <select readonly class="form-control mx-2" v-model="empotageForm.typeCmd">
                                             <option value="">Choisir le type commande</option>
                                             <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
                                         </select>
@@ -443,12 +457,40 @@
             
           </div>
         </div>
-        
+         <!-- Modal Facture-->
+        <div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+          aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="document">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left">
+                        <h4 class="modal-title w-100 font-weight-bold">Rapport d'empotage</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3">
+                         <template v-if="pdfFileModal != null">
+                            <embed :src="'/pdf/empotage/'+pdfFileModal" frameborder="0" width="100%" height="450px">
+                          </template>
+                         <template  v-else> Auncun fichier </template>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" v-on:click="closeModalPdf()" class="btn btn-warning">Fermer</button>
+                  </div>
+             </div>
+            
+          </div>
+        </div>
+        <modalDetailsCommande></modalDetailsCommande>
 
     </div>
 </template>
 <script>
-    import { PdfMakeWrapper, Table } from 'pdfmake-wrapper';
+    import { EventBus } from '../../event-bus';
+
+    import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
+    import { PdfMakeWrapper, Table, QR } from 'pdfmake-wrapper';
 
     import { ITable } from 'pdfmake-wrapper/lib/interfaces'; 
 
@@ -462,7 +504,9 @@
             'typeCmd',
             'defaultContenaire',
             'listContenaire',
-            'clientCurrent'
+            'clientCurrent',
+            'currentEntite',
+            'listEntrepots'
         ],  
         components: {
             PageLoader
@@ -485,10 +529,10 @@
                     identifiant:'',
                     typeCmd: '',
                     dossier: '',
-                    nbrCmd: '',
-                    nbrColis: '',
-                    poids: '',
-                    volume: '',
+                    nbrCmd: 0,
+                    nbrColis: 0,
+                    poids: 0,
+                    volume: 0,
                     dateDebut: '',
                     dateCloture: '',
                     isSelected: false,
@@ -530,7 +574,9 @@
 
                 },
                 search: "",
-                etatFiltre: ""
+                etatFiltre: "",
+                checking: false,
+                pdfFileModal: null
             }
 
         },
@@ -562,6 +608,22 @@
             this.defaultContenaire.id = id;
             this.setProgressCont(this.selected.volume);
         },
+        getTypeCommande(id){
+            for(var i=0; i<this.typeCmd.length;i++){
+                if(this.typeCmd[i].id === id){
+                    return this.typeCmd[i].typcmd;
+                }
+            }
+            return id;
+        },
+        getColorTypeCmd(id){
+             for(var i=0; i<this.typeCmd.length;i++){
+                if(this.typeCmd[i].id === id){
+                    return this.typeCmd[i].tcolor;
+                }
+            }
+            return "#aaa";
+        },
         empoter(event, cmd){
             var ischecked=0;
            
@@ -592,7 +654,7 @@
                 this.setProgressCont(res[0].total_volume);
                 this.getEmpotage(); // refresh tableau prechargement
                 
-                this.getCmdSelected(this.selected.identifiant);
+                this.getCmdSelected(this.selected.identifiant, false);
                 this.getReception();
 
            
@@ -625,6 +687,7 @@
                 setTimeout(function(){
                     self.isLoading = false;
                 },500);
+                this.checking=true;
             });
         }, 
         getReception(page = 1){
@@ -645,7 +708,7 @@
                         var obj = this.reception.data[i];
 
 
-                        if((obj.dossier_empotage_id > 0 && this.selected.identifiant == obj.dossier_empotage_id) || obj.dossier_empotage_id == 0 || obj.dossier_empotage_id == null ){
+                        if((obj.dossier_empotage_id > 0 && this.selected.identifiant == obj.dossier_empotage_id) ){
 
 
                             if(this.eventCmdSelected.idcmd!=obj.reidre || (this.eventCmdSelected.ischecked > 0 && this.eventCmdSelected.idcmd==obj.reidre)){
@@ -727,58 +790,103 @@
 
             return dateTime;
         },
-        getCmdSelected(id){
+        getCmdSelected(id, genererPDF){
             axios.get('/gerer/getCmd/empoter/'+id).then(response => {
                 this.checkedCommandes = response.data.result;
-                
+                 if(genererPDF){
+                    this.generatePdf(true);
+                }
             });
         },
         valider(){
-            console.log(this.commandeSelected);
+            this.commandeSelected = [];
+            this.commandeNoSelected = [];
             var self = this;
-            $(".inputCmd").each(function(){
+            /*$(".inputCmd").each(function(){
                 if($(this).is(':checked')){
                     self.commandeSelected.push($(this).val());
                 }else{
                     self.commandeNoSelected.push($(this).val());
                 }
                 
-            });
-            axios.post("/gerer/validationEmpotage/valider", {
-                'idsCmd': this.commandeSelected,
-                'ignored': this.commandeNoSelected,
-                'idEmpotage' : this.selected.identifiant
+            });*/
 
-            }).then(response => {
-              
-                if(response.data.code==0){
-                    Vue.swal.fire(
-                      'succés!',
-                      'validé avec succés!',
-                      'success'
-                    );
-                    this.selected.etat = 1;
-                    //this.getPrechargement();
-                    this.getReception();
-
-                    
+            $(".val-douane").each(function(){
+                if($(this).val()!=''){
+                    self.commandeSelected.push($(this).attr("data-id"));
                 }else{
-                    this.submitted_add = false;
-                     Vue.swal.fire(
-                      'error!',
-                      response.data.message,
-                      'error'
-                    )
-                }  
+                    self.commandeNoSelected.push($(this).attr("data-id"));
+                }
+                
             });
+
+
+            if(!this.commandeSelected.length>0){
+                Vue.swal.fire(
+                      'warning!',
+                      'Renseigner au moins un n° douane avant de valider!',
+                      'warning'
+                    );
+                return false;
+            }
+
+            Vue.swal.fire({
+                  title: 'Confirmez la validation',
+                  text: "Dossier n° "+this.selected.identifiant,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '',
+                  confirmButtonText: 'Oui, Valider!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                       axios.post("/gerer/validationEmpotage/valider/"+this.idClient, {
+                            'idsCmd': this.commandeSelected,
+                            'ignored': this.commandeNoSelected,
+                            'idEmpotage' : this.selected.identifiant
+
+                        }).then(response => {
+
+
+                            // Envoi notification avec le fichier PDF
+
+                            this.getCmdSelected(this.selected.identifiant, true);
+                          
+                            if(response.data.code==0){
+                                Vue.swal.fire(
+                                  'succés!',
+                                  'validé avec succés!',
+                                  'success'
+                                );
+                                this.selected.etat = 1;
+                                //this.getPrechargement();
+                                this.getReception();
+
+                                
+                            }else{
+                                this.submitted_add = false;
+                                 Vue.swal.fire(
+                                  'error!',
+                                  response.data.message,
+                                  'error'
+                                )
+                            }  
+                        });
+                    }
+                });
+
+
+
+            
         },
-        generatePdf(){
+        generatePdf(isnotification=false){
 
 
             
             PdfMakeWrapper.setFonts(pdfFonts);
 
             const pdf = new PdfMakeWrapper();
+            pdf.pageOrientation('landscape');
             pdf.defaultStyle({
                 fontSize: 10
             });
@@ -786,12 +894,12 @@
 
 
             var entete=[];
-             entete.push([{text: 'Marine +', fontSize: 22, bold: true, alignment: 'left'}, {text: 'Date: '+ this.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}]); 
+             entete.push([{text: this.currentEntite['nom'], fontSize: 22, bold: true, alignment: 'left'}, {text: 'Date: '+ this.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}]); 
             entete.push([{text:''}, {text: ['Entrepôt: ', {text: 'CNM', fontSize: 14}],  alignment: 'right'}]);
            
             entete.push([{text: 'N°Dossier '+this.selected.dossier, fontSize: 15, alignment: 'center', lineHeight: 2, colSpan: 2}]);
              entete.push([{text: "Destination: "+this.clientCurrent.pays, fontSize: 13, alignment: 'left', colSpan: 2}]);
-            entete.push([{text: "Rapport d'empotage pour le compte de: Marine + "+this.clientCurrent.clnmcl, fontSize: 13, alignment: 'left', colSpan: 2}]);
+            entete.push([{text: "Rapport d'empotage pour le compte de: "+this.currentEntite['nom']+" "+this.clientCurrent.clnmcl, fontSize: 13, alignment: 'left', colSpan: 2}]);
            
 
             var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
@@ -837,14 +945,14 @@
 
                 if(obj.renbpl > 0){
                     nbr.push(obj.renbpl);
-                    emballage.push((obj.renbpl).toString() + ' Palette(s)');
+                    emballage.push((obj.renbpl).toString() + ' Pal.');
                 }
                 
                 const item = [obj.refere, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa, obj.douane];
                 data.push(item);
             }
 
-            var table = new Table(data).widths('*').layout({
+            var table = new Table(data).widths([70,70,'*',60,60,80,80]).layout({
                 color(columnIndex){
                 return columnIndex=== 0 ? "#cccccc": '';  
                 },
@@ -891,9 +999,41 @@
             pdf.add(table);
 
             pdf.add(tabtotaux);
+            
+
+            pdf.add(new QR((this.selected.dossier).toString()).fit(80).alignment('right').end);
+
+
+            if(isnotification){
+                
+               var that = this; 
+                pdf.create().getDataUrl(function(url) { 
+
+                    console.log(url, "File PDF"); 
+                    axios.post("/gerer/empotage/notification/"+that.clientCurrent['id'], {
+                        'idsCmd': that.commandeSelected,
+                        'id_dossier' : that.selected.dossier,
+                        'numtc': that.selected.numtc,
+                        'typetc': that.selected.typetc,
+                        'plomb':  that.selected.plomb,
+                        'typeCmd': that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
+                        'base64_file_pdf': url
+
+                    }).then(response => {
+
+                    });
+
+               }); // download() or open() // getDataUrl
+
+            }else{
+                pdf.create().download(); 
+            }
            
 
-            pdf.create().open(); // download() or open()
+            /* pdf.create().open(); // download() or open()
+
+
+           
 
 
             pdf.create().getBase64((data) => {
@@ -905,6 +1045,8 @@
               
                 });
             });
+
+            */
     
            },
            showDossier(dossier){
@@ -932,7 +1074,7 @@
                 this.capacite = dossier.capaciteContenaire;
                 this.setProgressCont(dossier.total_volume);
                 this.getReception();
-                this.getCmdSelected(this.selected.identifiant);
+                this.getCmdSelected(this.selected.identifiant, false);
 
            },
            back(){
@@ -949,9 +1091,10 @@
                     .then(res => this.dossiers = res.data)
                     .catch(error => {});
             },
-            say: function (message) { 
+            say: function (message, typecmd) { 
                 this.keyword = message;
                 this.showDropDown=false;
+                this.empotageForm.typeCmd = typecmd;
             },
             isFocus(){
                this.showDropDown=true;
@@ -1025,14 +1168,44 @@
                 this.empotageForm.plomb= "";
                 this.empotageForm.typeCmd = "";
             },
-             saveDouane(id){ 
-                $(".loader_"+id).show();
-                const data = new FormData();
+             saveDouane(cmd){ 
+                $(".loader_"+cmd.reidre).show();
+                /*const data = new FormData();
                 data.append('id', id);
                 data.append('douane', this.douane[id]);
                 axios.post("/gerer/updateDouane", data).then(response => {
                     $(".loader_"+id).hide(); 
+                });*/
+
+
+                const data = new FormData();
+                data.append('idEmpotage', this.selected.identifiant);
+                data.append('idreception', cmd.reidre);
+                data.append('douane', this.douane[cmd.reidre]);
+
+
+
+                axios.post("/gerer/updateDouane", data).then(response => {
+                    let res = response.data.result;
+        
+                    this.selected.nbrCmd   = res[0].total_cmd;
+                    this.selected.nbrColis = parseInt(res[0].total_colis==null ? 0 : res[0].total_colis) + parseInt(res[0].total_palette==null ? 0 : res[0].total_palette);
+                    this.selected.poids    = res[0].total_poids==null ? 0 : res[0].total_poids;
+                    this.selected.volume   = res[0].total_volume==null ? 0 : res[0].total_volume;
+
+
+
+                    this.setProgressCont(res[0].total_volume);
+                    this.getEmpotage(); // refresh tableau prechargement
+                    
+                    this.getCmdSelected(this.selected.identifiant, false);
+                    this.getReception();
+                    $(".loader_"+cmd.reidre).hide(); 
+
+               
+                  
                 });
+
             },
             focusDoune(id){},
             cloturer(){
@@ -1080,7 +1253,7 @@
                   confirmButtonText: 'Oui, supprimer!'
                 }).then((result) => {
                   if (result.isConfirmed) {
-                        axios.delete('/gerer/deleteEmpotage/'+empotage.id).then(response => {
+                        axios.delete('/gerer/deleteEmpotage/'+empotage.id+"?idClient="+this.idClient).then(response => {
                              Vue.swal.fire(
                               'Deleted!',
                               'Your file has been deleted.',
@@ -1095,9 +1268,35 @@
                   }
                 })
             },
+           showModal(dry){
+                 EventBus.$emit('VIEW_CMD', {
+                    openView: true,
+                    dry: dry,
+                    fournisseur: this.listFournisseurs,
+                    typeCommande: this.typeCmd,
+                    entrepot: this.listEntrepots,
+                    idClient: this.idClient
+                });
+
+            },
+            format_nbr(mnt){
+                if(mnt != '' && mnt != null){
+                    return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                }
+                return mnt;
+            },
+            showRapport(empo){
+                var labelCmd = empo.typeCommande.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+            
+                this.pdfFileModal = 'dossier-'+empo.reference+'_'+labelCmd+"_numtc-"+empo.numContenaire+"_plomb-"+empo.plomb+".pdf";
+           },
+             closeModalPdf(){
+                 this.$refs.closePoupPdf.click();
+            },
         },
         mounted() {
           this.getEmpotage();
+          console.log(this.typeCmd);
         }
     }
 </script>

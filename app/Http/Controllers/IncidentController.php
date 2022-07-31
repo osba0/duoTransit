@@ -78,6 +78,13 @@ class IncidentController extends Controller
                 "entites_id" => $user->entites_id,    
                 "photos" => json_encode($allFileName),
             ]);
+
+
+            // Maj reinci
+
+            Reception::where("rencmd", request('commandes'))->update(["reinci" => true]); 
+
+
         }catch(\Exceptions $e){
               return response([
                 "code" => 1,
@@ -139,6 +146,14 @@ class IncidentController extends Controller
             }
         }
         $incident = Incidents::where('id', request('id'))->delete();
+
+        // Maj reinci
+            
+        $query = Incidents::where("commandes", request('commande'))->get()->first(); 
+
+        if(!$query){
+            Reception::where("rencmd", request('commande'))->update(["reinci" => false]);
+        }
 
         return response([
             "code" => 0,

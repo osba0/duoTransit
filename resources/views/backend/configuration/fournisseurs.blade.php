@@ -11,7 +11,7 @@
                 </a>
             </div>
             
-            <fournisseur></fournisseur>
+            <fournisseur :list-client="{{ json_encode($listClient) }}"></fournisseur>
         </div>
     </div>
 </div>

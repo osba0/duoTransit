@@ -10,7 +10,7 @@ use App\Models\TypActivity;
 
 class Reception extends Model
 {
-    protected $fillable = ['refere', 'reecvr', 'renufa', 'revafa', 'fournisseurs_id', 'type_commandes_id', 'clients_id', 'repoid', 'revolu', 'renbcl','renbpl','reemba', 'reempl', 'redali', 'rencmd', 'reetat','refasc', 'recomnt', 'entrepots_id', 'users_id', 'entites_id', 'dossier_prechargements_id','dossier_empotage_id'];
+    protected $fillable = ['refere', 'reecvr', 'renufa', 'revafa', 'fournisseurs_id', 'type_commandes_id', 'clients_id', 'repoid', 'revolu', 'renbcl','renbpl','reemba', 'reempl', 'redali', 'reinci', 'recomt','rencmd', 'reetat','refasc', 'recomnt', 'entrepots_id', 'users_id', 'entites_id', 'dossier_prechargements_id','dossier_empotage_id', 'priorite'];
 
     use HasFactory, LogsActivity;
 
@@ -24,7 +24,7 @@ class Reception extends Model
 
     protected static $ignoreChangedAttributes = ['updated_at'];
 
-    protected static $logAttributes = ['reidre','refere', 'reecvr', 'renufa', 'revafa', 'fournisseurs_id', 'type_commandes_id', 'clients_id', 'repoid', 'revolu', 'renbcl','renbpl','reemba', 'reempl','dossier_id', 'redali', 'rencmd', 'reetat','refasc', 'recomnt', 'entrepots_id', 'users_id', 'entites_id', 'dossier_prechargements_id','dossier_empotage_id'];
+    protected static $logAttributes = ['reidre','refere', 'reecvr', 'renufa', 'revafa', 'fournisseurs_id', 'type_commandes_id', 'clients_id', 'repoid', 'revolu', 'renbcl','renbpl','reemba', 'reempl','dossier_id', 'redali', 'rencmd', 'reetat','refasc', 'recomnt', 'entrepots_id', 'users_id', 'entites_id', 'dossier_prechargements_id','dossier_empotage_id', 'priorite'];
 
     protected static $recordEvents = ['created', 'updated', 'deleted'];
 
@@ -66,6 +66,7 @@ class Reception extends Model
             $query->where('reecvr', 'like', $term)
                 ->orWhere('renufa', 'like', $term)
                 ->orWhere('repoid', 'like', $term)
+                ->orWhere('rencmd', 'like', $term)
                 ->orWhere('revolu', 'like', $term)
                 ->orWhereHas('user', function ($query) use ($term) {
                     $query->where('firstname', 'like', $term);
@@ -76,6 +77,14 @@ class Reception extends Model
                 ->orWhereHas('fournisseur', function ($query) use ($term) {
                     $query->where('fonmfo', 'like', $term);
                 });
+        });
+    }
+
+    public function scopeFiltreRate($query, $code)
+    {
+
+        $query->where(function ($query) use ($code) {
+            $query->where('priorite', $code);
         });
     }
 

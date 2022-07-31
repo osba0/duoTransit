@@ -37,9 +37,13 @@ $config = [
                         </li>
                     </ul>
                      @if (\Request::is('configuration/*'))
-                     <div class="ml-3"><strong class="text-primary color-white px-2 fontAnton">{{ auth()->user()->entite->nom }}</strong></div>
+                        @if (auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
+                            <div class="ml-3 d-flex align-items-center"><strong class="text-primary color-white px-2 fontAnton">Super Admin</strong></div>
+                        @else
+                            <div class="ml-3 d-flex align-items-center"><strong class="text-primary color-white px-2 fontAnton">{{ auth()->user()->entite->nom }}</strong></div>
+                        @endif
                      @else
-                       <div class="ml-3">
+                       <div class="ml-3 d-flex align-items-center">
                             <img src="{{ url('/images/logo/'.$logo) }}" alt="" class="mr-3 pr-3 border-right" style="height: 40px;">
                             <strong class="text-primary color-white px-2 fontAnton"><u>{{ auth()->user()->entite->nom }}</u></strong>
                         </div>
@@ -74,7 +78,7 @@ $config = [
                               <p>Tableau de bord</p>
                             </a>
                         </li>
-                        @if (\Request::is('reception/*') or \Request::is('activity/*') or \Request::is('precharger/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is('gerer/*') or \Request::is('historique-empotage/*'))  
+                        @if (\Request::is('reception/*') or \Request::is('activity/*') or \Request::is('precharger/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is('gerer/*') or \Request::is('historique-empotage/*') or \Request::is('historique-prechargement/*'))  
                             @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
                             <li class="nav-item">
                                 <a href="/reception/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('reception/*') ? 'active' : '' }}"><i class="nav-icon fa fa-sign-in"></i> <p>Réceptionner</p></a>
@@ -83,7 +87,13 @@ $config = [
 
                             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
                             <li class="nav-item">
-                                <a href="/precharger/{{$id_client?? ''}}" class="nav-link {{ request()->is('precharger/*') ? 'active' : '' }}"><i class="nav-icon fa fa-asterisk"></i> <p>Précharger</p></a>
+                                <a href="/precharger/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('precharger/*') ? 'active' : '' }}"><i class="nav-icon fa fa-asterisk"></i> <p>Préchargement</p></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('historique-prechargement', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-prechargement/*')) ? 'active' : '' }}">
+                                  <i class="fa fa-clock-o nav-icon"></i>
+                                  <p style="line-height: 18px; margin-top:3px">Historique <br> préchargement</p>
+                                </a>
                             </li>
                             @endif
 
@@ -203,16 +213,16 @@ $config = [
                                     
                                 </a>
                             </li>
-                              <li class="nav-item">
+                           
+                            @endUserCan
+                            @userCan(\App\Models\UserRole::ROLE_ADMIN)
+                             <li class="nav-item">
                                 <a href="{{route('typecommande')}}" class="nav-link {{ request()->is('configuration/typecommande') ? 'active' : '' }}">
                                     <i class="fa fa-arrows nav-icon"></i>
                                     <p>Type Commandes</p>
                                     
                                 </a>
                             </li>
-                           
-                            @endUserCan
-                            @userCan(\App\Models\UserRole::ROLE_ADMIN)
                             <li class="nav-item">
                                 <a href="{{route('utilisateurs')}}" class="nav-link {{ request()->is('configuration/utilisateurs') ? 'active' : '' }}">
                                     <i class="fa fa-users nav-icon"></i>
@@ -243,8 +253,8 @@ $config = [
             <!-- Main content -->
             <div class="content" style="position: relative;">
                 <pageloader :is-loading=false></pageloader> 
-                <div class="container-fluid pt-4 pb-5">
-                    @yield('content')
+                <div class="container-fluid">
+                    <div class="pt-3 pb-5">@yield('content')</div>
                 </div><!-- /.container-fluid -->
             </div>
             <!-- /.content -->

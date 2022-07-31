@@ -19,8 +19,9 @@ class DossierPrechargements extends Migration
             $table->integer('nbreContenaire')->nullable();
             $table->integer('type_commandes_id')->constrained(); 
             $table->foreignId('users_id')->constrained();
-            $table->foreignId('entites_id')->constrained();
+            $table->foreignId('clients_id')->constrained();
             $table->boolean('reetat');  
+            $table->text('rapport_pdf');    
             $table->timestamps();
         });
     }

@@ -14,7 +14,10 @@
                 :list-fournisseurs = "{{ json_encode($fournisseurs) }}" 
                 :type-cmd="{{ json_encode($typeCmd) }}"
                 :default-contenaire="{{ $defaultContenaire }}"
-                :list-contenaire="{{ json_encode($listContenaire) }}"></prechargement-client>
+                :list-contenaire="{{ json_encode($listContenaire) }}"
+                :current-client="{{ json_encode($client) }}"
+                :current-entite="{{ json_encode($entite) }}"
+                :list-entrepots="{{ json_encode($entrepots) }}"></prechargement-client>
             @else
                 <div class="badge badge-warning p-3">Client non autorisé ou inexistant!</div>
             @endif

@@ -45,7 +45,8 @@ class CreateReceptionsTable extends Migration
             $table->integer('dossier_prechargements_id')->nullable();
             $table->integer('dossier_empotage_id')->nullable();
             $table->integer('dossier_id')->nullable();
-
+            $table->boolean('reinci')->default(0);
+            $table->integer('priorite')->default(2);
             $table->timestamp('recrea');  
             $table->timestamp('reupda');
 

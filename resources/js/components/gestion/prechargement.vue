@@ -27,7 +27,7 @@
             <div class="row d-flex align-items-center justify-content-between mb-3">
                 <ul class="legend mt-4 mb-2 pl-3 flex-1">
                     <li v-for="type in typeCmd" class="d-flex align-items-center">
-                        <span class="etat_T m-0 mr-1" :style="{'background': type.tcolor}"></span> 
+                        <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
                         <label class="m-0 mr-2">{{type.typcmd}}</label>
                     </li>
                 </ul>
@@ -114,15 +114,16 @@
                                     <th class="p-2 border-right border-white h6">Etat</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Date</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
-                                    <th class="text-nowrap p-2 border-right text-right border-white h6">Action</th>
+                                    
+                                    <th class="text-nowrap p-2 border-right text-right border-white h6">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bgStripe preChargeTable"  :class="[isLoading ? 'loader-line' : '']"> 
-                                <template v-if="!prechargement.data || !prechargement.data.length">
-                                    <tr><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
+                                <template v-if="!prechargement.data || !prechargement.data.length" >
+                                    <tr v-if="checking"><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
                                 </template>
                                 <template v-else>
-                                    <tr v-for="pre in prechargement.data" :key="prechargement.id" class="bg-white position-relative" :class="[{ 'rowActif': pre.id == selected.id, 'rowInactif':pre.id != selected.id }]">
+                                    <tr v-for="pre in prechargement.data" :key="prechargement.id" class="bg-white position-relative" :class="[{ 'rowActif': pre.identifiant == selected.identifiant, 'rowInactif':pre.identifiant != selected.identifiant }]">
                                         <td class="position-relative align-middle">
                                             <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': pre.typeCmd_color} : {'background': '#ccc'}]"></div>
                                             {{ pre.id }}
@@ -136,17 +137,29 @@
                                         <!--td>{{ pre.typecmd }}</td-->
                                        
                                         <td class="align-middle">
-                                            <span v-if="pre.etat==1" class="badge badge-success">Validé</span>
+                                            <template v-if="pre.etat==1">
+                                                <span class="badge badge-success">Validé</span>
+                                                <button class="btn btn-default border-0"  @click="reactiver(pre)">
+                                                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                                                </button>
+                                            </template>
+                                            
                                             <span v-if="pre.etat==0" class="badge badge-warning">En cours</span>
                                         </td>
                                         <td class="align-middle">{{ pre.dateCrea }}</td>
                                         <td class="align-middle">{{ pre.user }}</td>
+                                        
                                         <td class="align-middle">  
-                                            <div class="w-100 text-right">
-                                                <button @click="showDossier(pre)" class="btn btn-info btn-sm">Ouvrir</button>
-                                                  <a title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1 bg-white" v-on:click="deletePre(pre)">
+                                            <div class="w-100 text-right" :class="[pre.etat==1 ? 'text-center' : 'text-right']">
+                                                <a v-if="pre.etat==1" href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(pre)" data-toggle="modal" data-target="#openFacture">
+                                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                                </a>
+
+                                                <button v-if="pre.etat!=1" @click="showDossier(pre)" class="btn btn-info btn-sm">Ouvrir</button>
+
+                                                <a v-if="pre.etat==0" title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1 bg-white" v-on:click="deletePre(pre)">
                                                         <i class="fa fa-close text-danger" aria-hidden="true"></i>
-                                                    </a>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -177,12 +190,20 @@
                 
                 <table class="table table-bordered bg-white"> 
                 <tr>
-                    <th class="text-uppercase thead-blue py-1 w-50">Dossier selectionné</th>
+                    <th class="text-uppercase thead-blue py-1 w-60">Dossier selectionné  
+                        <span class="py-0 px-2 rounded text-lowercase bg-warning" v-if="selected.etat==0">En cours</span>
+                    <span class="py-0 px-2 rounded text-lowercase bg-success" v-if="selected.etat==1">Validé</span></th>
                     <th class="text-uppercase thead-blue py-1">Etat contenaire</th>
                 </tr>
                 <tr>
                     <td class="align-middle">
                         <div class="d-flex justify-content-between detailPrecharge position-relative">
+                            <ul class="w-100 legend m-0 p-0 position-absolute" style="top:-10px">
+                                <li class="w-100 text-center font-weight-bold">
+                                    <span class="float-none d-inline-block etat_T m-0 mr-1 border-0" :style="{'background': getColorTypeCmd(selected.typeCommande)}"></span> 
+                                    {{ selected.typeCmd }}
+                                </li>
+                            </ul>
                             <table class="table m-0 mt-3 table-striped">
                                 <tbody> 
                                      <tr>
@@ -201,10 +222,7 @@
                     </td>
                     <td class="pt-1 pb-4">
                         <div class="d-flex m-0 customRadio justify-content-center">
-
-
                             <p class="pr-3 m-0" v-for="contenaire in listContenaire" >
-
                                 <input type="radio" :value="contenaire.volume" v-model="capacite" @change="switchContenaire(contenaire.id, contenaire.volume)" :id="'cont_'+contenaire.volume" name="radio-group">
                                 <label :for="'cont_'+contenaire.volume"><span v-if="defaultContenaire.id==contenaire.id">{{ nbrContenaire }}</span> x {{contenaire.nom}}</label>
                             </p>
@@ -221,30 +239,69 @@
             </div>
             <div class="d-flex justify-content-between align-items-center mb-3 sucesss"> 
                 <button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button>
-                <div class="h5 mb-0 rounded bg-white py-2 px-3 border">{{ selected.typeCmd }}</div>
-                <!--div class="h5 mb-0 rounded bg-white py-2 px-3 border">Nbre Commande: {{ selected.nbrCmd }}</div-->
-                <div class="h5 mb-0 rounded bg-white py-2 px-3 border">
-                    <span class="py-2 px-3 badge badge-warning" v-if="selected.etat==0">En cours</span>
-                    <span class="py-2 px-3 badge badge-success" v-if="selected.etat==1">Validé</span>
-                </div>
+                <!--div class="h5 m-0">
+                    <span class="py-0 px-0 text-uppercase font-weight-bold">{{ selected.typeCmd }} </span> 
+                </div-->
+               
+                    
+                
                 <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()">Valider</button>
             </div>
             <hr>
+            <div class="d-flex justify-content-between align-content-center mb-2">
+                <div class="d-flex align-items-end">
+                    <div>
+                        <div class="d-flex align-items-center">
+                            <label for="paginate" class="text-nowrap mr-2 mb-0"
+                                >Nbre de ligne par Page</label> 
+                            <select
+                                v-model="paginate"
+                                class="form-control form-control-sm">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                            </select>
+                        </div>
+                    </div>
+            
+                </div>
+                <div class="d-flex align-items-center">
+                    <label class="text-nowrap mr-2 mb-0"
+                            >Filtre par priorité</label> 
+                    <select v-model="filtreRate" class="form-control form-control-sm">
+                        <option value="">Afficher tout</option>
+                        <option value="1">Pas urgente</option>
+                        <option value="2">Normale</option>
+                        <option value="3">Urgente</option>
+                    </select>
+                </div>
+                <div class="d-flex px-0 align-items-end col-md-4">
+                    <input
+                        v-model.lazy="searchRecep"
+                        type="search"
+                        class="form-control"
+                        placeholder="Rechercher par n°cmd, n°fe, n°ecv,n°fact, utilisateur, fournisseur..."
+                    />
+                </div>
+               
+            </div>  
                 
                 <table class="table">
-                    <thead class="thead-blue borderorange">
+                    <thead class="thead-blue">
                          <tr>
                             <th class="p-2 border-right border-white h6">N°CDE</th>
                             <th class="p-2 border-right border-white h6">N°FE</th>
                             <th class="p-2 border-right border-white h6">N°ECV</th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
-                            <th class="text-right p-2 border-right border-white h6">Poids</th>
-                            <th class="text-right p-2 border-right border-white h6">Volume</th>
+                            <th class="text-right p-2 border-right border-white h6">Poids (KG)</th>
+                            <th class="text-right p-2 border-right border-white h6">Volume (m<sup>3</sup>)</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Date livraison</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Crée par</th>
                             <th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th>
-                            <th class="text-right p-2 border-right border-white h6">Action</th>
+                            <th class="p-2 border-right text-center border-white h6">Priorité</th>
+                            <th class="text-right p-2 border-right border-white h6">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bgStripe">
@@ -282,18 +339,26 @@
                             </template>
                            
                         </td>
+                        <td class="p-2 align-middle rateCenter position-relative">
+
+                            <rate :length="3" :value="dry.priorite" :ratedesc="['Pas urgente', 'Normale', 'Urgente']" :readonly="true"  />
+
+                        </td>
                         <td class="p-2 text-right">
                             <div class="d-flex justify-content-end align-items-center">
+                                <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
                                 <span v-if="dry.dossier_id > 0"><i class="fa fa-check-circle"></i></span>
-                                <label class="switch">
+                                <label class="switch" :style= "[selected.etat==1 ? {opacity: 0.5} : {opacity: 1}]">
                                     <template v-if="selected.etat==0">
-                                        <input class="switch-input inputCmd" :checked="(selected.id == dry.dossier_id || dry.idPre > 0)" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
+                                        <input class="switch-input inputCmd" :disabled="selected.etat==1" :checked="(selected.id == dry.dossier_id || dry.idPre > 0)" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
                                         <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
                                         <span class="switch-handle"></span> 
                                     </template>
                                     <template v-else>
-                                        <input class="switch-input inputCmd" :checked="(selected.id == dry.dossier_id)" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
-                                        <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
+                                        <input class="switch-input inputCmd" :disabled="selected.etat==1" :checked="(selected.id == dry.dossier_id)" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
+                                        <span class="switch-label" data-on="OK" data-off="Choisir"></span> 
                                         <span class="switch-handle"></span> 
                                     </template>
                                     
@@ -379,7 +444,7 @@
                              </div>
                              <div class="modal-footer d-flex justify-content-center"> 
                                 <button type="submit" class="btn btn-success d-flex align-items-center">
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" :class="{'d-none': !submitted_add, 'd-inline-block': submitted_add && !$v.typeCommande.required}"></span>Créer</button>
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" :class="{'d-none': !submitted_circle, 'd-inline-block': submitted_circle && !$v.typeCommande.required}"></span>Créer</button>
                                 <button type="button" v-on:click="closeModalDossier()" class="btn btn-warning">Annuler</button>
                             </div>
                         </form>   
@@ -387,11 +452,42 @@
              </div>
           </div>
         </div>
-        
+
+
+        <!-- Modal Facture-->
+        <div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+          aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="document">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left">
+                        <h4 class="modal-title w-100 font-weight-bold">Facture</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3">
+                         <template v-if="pdfFileModal != null">
+                            <embed :src="'/pdf/prechargement/'+pdfFileModal" frameborder="0" width="100%" height="450px">
+                          </template>
+                         <template  v-else> Auncun fichier </template>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" v-on:click="closeModalPdf()" class="btn btn-warning">Fermer</button>
+                  </div>
+             </div>
+            
+          </div>
+        </div>
+        <modalDetailsCommande></modalDetailsCommande>
 
     </div>
 </template>
 <script>
+    import { EventBus } from '../../event-bus';
+
+
+    import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
     import { PdfMakeWrapper, Table, Img, QR } from 'pdfmake-wrapper';
 
     import { ITable } from 'pdfmake-wrapper/lib/interfaces'; 
@@ -412,7 +508,8 @@
             'defaultContenaire',
             'listContenaire',
             'currentClient',
-            'currentEntite'
+            'currentEntite',
+            'listEntrepots'
             
         ],  
         components: {
@@ -422,7 +519,7 @@
             return {
                 isLoading: true,
                 submitted_add: false,
-                paginate: 5,
+                paginate: 10,
                 selectedTypeCmd: "",
                 prechargement:{},
                 prechargementDossier: {},
@@ -430,6 +527,7 @@
                 paginateRecep: 10,
                 choose:'',
                 selected: {
+                    identifiant: '',
                     typeCmd: '',
                     id: '',
                     nbrCmd: '',
@@ -463,7 +561,12 @@
 
                 },
                 search: "",
-                etatFiltre: ""
+                etatFiltre: "",
+                submitted_circle: false,
+                checking: false,
+                pdfFileModal: '',
+                searchRecep: '',
+                filtreRate: ''
             }
 
         },
@@ -493,6 +596,12 @@
             },
             etatFiltre: function(value) {
                 this.getPrechargement();
+            },
+            searchRecep: function(value) {
+                this.getReception();
+            },
+            filtreRate: function(value) {
+                this.getReception();
             }
         },
         methods: { 
@@ -506,6 +615,14 @@
                 this.capacite = volume; 
                 this.defaultContenaire.id = id;
                 this.setProgressCont(this.selected.volume);
+            },
+            getColorTypeCmd(id){
+                 for(var i=0; i<this.typeCmd.length;i++){
+                    if(this.typeCmd[i].id === id){
+                        return this.typeCmd[i].tcolor;
+                    }
+                }
+                return "#aaa";
             },
             preselectionner(event, cmd){
                 var ischecked=0;
@@ -535,7 +652,7 @@
                 this.setProgressCont(res[0].total_volume);
                 this.getPrechargement(); // refresh tableau prechargement
                 
-                this.getCmdSelected(this.selected.id);
+                this.getCmdSelected(this.selected.id, false);
                 this.getReception();
 
            
@@ -573,13 +690,14 @@
                 setTimeout(function(){
                     that.isLoading = false;
                 },500);
+                this.checking=true;
                 
             });
         },
         deletePre(pre){
                 Vue.swal.fire({
                   title: 'Confirmez la suppression',
-                  text: "Préchargement n° "+pre.id,
+                  text: "Dossier de préchargement n° "+pre.id,
                   icon: 'warning',
                   showCancelButton: true,
                   confirmButtonColor: '#d33',
@@ -587,11 +705,11 @@
                   confirmButtonText: 'Oui, supprimer!'
                 }).then((result) => {
                   if (result.isConfirmed) {
-                        axios.delete('/gerer/deletePre/'+pre.id).then(response => {
+                        axios.delete('/gerer/deletePre/'+pre.id+'?clientID='+this.idClient+"&typeCmd="+pre.typecmdId).then(response => {
                             console.log(response);
                              Vue.swal.fire(
-                              'Deleted!',
-                              'Your file has been deleted.',
+                              'Supprimé!',
+                              'Dossier préchargement supprimé.',
                               'success'
                             );
                              this.modeModify = false;
@@ -605,7 +723,7 @@
             },
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/gerer/dossier/pre/reception/'+this.idClient+"/"+this.selected.typeCommande+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id).then(response => {
+            axios.get('/gerer/dossier/pre/reception/'+this.idClient+"/"+this.selected.typeCommande+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id+"&etat="+this.selected.etat+"&filtreRate="+this.filtreRate+"&keysearch="+this.searchRecep).then(response => {
                 this.reception = response.data;
                 if(this.selected.etat==0){
                     this.selected.nbrCmd   = 0;
@@ -659,6 +777,23 @@
             if (this.$v.initChargement.$invalid) {
                 return;
             }
+
+            this.submitted_circle=true;
+
+
+            var date1 = new Date(this.initChargement.dateDebut);
+            var date2 = new Date(this.initChargement.dateCloture);
+
+            if(date1.getTime() > date2.getTime()){
+                Vue.swal.fire(
+                      'warning!',
+                      'Date début incorrecte!',
+                      'warning'
+                    );
+                this.submitted_circle=false;
+
+                return false;
+            }
             
             axios.post("/gerer/createDossier", {
                 'numdossier': this.initChargement.numDossier,
@@ -672,10 +807,11 @@
                 if(response.data.code==0){
                     Vue.swal.fire(
                       'succés!',
-                      'Crée avec succés!',
+                      'Dossier crée avec succés!',
                       'success'
                     );
                     this.submitted_add = false;
+                    this.submitted_circle = false;
 
                     this.closeModalDossier();
                     this.getPrechargement();
@@ -698,23 +834,31 @@
 
             return dateTime;
         },
-        getCmdSelected(idDossier){
+        getCmdSelected(idDossier, genererPDF){
             axios.get('/gerer/getCmd/'+idDossier).then(response => {
                 this.checkedCommandes = response.data.result;
+                if(genererPDF){
+                    this.generatePdf(true);
+                }
+                
                 
             });
         },
         valider(){
-            console.log(this.commandeSelected);
+            this.commandeSelected = [];
+            this.commandeNoSelected = [];
+            
             var self = this;
             $(".inputCmd").each(function(){
                 if($(this).is(':checked')){
+                    console.log("OK", $(this).val());
                     self.commandeSelected.push($(this).val());
                 }else{
                     self.commandeNoSelected.push($(this).val());
                 }
                 
             });
+
             if(!this.commandeSelected.length>0){
                 Vue.swal.fire(
                       'warning!',
@@ -723,33 +867,59 @@
                     );
                 return false;
             }
-            axios.post("/gerer/createDossier/valider/"+this.currentClient['id'], {
-                'idsCmd': this.commandeSelected,
-                'ignored': this.commandeNoSelected,
-                'id_dossier' : this.selected.id
 
-            }).then(response => {
-              
-                if(response.data.code==0){
-                    Vue.swal.fire(
-                      'succés!',
-                      'validé avec succés!',
-                      'success'
-                    );
-                    this.selected.etat = 1;
-                    //this.getPrechargement();
-                    this.getReception();
 
-                    
-                }else{
-                    this.submitted_add = false;
-                     Vue.swal.fire(
-                      'error!',
-                      response.data.message,
-                      'error'
-                    )
-                }  
-            });
+            Vue.swal.fire({
+                  title: 'Confirmez la validation',
+                  text: "Dossier n° "+this.selected.id,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '',
+                  confirmButtonText: 'Oui, Valider!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                        axios.post("/gerer/createDossier/valider/"+this.currentClient['id'], {
+                            'idsCmd': this.commandeSelected,
+                            'ignored': this.commandeNoSelected,
+                            'id_dossier' : this.selected.id,
+                            'typeCmd' : this.selected.typeCommande
+
+                        }).then(response => {
+                          
+                            if(response.data.code==0){
+
+                                // Envoi notification avec le fichier PDF
+
+                                this.getCmdSelected(this.selected.id, true);
+                                
+                                Vue.swal.fire(
+                                  'succés!',
+                                  'validé avec succés!',
+                                  'success'
+                                );
+                                this.selected.etat = 1;
+                                //this.getPrechargement();
+                                this.getReception();
+
+                                
+                            }else{
+                                this.submitted_add = false;
+                                 Vue.swal.fire(
+                                  'error!',
+                                  response.data.message,
+                                  'error'
+                                )
+                            }  
+                        });
+                    }
+                });
+
+
+
+
+
+            
         },
         flushFormular(){
 
@@ -759,11 +929,12 @@
             this.initChargement.typeCommande= "";
 
         },
-        generatePdf(){
+        generatePdf(isnotification=false){
 
             PdfMakeWrapper.setFonts(pdfFonts);
 
             const pdf = new PdfMakeWrapper();
+            pdf.pageOrientation('landscape');
             pdf.defaultStyle({
                 fontSize: 10
             });
@@ -783,7 +954,7 @@
 
             const data = [];
 
-            const headerTab = ['N°FE', 'N°ECV', 'N°CDE', 'Emballage', 'Fournisseurs', 'Poids', 'Volume', 'Factures'];
+            const headerTab = ['N°FE', 'N°ECV', 'N°CDE', 'Emballage', 'Fournisseurs', 'Poids(kg)', 'Volume(m3)', 'Factures'];
             
             data.push(headerTab); 
             //data.push(code); 
@@ -792,6 +963,8 @@
                 var obj = this.checkedCommandes[i];
                 var nbr = [];
                 var emballage = [];
+                var cmdCell=[];
+                var prio = "";
 
 
                 if(obj.renbcl > 0){
@@ -801,21 +974,35 @@
 
                 if(obj.renbpl > 0){
                     nbr.push(obj.renbpl);
-                    emballage.push((obj.renbpl).toString() + ' Palette(s)');
+                    emballage.push((obj.renbpl).toString() + ' Pal.');
                 }
 
+                cmdCell.push(obj.rencmd);
                 
 
+                var rateMinus = 3-obj.priorite;
                 
-                const item = [obj.refere,obj.reecvr, obj.rencmd, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
+                for(var p=0; p < obj.priorite+rateMinus; p++){
+                    if(p<obj.priorite){
+                        prio += '+ ';
+                    }else{
+                        prio += '- ';
+                    }
+                    
+                }
+
+                cmdCell.push(prio);
+
                 
-                data.push(item);
+                const item = [obj.refere,obj.reecvr, cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
+                
+                data.push(item); 
             }
             if(this.checkedCommandes.length==0){
                 data.push([{text: 'Aucune commande selectionné', fontSize: 12, alignment: 'center', colSpan: 8}])
             }
            
-            var table = new Table(data).widths('*').layout({
+            var table = new Table(data).widths([70,70,70,70,'*',60,60,90]).layout({
                 color(columnIndex){
                 return columnIndex=== 0 ? "#cccccc": '';  
                 },
@@ -828,6 +1015,22 @@
                     
                 }
             }).end;
+
+            // totaux
+            var totaux = [[{text: 'Total commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume total', fontSize: 10, bold: true, alignment: 'center'} ]];
+            totaux.push([{text: this.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
+
+            var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
+                color(columnIndex){
+                return columnIndex=== 0 ? "#cccccc": '';  
+                },
+                fillColor (columnIndex){
+                    if(columnIndex===0){
+                        return columnIndex === 0 ? "#ccc": '';  
+                    }
+                    
+                }
+            }).margin([0, 15, 8, 7]).end;
 
             pdf.header = {
                  exampleLayout: {
@@ -860,22 +1063,46 @@
 
 
             pdf.add(table);
-
+            pdf.add(tabtotaux);
             pdf.add(
                 pdf.ln(2)
             );
 
-            pdf.add(new QR(this.selected.id).fit(80).alignment('right').end);
-           
 
-            pdf.create().open(); // download() or open()
-    
+
+            pdf.add(new QR((this.selected.id).toString()).fit(80).alignment('right').end);
+
+            if(isnotification){
+                
+               var that = this; 
+                pdf.create().getDataUrl(function(url) { 
+
+                    console.log(url, "File PDF"); 
+                    axios.post("/gerer/createDossier/notification/"+that.currentClient['id'], {
+                        'idsCmd': that.commandeSelected,
+                        'id_dossier' : that.selected.id,
+                        'date_debut': that.selected.dateDebut.replaceAll("/", "-"),
+                        'date_fin': that.selected.dateCloture.replaceAll("/", "-"),
+                        'typeCmd': that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
+                        'base64_file_pdf': url
+
+                    }).then(response => {
+
+                    });
+
+               }); // download() or open() // getDataUrl
+
+            }else{
+                pdf.create().download(); 
+            }
+           
     
            },
            showDossier(dossier){
             this.commandeSelected = [];
             this.commandeNoSelected = [];
             this.isDetail = true;
+            this.selected.identifiant = dossier.identifiant;
             this.selected.id         = dossier.id;
             this.selected.nbrCmd     = dossier.nbrCmd;
             this.selected.nbrColis   = parseInt(dossier.total_colis)+parseInt(dossier.total_pallette);
@@ -889,7 +1116,7 @@
             this.selected.etat = dossier.etat;
             this.setProgressCont(dossier.total_volume);
             this.getReception();
-            this.getCmdSelected(this.selected.id);
+            this.getCmdSelected(this.selected.id, false);
 
 
 
@@ -903,7 +1130,59 @@
             this.eventCmdSelected.ischecked = -1;
             this.eventCmdSelected.idcmd = '';
 
-           }
+           },
+           reactiver(pre){
+                Vue.swal.fire({
+                  title: 'Confirmez la réactivation',
+                  text: "Dossier de préchargement n° "+pre.id,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '',
+                  confirmButtonText: 'Oui, réactivé!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                        axios.post('/gerer/reactiver/'+pre.id+'?identifiant='+pre.identifiant).then(response => {
+                            
+                            if(response.data.code != 0){
+                                Vue.swal.fire(
+                                  'Error!',
+                                   response.data.message,
+                                  'error'
+                                );
+
+                                return false;
+                            }
+                             
+                             this.getPrechargement();
+
+
+                        });
+                  
+                  }
+                })
+           },
+           showInvoice(pre){
+            var labelCmd = pre.typecmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+            
+                this.pdfFileModal = 'dossier-'+pre.id+'_'+labelCmd+"_du_"+pre.dateDebut.replaceAll("/", "-")+"_au_"+pre.dateCloture.replaceAll("/", "-")+".pdf";
+                console.log(this.pdfFileModal);
+           },
+           closeModalPdf(){
+                 this.$refs.closePoupPdf.click();
+            },
+            showModal(dry){
+
+                 EventBus.$emit('VIEW_CMD', {
+                    openView: true,
+                    dry: dry,
+                    fournisseur: this.listFournisseurs,
+                    typeCommande: this.typeCmd,
+                    entrepot: this.listEntrepots,
+                    idClient: this.idClient
+                });
+
+            }
         },
         mounted() {
           this.getPrechargement();

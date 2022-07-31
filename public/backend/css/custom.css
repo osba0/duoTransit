@@ -107,16 +107,35 @@
     font-style: normal;
 
 }
+.boxAction{
+    width:  35px;
+    height: 35px;
+}
+.w-60{
+    width:  60%;
+}
 .fontAnton{
     font-family: Anton;
 }
 .bg-light-blue {
     background: rgba(56, 104, 142, 0.16) !important;
 }
+.iconenbre {
+  top: -7px;
+  right: -7px;
+  background: #3e5267;
+  width: 20px;
+  height: 20px;
+  font-size: 10px;
+  border: 2px solid white;
+}
 body{
     font-size: 1em;
     padding: 0 !important;
     background: #f4f6f9 !important;
+}
+.breadcrumb {
+    margin-bottom: 15px;
 }
 .main-type-action-press-filter {
     border: 0.5rem solid #9ab3c5;
@@ -971,3 +990,29 @@ table .bgStripe .rowActif{
         width: 100%;
     }
 }
+.rateCenter .Rate{
+    width: 100%;
+    text-align: center;
+}
+
+.rateCenter button:focus{
+    border:  0;
+    outline: 0;
+}
+
+.rateCenter .Rate__view {
+  position: absolute;
+  top: 6px;
+  left:  0;
+  line-height: 1px;
+  width: 100%;
+  text-align: center;
+}
+
+.rateCenter .Rate__view .desc{
+    font-size: 10px;
+}
+.rateCenter .Rate__star{
+    padding:  0;
+}
+

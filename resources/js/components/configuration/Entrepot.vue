@@ -5,7 +5,11 @@
                 <thead class="thead-blue">
                      <tr>
                         <th class="p-2 border-right border-white h6">#</th>
-                        <th class="p-2 border-right border-white h6">Nom</th>
+                        <th class="p-2 border-right border-white h6">Nom Entrepôt</th>
+                        <th class="p-2 border-right border-white h6">Titulaire</th>
+                        <th class="p-2 border-right border-white h6">Email</th>
+                        <th class="p-2 border-right border-white h6">Téléphone</th>
+                        <th class="p-2 border-right border-white h6">Adresse</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
@@ -19,6 +23,18 @@
                         </td>
                          <td class="p-2 align-middle">
                             {{ entrepot.nom }}
+                        </td>
+                          <td class="p-2 align-middle">
+                            {{ entrepot.titulaire }}
+                        </td>
+                          <td class="p-2 align-middle">
+                            {{ entrepot.email }}
+                        </td>
+                          <td class="p-2 align-middle">
+                            {{ entrepot.telephone }}
+                        </td>
+                          <td class="p-2 align-middle">
+                            {{ entrepot.adresse }}
                         </td>
                          <td class="p-2 text-right">
                              <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editEntrepot(entrepot)" data-toggle="modal" data-target="#newEntrepot">
@@ -58,18 +74,63 @@
                     <div class="modal-body mx-3">
                          <form @submit.prevent="saveEntrepot" enctype="multipart/form-data" key=1 >
                             <div class="row">
-                                <div class="col-12 my-2 d-flex flex-column justify-content-start align-items-center">
+                                <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
-                                       <label for="nom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Nom
+                                       <label for="nomEntrepot"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Nom Entrepôt
                                        </label>
-                                        <input class="w-65 form-control" id="nom" v-model="entrepotForm.nom" 
-                                        :class="{ 'border-danger': submitted && !$v.entrepotForm.nom.required }" />
+                                        <input class="w-65 form-control" id="nomEntrepot" v-model="entrepotForm.nomEntrepot" 
+                                        :class="{ 'border-danger': submitted && !$v.entrepotForm.nomEntrepot.required }" />
+                                    </div>
+                                    
+                                 </div>
+                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                       <label for="titulaire"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Titulaire
+                                       </label>
+                                        <input class="w-65 form-control" id="titulaire" v-model="entrepotForm.titulaire" 
+                                        :class="{ 'border-danger': submitted && !$v.entrepotForm.titulaire.required }" />
                                     </div>
                                     
                                  </div>
                                 
                              </div>
+                              <div class="row">
+                                <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                       <label for="email"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        E-mail
+                                       </label>
+                                        <input class="w-65 form-control" id="email" v-model="entrepotForm.email" 
+                                        :class="{ 'border-danger': submitted && !$v.entrepotForm.email.required }" />
+                                    </div>
+                                    
+                                 </div>
+                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                       <label for="telephone"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Téléphone
+                                       </label>
+                                       <input class="w-65 form-control" id="telephone" v-model="entrepotForm.telephone"/>
+                                    </div>
+                                    
+                                 </div>
+                                
+                             </div>
+
+                             <div class="row">
+                                <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                       <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Adresse
+                                       </label>
+                                        <input class="w-65 form-control" id="adresse" v-model="entrepotForm.adresse"/>
+                                    </div>
+                                    
+                                 </div>
+                             </div>
+
                              <div class="modal-footer d-flex justify-content-center"> 
 
                                 <template v-if="modeModify">
@@ -92,15 +153,16 @@
     </div>
 </template>
 <script>
-    import { required, minLength, between } from 'vuelidate/lib/validators'
+    import { required, minLength, between, email } from 'vuelidate/lib/validators'
     export default {
         data() { 
             return {
                 entrepotForm :{
                     id: '',
-                    nom: '',
+                    titulaire: '',
+                    nomEntrepot: '',
                     adresse: '',
-                    logo: '',
+                    email: '',
                     telephone: ''
 
                 },
@@ -114,7 +176,9 @@
         },
         validations: {
            entrepotForm : {
-                nom: { required }
+                nomEntrepot: { required },
+                titulaire: { required },
+                email: { required, email }
             },
         },
         watch: {
@@ -135,16 +199,19 @@
                 }
                 
                const data = new FormData();
-                data.append('nom', this.entrepotForm.nom);
+               
+               data.append('nomEntrepot', this.entrepotForm.nomEntrepot);
+               data.append('titulaire', this.entrepotForm.titulaire);
+               data.append('email', this.entrepotForm.email);
+               data.append('telephone', this.entrepotForm.telephone);
+               data.append('adresse', this.entrepotForm.adresse);
                
 
                 let action = "createEntrepot";
 
                 if(this.modeModify){
                     data.append('id', this.entrepotForm.id);
-                    if(this.hasImage){
-                        data.append('imageSet', this.entrepotForm.logo);
-                    }
+
                     action = "modifyEntrepot";
                 }
 
@@ -212,7 +279,11 @@
                 this.modeModify = true;
                 this.submitted = false;
                 this.entrepotForm.id = entrepot.id;
-                this.entrepotForm.nom = entrepot.nom;
+                this.entrepotForm.nomEntrepot = entrepot.nom;
+                this.entrepotForm.titulaire = entrepot.titulaire;
+                this.entrepotForm.email = entrepot.email;
+                this.entrepotForm.telephone = entrepot.telephone;
+                this.entrepotForm.adresse = entrepot.adresse;
             },
             closeModal(){
                 this.$refs.closePoup.click();

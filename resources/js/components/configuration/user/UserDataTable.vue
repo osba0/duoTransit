@@ -10,7 +10,7 @@
                         <th class="p-2 border-right border-white h6">Email</th>
                         <th class="p-2 border-right border-white h6">Login</th>
                         <th class="p-2 border-right border-white h6">Profil</th>
-                        <th class="p-2 border-right border-white h6">Client(s) autorisé(s)</th>
+                        <th class="p-2 border-right border-white h6">Société(s) autorisée(s)</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
@@ -183,7 +183,7 @@
                                      </div>
                                       <div class="col-6 my-2 d-flex flex-column">
                                     <div class="w-100 d-flex">
-                                        <label class="typo__label pt-3 d-block m-0 text-right w-35  pr-2 nowrap">Clients Autorisés</label>
+                                        <label class="typo__label pt-3 d-block m-0 text-right w-35  pr-2 nowrap">Société(s) Autorisée(s)</label>
                                         <div class="w-65 p-2">
                                             <multiselect v-model="value" :options="clients" :disabled = "noClientRole" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Choisir" label="clnmcl" track-by="id" :preselect-first="false">
                                                 <template slot="selection" slot-scope="{ values, search, isOpen }">

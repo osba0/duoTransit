@@ -16,6 +16,11 @@ import VueSweetalert2 from 'vue-sweetalert2';
 // If you don't need the styles, do not connect
 import 'sweetalert2/dist/sweetalert2.min.css';
 
+import rate from 'vue-rate'
+import 'vue-rate/dist/vue-rate.css'
+
+Vue.use(rate);
+
 
 Vue.use(VueToast,{
     position: 'top' 
@@ -63,8 +68,11 @@ Vue.component('contenaire', require('./components/configuration/Contenaire.vue')
 Vue.component('typecommande', require('./components/configuration/TypeCommande.vue').default);
 
 Vue.component('historique-empotage', require('./components/historique/histoEmpotage.vue').default);   
+Vue.component('historique-prechargement', require('./components/historique/histoPrechargement.vue').default);   
 
 Vue.component('prechargement-client', require('./components/prechargement/index.vue').default);  
+
+Vue.component('modalDetailsCommande', require('./components/modal/detailsCommande.vue').default); 
 
 Vue.component('empotage-entite', require('./components/gestion/empotage.vue').default);  
 

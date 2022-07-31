@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Resources\DossierPrechargementResource;
 use App\Http\Resources\ReceptionResource;
 
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\prechargementCommandesClient;
+
 use App\Models\TypeCommande;
 use App\Models\Client;
 use App\Models\Fournisseur;
@@ -14,6 +17,13 @@ use App\Models\DossierPrechargement;
 use App\Models\Contenaire;
 use App\Models\Reception;
 use App\Models\Entite;
+use App\Models\User;
+use App\Models\UserRole; 
+use App\Models\TypActivity;
+use App\Models\LogActivity;
+use App\Models\Entrepot;
+
+
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -44,7 +54,7 @@ class PrechargementController extends Controller
         $client = Client::where('slug', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
         if(!$client)  abort(404);
 
-        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->get(); 
+        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get();  
 
         $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
 
@@ -52,10 +62,14 @@ class PrechargementController extends Controller
 
         $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
 
+        
+
+        $entrepots = Entrepot::get(); 
+
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
         }else{
-            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires];
+            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client , 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires, "entite" => $entite, "entrepots" => $entrepots];
         }
         
         return  view('backend.prechargement.index', $data);
@@ -76,9 +90,9 @@ class PrechargementController extends Controller
                   
                 $store = DossierPrechargement::create([
                     "contenaires_id"    => $defaultContenaire['id'],
-                    "reetat"            => 1,
+                    "reetat"            => 0,
                     "users_id"          => Auth::user()->id,
-                    "entites_id"        => Auth::user()->entites_id,
+                    "clients_id"        => request('clientID'),
                     "type_commandes_id" => request('typeCmd')
                 ]); 
                 return response([
@@ -113,9 +127,11 @@ class PrechargementController extends Controller
 
         $paginate = request('paginate');
 
-        $sql = "";
+        $keyword = request('keysearch');
+        $typeCommande = request('typeCmd');
+        $etatFiltre = request('etatFiltre');
 
-      
+        $sql = "";
 
         if (isset($paginate)) {
 
@@ -131,6 +147,7 @@ class PrechargementController extends Controller
                 DB::raw('SUM(receptions.renbcl) as total_colis'), 
                 DB::raw('SUM(receptions.renbpl) as total_palette'), 
                 DB::raw('count(receptions.rencmd) as total_cmd'), 
+                DB::raw('SUM(receptions.revafa) as total_mnt'), 
                 'dossier_prechargements.nbreContenaire', 
                 'dossier_prechargements.id as idPre', 
                 'dossier_prechargements.users_id', 
@@ -138,35 +155,36 @@ class PrechargementController extends Controller
                 'dossier_prechargements.reetat as etat',
                 'users.username as user',
                 'type_commandes.typcmd as typecmd',
-                'contenaires.nom as contenaire')->where('dossier_prechargements.entites_id', $user->entites_id);
+                'type_commandes.id as typecmdID',
+                'type_commandes.tcolor as typecmdColor',
+                'contenaires.nom as contenaire')->where('dossier_prechargements.clients_id', request('id'));
 
-            if(request('key')==1){
-                 $query = $query->where('dossier_prechargements.reetat', 1); 
+
+
+            if($keyword!=''){
+                $term = "%$keyword%";
+
+                $query = $query->where(function ($query) use ($term) {
+                    $query->where('dossier_prechargements.id', 'like', $term);
+                });
             }
 
+            if($typeCommande!=''){
+                $query = $query->where('dossier_prechargements.type_commandes_id', $typeCommande);
+            }
+
+            if($etatFiltre!=''){
+                $query = $query->where('dossier_prechargements.reetat', $etatFiltre);
+            }else{
+                $query = $query->where('dossier_prechargements.reetat', 0);
+            }
+
+            $query = $query->orderBy('dossier_prechargements.id','DESC');
+            
             $query = $query->paginate($paginate);
+
         }else{
-            $query = DB::table('dossier_prechargements')
-            ->leftJoin('receptions', 'receptions.dossier_prechargements_id', '=', 'dossier_prechargements.id')
-            ->leftJoin('users', 'dossier_prechargements.users_id', '=', 'users.id')
-            ->leftJoin('type_commandes', 'dossier_prechargements.type_commandes_id', '=', 'type_commandes.id')
-            ->leftJoin('contenaires', 'dossier_prechargements.contenaires_id', '=', 'contenaires.id')
-            ->groupBy('dossier_prechargements.id')
-            ->select('receptions.dossier_prechargements_id', 
-                DB::raw('SUM(receptions.repoid) as total_poids'), 
-                DB::raw('SUM(receptions.revolu) as total_volume'), 
-                DB::raw('SUM(receptions.renbcl) as total_colis'), 
-                DB::raw('SUM(receptions.renbpl) as total_palette'), 
-                DB::raw('count(receptions.rencmd) as total_cmd'), 
-                'dossier_prechargements.nbreContenaire', 
-                'dossier_prechargements.id as idPre', 
-                'dossier_prechargements.users_id', 
-                'dossier_prechargements.created_at as created_at_pre',
-                'dossier_prechargements.reetat as etat',
-                'users.username as user',
-                'type_commandes.typcmd as typecmd',
-                'contenaires.nom as contenaire' )->where('dossier_prechargements.entites_id', $user->entites_id)
-            ->get();
+           
         }
       
         return DossierPrechargementResource::collection($query);
@@ -184,10 +202,35 @@ class PrechargementController extends Controller
 
         $paginate = request('paginate');
 
+
+        $keyword = request('keysearch');
+
+        $filtreRate = request('rate');
+
+        
+
         if (isset($paginate)) {
-            $dries = Reception::receptionsQuery()->where('entites_id', $user->entites_id)->where('dossier_prechargements_id', request('idPre'))->orWhere('dossier_prechargements_id', 0)->orWhere('dossier_prechargements_id', NULL)->paginate($paginate);
+
+            $dries = Reception::where('clients_id', request('id'))->where(function($query){
+                     
+                $query->orWhere('dossier_prechargements_id', request('idPre'))->orWhere('dossier_prechargements_id', 0)->orWhere('dossier_prechargements_id', NULL);
+                })->where(function($query2){
+
+                    $query2->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL)->orWhere('dossier_prechargements_id', request('idPre'));
+                })->where('type_commandes_id', request('typecmd'));
+
+            if($keyword!=''){
+                $dries = $dries->search($keyword); 
+            }
+
+            if($filtreRate!=''){
+                $dries = $dries->filtreRate($filtreRate); 
+            }
+            
+            $dries = $dries->paginate($paginate);
+
         }else{
-            $dries = Reception::where('clients_id', request('id'))->where('entites_id', $user->entites_id)->orderBy('redali', 'asc')->get();
+           
         }
       
         return ReceptionResource::collection($dries);
@@ -223,6 +266,7 @@ class PrechargementController extends Controller
                 DB::raw('SUM(receptions.renbcl) as total_colis'), 
                 DB::raw('SUM(receptions.renbpl) as total_palette'), 
                 DB::raw('count(receptions.rencmd) as total_cmd'), 
+                DB::raw('SUM(receptions.revafa) as total_mnt'), 
                 'dossier_prechargements.nbreContenaire', 
                 'dossier_prechargements.id as idPre', 
                 'dossier_prechargements.users_id', 
@@ -240,7 +284,8 @@ class PrechargementController extends Controller
                                   'total_volume'   => $key->total_volume,
                                   'total_palette'  => $key->total_palette,
                                   'total_colis'    => $key->total_colis,
-                                  'total_cmd'      => $key->total_cmd];
+                                  'total_cmd'      => $key->total_cmd,
+                                  'total_mnt'      => $key->total_mnt];
 
         }
         return response([
@@ -249,37 +294,134 @@ class PrechargementController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+    public function valider(){
+
+        $user = Auth::user();
+
+        $client = Client::where('id', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+        if(!$client){
+            abort(404);
+        }
+
+        $response = true;
+
+        if(sizeof(request('idsCmd')) > 0){
+
+            $rep = DossierPrechargement::where('id',request('id_prechargement'))->update([
+                "reetat" => true,
+                "nbreContenaire"=> request('nbrContenaire'),
+                "contenaires_id"=> request('typeContenaire')
+            ]);
+
+            // Table reception déja mis a jour avec l'id prechargement
+
+            // Journal Associer les commandes à un numero de dossier
+
+            activity(TypActivity::MODIFIER)->withProperties(request('idsCmd'))->performedOn($client)->log('Validation préchargement client n°'.request('id_prechargement'));
+            $lastID = LogActivity::latest('id')->first();
+            $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $user->entites_id]);
+
+        }
+
+        
+
+        if($response){
+            return response([
+                "code" => 0,
+                "result" => 'Success'
+            ]);
+
+        }else{
+            return response([
+            "code" => 1,
+            "result" => "Ehec"
+            ]);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+
+    public function notifier(){
+        $user = Auth::user();
+        
+        $base64_pdf = trim(request('base64_file_pdf'), "data:application/pdf;base64,");
+        $base64_decode = base64_decode($base64_pdf);
+        $pathFile = 'pdf/prechargementClient/prechargement-'.request('id_prechargement').'_'.request('typeCmd').'.pdf';
+        $pdf = fopen($pathFile, 'w');
+        fwrite($pdf, $base64_decode);
+        fclose($pdf);
+
+       
+        // Notification
+
+        $transitaire = Entite::where('id', $user->entites_id)->get()->first();
+        $societe = Client::where('id', request('id'))->get()->first();
+
+        $commandes = Reception::whereIn('reidre',request('idsCmd'));
+
+
+        $getMailTransitaire = User::where("entites_id", $transitaire['id'])->whereJsonContains('roles', UserRole::ROLE_ADMIN)->get();
+
+        $emailSent=[];
+
+        foreach($getMailTransitaire as $user){
+        
+            $emailSent[] = $user['email'];
+        }
+
+        Notification::route('mail', [])->notify(new prechargementCommandesClient($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_prechargement'))); 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+    public function getCommande(){
+        $results = Reception::where('dossier_prechargements_id',request('id'))->get(); 
+        $details=[];
+
+        foreach ($results as $key) {
+           
+           $details[] = (object) ['refere'         => $key->refere,
+                                  'reecvr'         => $key->reecvr,
+                                  'rencmd'         => $key->rencmd,
+                                  'repoid'         => $key->repoid,
+                                  'renufa'         => $key->renufa,
+                                  'renbcl'         => $key->renbcl,
+                                  'renbpl'         => $key->renbpl,
+                                  'revolu'         => $key->revolu,
+                                  'renufa'         => $key->renufa,
+                                  'fournisseurs'   => $key->fournisseur->fonmfo,
+                                  'priorite'       => $key->priorite];
+   
+        }
+        return response([
+            "code" => 0,
+            "result" => $details
+        ]);
+    }
+
+    public function deletePre(){
+        $user = Auth::user();
+        $res = DossierPrechargement::select('id')->where('id', request('id'))->get()->toArray();
+        $ids = [];
+
+        foreach($res as $item){
+            $ids[] = $item['id'];
+            
+        }
+
+        Reception::whereIn('dossier_prechargements_id', $ids)->update([
+            "dossier_prechargements_id" => NULL
+        ]);
+
+
+
+        $dossier =  DossierPrechargement::where('id','=',request('id'))->where('type_commandes_id', request('typeCmd'))->firstOrFail(); 
+
+        DossierPrechargement::setIDClient(request('clientID'), $user->entites_id); 
+
+        $dossier->delete();
+    
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
     }
 }

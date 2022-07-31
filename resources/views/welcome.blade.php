@@ -102,7 +102,7 @@ $config = [
         </div>
     </header>
     <div class="container" id="app_run">
-          <div class="content">
+        <div class="content">
           <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2">
             <div class="flex-grow-1 mb-1 mb-md-0">
               <h1 class="h3 fw-bold mb-2">
@@ -117,7 +117,65 @@ $config = [
             </div>
           </div>
         </div>
-         @userCan(\App\Models\UserRole::ROLE_ADMIN)
+
+        @userCan(\App\Models\UserRole::ROLE_CLIENT)
+            <div class="row">
+                <div class="col-md-3 mt-3">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4">
+                        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                          <dl class="mb-0">
+                            <dt class="fs-3 fw-bold">{{$totalCmdAttente}}</dt>
+                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Commande(s) en Attente</dd>
+                          </dl>
+                          <div class="item item-rounded-lg bg-primary">
+                            <i class="fa fa-list-ul h2 m-0 text-white" aria-hidden="true"></i>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mt-3">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4 cursor-pointer">
+                        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                          <dl class="mb-0">
+                            <dt class="fs-3 fw-bold">{{$four}}</dt>
+                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Fournisseur(s)</dd>
+                          </dl>
+                          <div class="item item-rounded-lg bg-primary">
+                            <i class="fa fa-handshake-o  text-white h2 m-0" aria-hidden="true"></i>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mt-3">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4 cursor-pointer">
+                        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                          <dl class="mb-0">
+                            <dt class="fs-3 fw-bold">{{$typeCmdTotal}}</dt>
+                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Type(s) Commande(s)</dd>
+                          </dl>
+                          <div class="item item-rounded-lg bg-primary">
+                            <i class="fa fa-arrows text-white h2 m-0" aria-hidden="true"></i>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mt-3">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4 cursor-pointer {{ $recap['nbrJourMoyen']<=8?'bg-success':'' }} {{ ($recap['nbrJourMoyen']>8 && $recap['nbrJourMoyen']<=15)?'bg-warning':'' }} {{ $recap['nbrJourMoyen']>15?'bg-danger':'' }}">
+                        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                          <dl class="mb-0">
+                            <dt class="fs-3 fw-bold {{ ($recap['nbrJourMoyen']>8 && $recap['nbrJourMoyen']<=15)?'text-dark':'text-white' }}" >{{$recap['nbrJourMoyen']}} Jour(s)</dt>
+                            <dd class="fs-sm fw-medium fs-sm fw-medium {{ ($recap['nbrJourMoyen']>8 && $recap['nbrJourMoyen']<=15)?'text-dark':'text-white' }}  mb-0">Délai Moyen des commandes</dd>
+                          </dl>
+                          <div class="item item-rounded-lg bg-white">
+                            <i class="fa fa-clock-o text-dark h2 m-0" aria-hidden="true"></i>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endUserCan
+
+        @userCan(\App\Models\UserRole::ROLE_ADMIN)
             <div class="row">
                  @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
                  <div class="col-md-3 mt-3">
@@ -131,15 +189,35 @@ $config = [
                             <i class="fa fa-list-ul h2 m-0 text-white" aria-hidden="true"></i>
                           </div>
                         </div>
-                        <div class="bg-body-light mt-3 rounded-bottom">
+                        <div class="bg-white mt-3 rounded-bottom">
                           <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="javascript:void(0)">
+                            <span></span>
+                            <i class="fa fa-arrow-circle-right h3 m-0 ms-1 opacity-0 fs-base"></i>
+                          </a>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                <div class="col-md-3 mt-3">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("typecommande") }}'">
+                        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                          <dl class="mb-0">
+                            <dt class="fs-3 fw-bold">{{$typeCmdNbr}}</dt>
+                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Type de Commande</dd>
+                          </dl>
+                          <div class="item item-rounded-lg bg-primary">
+                            <i class="fa fa-arrows text-white h2 m-0" aria-hidden="true"></i>
+                          </div>
+                        </div>
+                        <div class="bg-body-light mt-3 rounded-bottom">
+                          <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ route('typecommande') }}">
                             <span>Afficher</span>
                             <i class="fa fa-arrow-circle-right h3 m-0 ms-1 opacity-25 fs-base"></i>
                           </a>
                         </div>
                     </div>
                 </div>
-                @endif
                 
                  <div class="col-md-3 mt-3">
                     <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("utilisateurs") }}'">
@@ -160,6 +238,25 @@ $config = [
                         </div>
                     </div>
                 </div> 
+                <div class="col-md-3 mt-3">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("fournisseurs") }}'">
+                        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                          <dl class="mb-0">
+                            <dt class="fs-3 fw-bold">{{$fourNbr}}</dt>
+                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Fournisseurs</dd>
+                          </dl>
+                          <div class="item item-rounded-lg bg-primary">
+                            <i class="fa fa-handshake-o  text-white h2 m-0" aria-hidden="true"></i>
+                          </div>
+                        </div>
+                        <div class="bg-body-light mt-3 rounded-bottom">
+                          <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ route('fournisseurs') }}">
+                            <span>Afficher</span>
+                            <i class="fa fa-arrow-circle-right h3 m-0 ms-1 opacity-25 fs-base"></i>
+                          </a>
+                        </div>
+                    </div>
+                </div>
                 
                 @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
                 <div class="col-md-3 mt-3">
@@ -228,25 +325,7 @@ $config = [
                 @endif
 
 
-                  <div class="col-md-3 mt-3">
-                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("typecommande") }}'">
-                        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                          <dl class="mb-0">
-                            <dt class="fs-3 fw-bold">{{$typeCmdNbr}}</dt>
-                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Type de Commande</dd>
-                          </dl>
-                          <div class="item item-rounded-lg bg-primary">
-                            <i class="fa fa-arrows text-white h2 m-0" aria-hidden="true"></i>
-                          </div>
-                        </div>
-                        <div class="bg-body-light mt-3 rounded-bottom">
-                          <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ route('typecommande') }}">
-                            <span>Afficher</span>
-                            <i class="fa fa-arrow-circle-right h3 m-0 ms-1 opacity-25 fs-base"></i>
-                          </a>
-                        </div>
-                    </div>
-                </div>
+                  
             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ADMIN))
             </div>
            
@@ -256,27 +335,6 @@ $config = [
 
      @userCan(\App\Models\UserRole::ROLE_ROOT)
             
-                 
-               
-                <div class="col-md-3 mt-3">
-                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("fournisseurs") }}'">
-                        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
-                          <dl class="mb-0">
-                            <dt class="fs-3 fw-bold">{{$fourNbr}}</dt>
-                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Fournisseurs</dd>
-                          </dl>
-                          <div class="item item-rounded-lg bg-primary">
-                            <i class="fa fa-handshake-o  text-white h2 m-0" aria-hidden="true"></i>
-                          </div>
-                        </div>
-                        <div class="bg-body-light mt-3 rounded-bottom">
-                          <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ route('fournisseurs') }}">
-                            <span>Afficher</span>
-                            <i class="fa fa-arrow-circle-right h3 m-0 ms-1 opacity-25 fs-base"></i>
-                          </a>
-                        </div>
-                    </div>
-                </div>
                  <div class="col-md-3 mt-3">
                     <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("contenaires") }}'">
                         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">

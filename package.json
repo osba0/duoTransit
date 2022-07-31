@@ -7,25 +7,47 @@
         "watch-poll": "mix watch -- --watch-options-poll=1000",
         "hot": "mix watch --hot",
         "prod": "npm run production",
-        "production": "mix --production"
+        "production": "mix --production",
+        "start": "cross-env NODE_ENV=dev node app.js"
     },
     "devDependencies": {
-        "axios": "^0.21",
-        "bootstrap": "^4.0.0",
-        "jquery": "^3.2",
+        "@tailwindcss/forms": "^0.2.1",
+        "@types/pdfmake": "^0.1.19",
+        "alpinejs": "^2.7.3",
+        "autoprefixer": "^10.1.0",
+        "axios": "^0.21.4",
+        "bootstrap": "^4.6.0",
+        "jquery": "^3.6",
+        "laravel-echo": "^1.11.3",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
-        "popper.js": "^1.12",
-        "postcss": "^8.1.14",
+        "popper.js": "^1.16.1",
+        "postcss": "^8.2.1",
+        "postcss-import": "^12.0.1",
+        "pusher-js": "^7.0.3",
         "resolve-url-loader": "^3.1.2",
-        "sass": "^1.20.1",
-        "sass-loader": "^8.0.0",
-        "vue": "^2.5.17",
+        "sass": "^1.32.11",
+        "sass-loader": "^11.0.1",
+        "tailwindcss": "^2.0.2",
+        "vue": "^2.6.12",
         "vue-loader": "^15.9.5",
-        "vue-template-compiler": "^2.6.10"
+        "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
+        "cross-env": "^7.0.3",
+        "html-to-pdfmake": "^2.4.4",
+        "laravel-mix-alias": "^1.0.3",
         "laravel-vue-pagination": "^2.3.1",
-        "vue-toast-notification": "^0.6.1"
+        "node-libs-browser": "^2.2.1",
+        "pdfmake": "^0.2.2",
+        "pdfmake-wrapper": "^2.1.2",
+        "vue-multiselect": "^2.1.6",
+        "vue-qrcode-component": "^2.1.1",
+        "vue-rate": "^2.5.0",
+        "vue-sweetalert2": "^5.0.2",
+        "vue-toast-notification": "^0.6.2",
+        "vue2-datepicker": "^3.11.0",
+        "vue2-timepicker": "^1.1.6",
+        "vuelidate": "^0.7.6"
     }
 }

@@ -11,7 +11,7 @@ class Client extends Model
 {
     use HasFactory, Notifiable, HasApiTokens;
 
-    protected $fillable = ['clnmcl', 'slug', 'cladcl', 'cllogo', 'cltele', 'cletat', 'clfocl','cltyco', 'pays', 'clenti'];
+    protected $fillable = ['clnmcl', 'slug', 'cladcl', 'clmail','cllogo', 'cltele', 'cletat', 'clfocl','cltyco', 'pays', 'clenti'];
     /**
      * The attributes that should be cast to native types.
      *

@@ -25,7 +25,7 @@ class ReceptionResource extends JsonResource
             "id_fournisseurs"=> $this->fournisseurs_id,
             "type_commandes" => isset($this->type_commande->typcmd)? $this->type_commande->typcmd : '',
             "typeCmd_color"  => isset($this->type_commande->tcolor)? $this->type_commande->tcolor : '' ,
-            "id_commandes"   => $this->type_commandes_id,
+            "id_commandes"   => is_null($this->type_commandes_id)? $this->typeCmd : $this->type_commandes_id, // typeCmd sur empotage
             "clients_id"     => $this->clients_id,
             "entrepots_id"   => $this->entrepots_id,
             "reuser"         => isset($this->user->username)? $this->user->username : '',
@@ -48,7 +48,9 @@ class ReceptionResource extends JsonResource
             "dossier_id"     => $this->dossier_id,
             "prechargeur"    => $this->prechargeur,
             "user_created"   => $this->user_created,
-            "dossier_empotage_id"     => $this->dossier_empotage_id
+            "dossier_empotage_id"     => $this->dossier_empotage_id,
+            "hasIncident"    => $this->reinci,
+            "priorite"       => isset($this->priorite)? $this->priorite:''
             //"isPreLoaded"    => $this->dossier_prechargements_id 
 
         ];

@@ -16,7 +16,11 @@ class EntrepotResource extends JsonResource
     {
          return [
             'id'        => $this->id,
-            'nom'       => $this->nom
+            'nom'       => $this->nomEntrepot,
+            'titulaire' => $this->titulaire,
+            'email'     => $this->email,
+            'telephone' => $this->telephone,
+            'adresse'   => $this->adresse
         ];
     }
 }

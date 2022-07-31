@@ -15,9 +15,11 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\UserRole;
 use App\Models\User;
+use App\Models\Entrepot;
 
 use App\Http\Resources\EmpotageResource;
 use App\Http\Resources\ReceptionResource;
+use App\Http\Resources\DossierPrechargementResource;
 
 
 class HistoActionController extends Controller
@@ -38,11 +40,13 @@ class HistoActionController extends Controller
 
         if(!$client)  abort(404);
 
-        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->get(); 
+        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get(); 
 
         $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
 
         $contenaires = Contenaire::whereIn('id',$entite->contenaires_id)->get(); 
+
+        $entrepots = Entrepot::get();  
         
         return  view('backend.historique_empotage.index', ['logo' => $client->cllogo, 'id_client' => $client->id, 'typeCmd' => $typeCmd, 'client' => $client, 'fournisseurs' => $fournis, 'listContenaire' => $contenaires]);
     }
@@ -119,6 +123,126 @@ class HistoActionController extends Controller
             ->select('*','four.fonmfo as fonmfo', 'b.username as user_created','a.username as prechargeur')->where('receptions.dossier_empotage_id', request('id_empotage'))->where('receptions.clients_id', request('id'))->where('receptions.type_commandes_id', request('typecmd'));
             if(request('filtre_four')!=''){
                 $histo = $histo->where('receptions.fournisseurs_id', request('filtre_four'));
+            }
+            $histo = $histo->paginate($paginate); 
+
+        }else{
+           
+        }
+      
+        return ReceptionResource::collection($histo);
+
+    }
+
+    /** Histo préchargement **/
+    
+     public function historiquePrechargement(Request $request){
+
+        $user = Auth::user();
+
+        if(!($user->hasRole(UserRole::ROLE_CLIENT))){
+             abort(401);
+        }
+
+        $entite = Entite::where('id', $user->entites_id)->get()->first();
+        
+        $client = Client::get()->where('slug', request('id'))->first();
+
+        if(!$client)  abort(404);
+
+        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get(); 
+
+        $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
+
+        $contenaires = Contenaire::whereIn('id',$entite->contenaires_id)->get();
+
+        $entrepots = Entrepot::get();  
+        
+        return  view('backend.historique_prechargement.index', ['logo' => $client->cllogo, 'id_client' => $client->id, 'typeCmd' => $typeCmd, 'client' => $client, 'fournisseurs' => $fournis, 'listContenaire' => $contenaires, "entrepots" => $entrepots]);
+    }
+
+    public function searchHistoPre(Request $request){ 
+        //var_dump(request('filtre.typeCmd'));
+
+        $user = Auth::user();
+
+        $paginate = request('paginate');
+
+        if (isset($paginate)) {
+
+            $req = DB::table('dossier_prechargements')
+            ->leftJoin('receptions', 'receptions.dossier_prechargements_id', '=', 'dossier_prechargements.id')
+            ->leftJoin('users', 'dossier_prechargements.users_id', '=', 'users.id')
+            ->leftJoin('type_commandes', 'dossier_prechargements.type_commandes_id', '=', 'type_commandes.id')
+            ->leftJoin('contenaires', 'dossier_prechargements.contenaires_id', '=', 'contenaires.id')
+            ->groupBy('dossier_prechargements.id')
+            ->select('receptions.dossier_prechargements_id', 
+                DB::raw('SUM(receptions.repoid) as total_poids'), 
+                DB::raw('SUM(receptions.revolu) as total_volume'), 
+                DB::raw('SUM(receptions.renbcl) as total_colis'), 
+                DB::raw('SUM(receptions.renbpl) as total_palette'), 
+                DB::raw('count(receptions.rencmd) as total_cmd'), 
+                DB::raw('SUM(receptions.revafa) as total_mnt'), 
+                'dossier_prechargements.nbreContenaire as nbreContenaire', 
+                'dossier_prechargements.id as idPre', 
+
+                'contenaires.nom as nomContenaire', 
+                'contenaires.id as IDContenaire',
+                'contenaires.volume as capacite',
+                'dossier_prechargements.users_id', 
+               
+                'dossier_prechargements.created_at as created_at_pre',
+                'dossier_prechargements.updated_at as updated_at_pre', 
+                'dossier_prechargements.reetat as etat',
+                'dossier_prechargements.rapport_pdf as rapport_pdf',
+                
+                'users.username as user',
+                'type_commandes.typcmd as typecmd',
+                'type_commandes.id as typecmdID',
+                'type_commandes.tcolor as typecmdColor',
+                'contenaires.nom as contenaire')->where('receptions.clients_id', request('id'))->whereBetween('dossier_prechargements.updated_at', [request('filtre.dateDebut').' 00:00:00', request('filtre.dateFin').' 23:59:59']);
+
+            if(request('filtre.typeCmd')!=''){
+                $req = $req->where('receptions.type_commandes_id', request('filtre.typeCmd'));
+            }
+            if(request('filtre.fournisseur')!=''){
+                $req = $req->where('receptions.fournisseurs_id', request('filtre.fournisseur'));
+            }
+            if(request('filtre.commande')!=''){
+                $cmd = request('filtre.commande');
+                $term = "$cmd%";
+                $req = $req->where('receptions.rencmd', 'like', $term);
+            }
+            $req = $req->orderBy("dossier_prechargements.updated_at", 'DESC')->paginate($paginate); 
+
+        }else{
+           
+        }
+      
+        return DossierPrechargementResource::collection($req);
+    }
+
+    public function searchCmdReceptionPre()
+    {
+        $user = Auth::user();
+
+        $paginate = request('paginate');
+
+        if (isset($paginate)) {
+
+            $histo = DB::table('receptions')
+            ->leftJoin('dossier_prechargements', 'dossier_prechargements.id', '=', 'receptions.dossier_prechargements_id')
+            ->leftJoin('fournisseurs as four', 'receptions.fournisseurs_id', '=', 'four.id')
+            ->leftJoin('users as a', 'dossier_prechargements.users_id', '=', 'a.id')
+            ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
+            ->select('*','four.fonmfo as fonmfo', 'b.username as user_created','a.username as prechargeur')->where('receptions.dossier_prechargements_id', request('id_pre'))->where('receptions.clients_id', request('id'))->where('receptions.type_commandes_id', request('typecmd'));
+            if(request('filtre_four')!=''){
+                $histo = $histo->where('receptions.fournisseurs_id', request('filtre_four'));
+            }
+            if(request('filtre_cmd')!=''){
+                $cmd = request('filtre_cmd');
+                $term = "$cmd%";
+                $histo = $histo->where('receptions.rencmd', 'like', $term);
             }
             $histo = $histo->paginate($paginate); 
 

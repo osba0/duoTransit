@@ -9,7 +9,6 @@
     
     <div class="row">
         <div class="col-md-12">
-        <div class="mb-3"></div>
             @if($id_client!='')
                 <prechargement-entite id-client = {{$id_client}} 
                 :list-fournisseurs = "{{ json_encode($fournisseurs) }}" 
@@ -18,6 +17,7 @@
                 :list-contenaire="{{ json_encode($listContenaire) }}"
                 :current-client="{{ json_encode($client) }}"
                 :current-entite="{{ json_encode($entite) }}"
+                :list-entrepots="{{ json_encode($entrepots) }}"
                >
                 
                 </prechargement-entite>

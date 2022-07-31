@@ -9,6 +9,7 @@
                         <th class="p-2 border-right border-white h6">Telephone</th>
                         <th class="p-2 border-right border-white h6">Adresse</th>
                         <th class="p-2 border-right border-white h6">Logo</th>
+                        <th class="p-2 border-right border-white h6">Société</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
@@ -37,6 +38,16 @@
                              <img src="/images/logo/no-image.png" style="height: 40px;">
                           </template>
                           
+                        </td>
+                        <td>
+                            <template v-for="client in listClient">
+                                <template v-if="client.clfocl.includes(fournisseur.id)">
+                                    <span class="badge bg-success mr-2 p-2 mb-2">
+                                    {{client.clnmcl}}
+                                    </span>  
+                                </template>
+                            </template>
+                                      
                         </td>
                          <td class="p-2 text-right">
                              <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editFournisseur(fournisseur)" data-toggle="modal" data-target="#newFournisseur">
@@ -127,6 +138,21 @@
                                     
                                  </div>
                              </div>
+                              <hr>
+                            <div class="row">
+                                <div class="col-12 my-2 d-flex flex-column">
+                                    <div class="w-100 d-flex justify-content-between flex-column align-items-center">
+                                        <label class="typo__label d-block m-0 w-100  pr-2 nowrap">Société</label>
+                                        <div class="w-100 p-0">
+                                            <multiselect v-model="fournisseurForm.client" :options="listClient" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Choisir" label="clnmcl" track-by="id" :preselect-first="false">
+                                                <template slot="selection" slot-scope="{ values, search, isOpen }">
+                                                    <span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} société(s) selectionné(s)</span> 
+                                                </template>
+                                            </multiselect> 
+                                        </div>
+                                    </div>
+                                </div>
+                             </div>
                              <div class="modal-footer d-flex justify-content-center"> 
 
                                 <template v-if="modeModify">
@@ -149,22 +175,32 @@
     </div>
 </template>
 <script>
-    import { required, minLength, between } from 'vuelidate/lib/validators'
+    import { required, minLength, between } from 'vuelidate/lib/validators';
+    import Multiselect from 'vue-multiselect';
     export default {
+         props: [
+            'listClient'
+        ],
+         components: {
+            Multiselect
+          },
         data() { 
+           
             return {
                 fournisseurForm :{
                     id: '',
                     nom: '',
                     adresse: '',
                     logo: '',
-                    telephone: ''
+                    telephone: '',
+                    client: '',
+                    idClients:''
 
                 },
                 hasImage: false,
                 submitted: false,
                 fournisseurs: {},
-                paginate: 5,
+                paginate: 10,
                 modeModify: false
             }
 
@@ -205,6 +241,17 @@
                 data.append('adresse', this.fournisseurForm.adresse);
                 data.append('telephone', this.fournisseurForm.telephone);
 
+
+                this.fournisseurForm.idClients = [];
+
+                // get clients
+                for(var i=0; i<this.fournisseurForm.client.length; i++){
+                    var item = this.fournisseurForm.client[i];
+                    this.fournisseurForm.idClients.push(item.id);  
+                }
+
+                data.append('listClientAjouter', JSON.stringify(this.fournisseurForm.idClients));
+
                 let action = "createFournisseur";
 
                 if(this.modeModify){
@@ -219,15 +266,18 @@
                   
                     if(response.data.code==0){
                         this.$refs.closePoup.click();
-                        this.getFournisseur();
                         this.flushData();
+                        this.getFournisseur();
                         Vue.swal.fire(
                           'succés!',
                           'Fournisseur enregistré avec succés!',
                           'success'
-                        )
+                        ).then((result) => {
+                          window.location.reload();
+                        });
                         
-
+                        
+                        
                     }else{
                          Vue.swal.fire(
                           'error!',
@@ -244,6 +294,8 @@
                 this.fournisseurForm.adresse = "";
                 this.fournisseurForm.telephone= "";
                 this.fournisseurForm.logo= "";
+                this.fournisseurForm.client= "";
+                this.fournisseurForm.idClients= "";
             },
             getFournisseur(page = 1){
                 axios.get('/configuration/getFournisseur?page=' + page + "&paginate=" + this.paginate).then(response => {
@@ -262,14 +314,17 @@
                 }).then((result) => {
                   if (result.isConfirmed) {
                         axios.delete('/configuration/deleteFournisseur/'+fournisseur.id+"?logo="+fournisseur.logo).then(response => {
-                            console.log(response);
+                            this.modeModify = false;
+                             this.getFournisseur();
                              Vue.swal.fire(
                               'Supprimé!',
                               'Fournisseur supprimé avec succés.',
                               'success'
-                            );
-                             this.modeModify = false;
-                             this.getFournisseur();
+                            ).then((result) => {
+                                 window.location.reload();
+                            });
+                             
+                           
 
 
                         });
@@ -291,6 +346,18 @@
                 }else{
                     this.hasImage = false;
                 }
+
+
+                // value selected client
+                this.fournisseurForm.client=[];
+                var selected = [];
+                for(var i=0; i<this.listClient.length;i++){
+                    var foauth = this.listClient[i].clfocl;
+                    if(foauth.includes(fournisseur.id)){
+                        selected.push(this.listClient[i]);
+                    }
+                }
+                this.fournisseurForm.client = selected;
             },
             closeModal(){
                 this.$refs.closePoup.click();
@@ -305,3 +372,4 @@
         }
     }
 </script>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

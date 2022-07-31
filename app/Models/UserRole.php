@@ -51,4 +51,15 @@ class UserRole
             static::ROLE_CLIENT => 'Client'
         ];
     }
+
+     /***
+     * @return array
+     */
+    public static function getRoleAdminList()
+    {
+        return [
+            static::ROLE_ADMIN  => 'Admin',
+            static::ROLE_USER   => 'User',
+        ];
+    }
 }

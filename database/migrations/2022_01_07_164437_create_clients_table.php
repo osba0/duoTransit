@@ -19,6 +19,7 @@ class CreateClientsTable extends Migration
             $table->string('clnmcl');
             $table->string('cladcl');
             $table->string('cltele');
+            $table->string('clmail');
             $table->string('cllogo')->nullable(); 
             $table->text('clfocl')->nullable();  
             $table->text('cltyco')->nullable();  
