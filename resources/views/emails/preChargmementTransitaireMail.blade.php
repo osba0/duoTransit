@@ -11,8 +11,10 @@
       <br/><br/>
       Cordialement,<br/><br/>
       <h3 style="margin:0"><u>{{ $transitaire['nom'] }}</u></h3>
-      {{ $transitaire['telephone'] }}<br/>
-      {{ $transitaire['adresse'] }}<br/>
+      Tél: {{ $transitaire['telephone'] }}<br/>
+      Fax: {{ $transitaire['fax'] }}<br/>
+      Email: {{ $transitaire['email'] }}<br/>
+      Adresse: {{ $transitaire['adresse'] }}<br/>
    </div>
    
 

@@ -2,39 +2,48 @@
     <div>
         <div class="row justify-content-center histoform">
             <div class="col-md-12">
-                <div class="border p-3 bg-white justify-content-center rounded  text-center">
-                    <div class="d-inline-flex filtreTireur align-items-end">
-                        <div class="mr-3 text-left" style="width: 230px">
+                <div class="d-inline-block">
+                    <div class="border p-3 bg-white justify-content-center rounded">
+                        <div class="d-inline-flex filtreTireur align-items-end">
+                            <div class="mr-3 text-left" style="width: 230px">
 
-                           <label class="mr-3  text-left w-100 mb-0">Date Début</label>
-                            <date-picker v-model="filtre.dateDebut" required valueType="YYYY-MM-DD"  :disabled-date="disabledFutureDate" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                               <label class="mr-3  text-left w-100 mb-0">Date Début</label>
+                                <date-picker v-model="filtre.dateDebut" required valueType="YYYY-MM-DD"  :disabled-date="disabledFutureDate" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                            </div>
+                            <div class="mr-3 text-left" style="width: 230px">
+                                  <label class="text-left w-100 mb-0">Date Fin</label>
+                                  <date-picker v-model="filtre.dateFin" required valueType="YYYY-MM-DD" input-class="form-control w-100" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                            </div>
+                            <div class="mr-3 text-left" style="width: 230px">
+                                <label class="text-left w-100 mb-0">Type Commande</label>
+                                <select class="form-control" v-model="filtre.typeCmd">
+                                    <option value="">Tout</option>
+                                    <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
+                                </select>
+                            </div>
+                            <div class="mr-3 text-left" style="width: 230px">
+                                <label class="text-left w-100 mb-0">Fournisseur</label>
+                                <select class="form-control" v-model="filtre.fournisseur">
+                                    <option value="">Tout</option>
+                                    <option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option>
+                                    
+                                </select>
+                            </div>
+                            <div class="mr-3 text-left" style="width: 230px">
+                                <label class="text-left w-100 mb-0">N°Dossier</label>
+                                <input type="text" class="form-control"  v-model="filtre.dossier">
+                            </div>
+                             <div class="mr-3 text-left" style="width: 230px">
+                                <label class="text-left w-100 mb-0">N°Commande</label>
+                                <input type="text" class="form-control"  v-model="filtre.commande">
+                            </div>
+                            <div>
+                               <button @click="search()" class="btn btn-success ml-3"> <span v-if="isloading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Rechercher</button>
+                            </div>
                         </div>
-                        <div class="mr-3 text-left" style="width: 230px">
-                              <label class="text-left w-100 mb-0">Date Fin</label>
-                              <date-picker v-model="filtre.dateFin" required valueType="YYYY-MM-DD" input-class="form-control w-100" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
-                        </div>
-                        <div class="mr-3 text-left" style="width: 230px">
-                            <label class="text-left w-100 mb-0">Type Commande</label>
-                            <select class="form-control" v-model="filtre.typeCmd">
-                                <option value="">Tout</option>
-                                <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
-                            </select>
-                        </div>
-                        <div class="mr-3 text-left" style="width: 230px">
-                            <label class="text-left w-100 mb-0">Fournisseur</label>
-                            <select class="form-control" v-model="filtre.fournisseur">
-                                <option value="">Tout</option>
-                                <option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option>
-                                
-                            </select>
-                        </div>
-                        
-                        <div>
-                           <button @click="search()" class="btn btn-success ml-3"> <span v-if="isloading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Rechercher</button>
-                        </div>
-                    </div>
-                     
-                </div>  
+                         
+                    </div>  
+                </div>
             </div>
           
         </div>
@@ -45,6 +54,25 @@
             <template v-if="!isDetail">      
                 <div class="row mt-3">
                     <div class="col-sm-12 ">
+                        <div class="d-flex justify-content-between align-content-center mb-2">
+                                <div class="d-flex align-items-end">
+                                    <div>
+                                        <div class="d-flex align-items-center">
+                                            <label class="text-nowrap mr-2 mb-0">Nbre de ligne par Page</label> 
+                                        <select
+                                            v-model="paginateHisto"
+                                            class="form-control form-control-sm">
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                        </select>
+                                    </div>
+                                </div>
+                        
+                            </div>
+                           
+                        </div> 
                         <div class="position-relative overflow-hidden">
                             <table class="table">
                                 <thead class="thead-blue" :class="[isloading ? '' : 'hasborder']">
@@ -57,14 +85,13 @@
                                         <th class="p-2 border-right border-white h6">N°TC</th>
                                         <th class="p-2 border-right border-white h6">Type TC</th>
                                         <th class="p-2 border-right border-white h6">N°Plomb</th>
-                                        <th class="p-2 border-right border-white h6">Nbre commandes</th>
                                         <th class="p-2 border-right border-white h6">Nbre colis total</th>
                                         <th class="p-2 border-right border-white h6">Poids total</th>
                                         <th class="p-2 border-right border-white h6">Volume total</th-->
                                         <th class="p-2 border-right border-white h6">Etat</th>
-                                        <th class="p-2 border-right border-white h6">Rapport en PDF</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Date</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
+                                        <th class="p-2 border-right border-white h6 text-right">Actions</th>
                                         
                                     </tr>
                                 </thead>
@@ -90,11 +117,6 @@
                                             <td class="p-2 align-middle">
                                                {{ res.plomb }}
                                             </td>
-                                            <td>
-                                                <div @click="detailsCommande(res)">
-                                                    {{ res.nbrCmd }} <i class="fa fa-eye mr-2" aria-hidden="true"></i>
-                                                </div>
-                                            </td>
                                             <td>{{ parseInt(res.total_colis) + parseInt(res.total_pallette) }}</td>
                                             <td>{{ res.total_poids }}</td>
                                             <td>{{ res.total_volume }}</td>
@@ -104,15 +126,26 @@
                                                 <span v-if="res.is_close==1" class="badge badge-secondary">Cloturé</span>
                                                 <span v-if="res.etat==0" class="badge badge-warning">En cours</span>
                                             </td>
-                                             <td>
+                                             <!--td>
                                                 <div v-if="res.rapport_pdf!=null" class="d-flex align-items-center w-100 justify-content-center cursor-pointer"  @click="getpdf(res.rapport_pdf, res.id)">
                                                     <i class="fa fa-download mr-2" aria-hidden="true"></i>
                                                     <span class="badge badge-danger">PDF</span>
                                                 </div>
                                                 
-                                            </td>
+                                            </td-->
                                             <td>{{ res.date }}</td>
                                             <td>{{ res.user }}</td>
+                                             <td class="p-2 align-middle">
+                                                <div class="d-flex justify-content-end align-items-center">
+                                                    <div @click="detailsCommande(res)" class="d-flex cursor-pointer bg-primary position-relative rounded-circle boxAction justify-content-center align-items-center mr-2" title="Liste des commandes">
+                                                    <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre">{{ res.nbrCmd }}</span> <i class="fa fa-list-ul" aria-hidden="true"></i>
+                                                    </div>
+                                                    <a v-if="res.etat==1" href="#" title="Rapport Empotage" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(res)" data-toggle="modal" data-target="#openFacture">
+                                                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                                    </a>
+                                                </div>
+                                                
+                                            </td>
                                         </tr>
                                     </template>
                                 </tbody>
@@ -196,7 +229,14 @@
                              {{dry.douane}}
                          </td>
                         <td class="p-2 text-right">
-                            <div class="d-flex justify-content-end align-items-center">
+                             <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                            <a href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
+                            </a>
+                            <!--div class="d-flex justify-content-end align-items-center">
                                 <span v-if="dry.dossier_empotage_id > 0"><i class="fa fa-check-circle"></i></span>
                                 <label class="switch">
                                     <template v-if="selected.etat==0">
@@ -211,7 +251,7 @@
                                     </template>
                                     
                                 </label>
-                            </div>
+                            </div-->
                         </td>
                     </tr>
                     </template>
@@ -228,13 +268,42 @@
                 <hr>
             </template>
         </template>
-  
-        
+        <!-- Modal Facture-->
+        <div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+          aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="document">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left">
+                        <h4 class="modal-title w-100 font-weight-bold">Facture</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3">
+                         <template v-if="pdfFile != null">
+                            <embed :src="'/assets/factures/'+pdfFile" frameborder="0" width="100%" height="450px">
+                          </template>
+                         <template v-if="pdfFileModal != null">
+                            <embed :src="'/pdf/empotage/'+pdfFileModal" frameborder="0" width="100%" height="450px">
+                          </template>
+                         <template v-if="pdfFileModal != null && pdfFile != null"> Auncun fichier </template>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" v-on:click="closeModalPdf()" class="btn btn-warning">Fermer</button>
+                  </div>
+             </div>
+            
+          </div>
+        </div>
+        <modalDetailsCommande></modalDetailsCommande>
      
     </div>
 </template>
 
 <script>
+
+import { EventBus } from '../../event-bus';
 
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
@@ -242,24 +311,33 @@ import VueTimepicker from 'vue2-timepicker';
 import 'vue2-timepicker/dist/VueTimepicker.css'; 
 import { PdfMakeWrapper, Table } from 'pdfmake-wrapper';
 
+import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
+
 export default { 
     props: [
             'listFournisseurs',
             'typeCmd',
-            'clientCurrent' 
+            'clientCurrent',
+            'listEntrepots'
     ],
+     components: {
+        modalDetailsCommande
+    },
     data() {
         return {
 
             filtre: {
-                dateDebut: new Date(new Date().getTime() - 24*60*60*1000).toISOString().slice(0,10),
+                dateDebut: new Date(new Date().getTime() - 168*60*60*1000).toISOString().slice(0,10), // 1 semaine 24 * 7 = 148
                 dateFin: new Date().toISOString().slice(0,10),
                 typeCmd: '',
-                fournisseur: ''
+                fournisseur: '',
+                dossier: '',
+                commande: ''
             },
             isloading: false,
             paginate: 5,
             paginateRecep: 5,
+            paginateHisto: 10,
             result: {},
             reception: {},
             showResult: false,
@@ -271,8 +349,15 @@ export default {
                 typeCmd: '',
                 dossier: ''
             },
-            isDetail: false
+            isDetail: false,
+            pdfFileModal: null,
+            pdfFile: null
         };
+    },
+    watch: {
+        paginateHisto: function() {
+            this.search();
+        }
     },
     methods: {
         disabledFutureDate(date) {
@@ -333,7 +418,39 @@ export default {
             this.selected.numtc='';
             this.selected.typetc='';
             this.selected.plomb='';
+        },
+        showInvoice(pre){
+            this.pdfFileModal = null;
+            this.pdfFile = null;
+
+            var labelCmd = pre.typeCommande.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+            this.pdfFileModal = 'dossier-'+pre.reference+'_'+labelCmd+'_numtc-'+pre.numContenaire+'_plomb-'+pre.plomb+".pdf";
+       },
+       closeModalPdf(){
+            this.$refs.closePoupPdf.click();
+        },
+        showFacture(file){
+            this.pdfFileModal = null;
+            this.pdfFile = null;    
+            if(file!=''){
+                this.pdfFile = file;
+            }
+        },
+        showModal(dry){ 
+    
+            EventBus.$emit('VIEW_CMD', {
+                openView: true,
+                dry: dry,
+                fournisseur: this.listFournisseurs,
+                typeCommande: this.typeCmd,
+                entrepot: this.listEntrepots,
+                idClient: this.clientCurrent.id
+            });
+
         }
+    },
+    mounted() {
+      this.search();
     }
    
 };

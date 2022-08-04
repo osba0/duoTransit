@@ -10,7 +10,7 @@ use App\Models\TypActivity;
 
 class ChargementCreation extends Model
 {
-    protected $fillable = ['numDossier', 'dateDebut', 'dateCloture', 'users_id', 'clients_id', 'type_commandes_id', 'reetat'];
+    protected $fillable = ['numDossier', 'dateDebut', 'dateCloture', 'users_id', 'clients_id', 'type_commandes_id', 'reetat', 'entrepots_id'];
    
     use HasFactory, LogsActivity;
 
@@ -19,7 +19,7 @@ class ChargementCreation extends Model
 
     protected static $ignoreChangedAttributes = ['updated_at'];
 
-    protected static $logAttributes = ['numDossier', 'dateDebut', 'dateCloture', 'users_id', 'clients_id', 'type_commandes_id', 'reetat'];
+    protected static $logAttributes = ['numDossier', 'dateDebut', 'dateCloture', 'users_id', 'clients_id', 'type_commandes_id', 'reetat', 'entrepots_id'];
 
     protected static $recordEvents = ['created', 'updated', 'deleted'];
 

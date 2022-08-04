@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Entite extends Model
 {
-    protected $fillable = ['id', 'nom', 'slug','adresse', 'logo', 'telephone','etat', 'contenaires_id', 'entrepots_id'];
+    protected $fillable = ['id', 'nom', 'slug', 'adresse', 'logo', 'telephone', 'fax', 'email', 'etat', 'contenaires_id', 'entrepots_id'];
 
     use HasFactory;
 

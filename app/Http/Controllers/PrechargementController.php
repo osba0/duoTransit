@@ -159,8 +159,6 @@ class PrechargementController extends Controller
                 'type_commandes.tcolor as typecmdColor',
                 'contenaires.nom as contenaire')->where('dossier_prechargements.clients_id', request('id'));
 
-
-
             if($keyword!=''){
                 $term = "%$keyword%";
 
@@ -227,7 +225,7 @@ class PrechargementController extends Controller
                 $dries = $dries->filtreRate($filtreRate); 
             }
             
-            $dries = $dries->paginate($paginate);
+            $dries = $dries->orderBy('redali', 'asc')->paginate($paginate);
 
         }else{
            

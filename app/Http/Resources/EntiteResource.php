@@ -19,6 +19,8 @@ class EntiteResource extends JsonResource
             'nom'       => $this->nom,
             'telephone' => $this->telephone,
             'adresse'   => $this->adresse,
+            'fax'       => $this->fax,
+            'email'     => $this->email,
             'logo'      => $this->logo,
             'etat'      => $this->etat,
             'entrepots' => $this->entrepots_id,

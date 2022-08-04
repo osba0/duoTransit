@@ -29,6 +29,8 @@ class EmpotageResource extends JsonResource
             "total_pallette" => $this->total_palette!=''?$this->total_palette:0,
             "typeCommande"   => $this->typecmd,
             "typeCommandeID" => $this->typecmdID,
+            "entrepot"       => $this->nomEntrepot,
+            "entrepotID"     => $this->idEntrepot,
             "IDContenaire"   => $this->IDContenaire,
             "capaciteContenaire"   => $this->capacite,
             "is_close"       => $this->cloture, 

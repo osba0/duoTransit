@@ -7,6 +7,8 @@
                         <th class="p-2 border-right border-white h6">#</th>
                         <th class="p-2 border-right border-white h6">Nom</th>
                         <th class="p-2 border-right border-white h6">Telephone</th>
+                        <th class="p-2 border-right border-white h6">Fax</th>
+                        <th class="p-2 border-right border-white h6">Email</th>
                         <th class="p-2 border-right border-white h6">Adresse</th>
                         <th class="p-2 border-right border-white h6">Entrepôts</th>
                         <th class="p-2 border-right border-white h6">Contenaires</th>
@@ -27,6 +29,12 @@
                         </td>
                         <td class="p-2 align-middle">
                             {{ entite.telephone }}
+                        </td>
+                          <td class="p-2 align-middle">
+                            {{ entite.fax }}
+                        </td>
+                          <td class="p-2 align-middle">
+                            {{ entite.email }}
                         </td>
                         <td class="p-2 align-middle">
                            {{ entite.adresse }}
@@ -127,6 +135,29 @@
                                     <div class="w-100 d-flex align-items-center my-2"></div>
                                  </div>
                                  <div class="col-6 my-2 d-flex flex-column">
+                                       <div class="w-100 d-flex align-items-center my-2">
+                                            <div class="md-form w-100 d-flex justify-content-between align-items-center">
+                                            <label for="fax" class="d-block m-0 text-right w-35 pr-2" >Fax</label>
+                                            <input class="w-65 form-control"  v-model="entiteForm.fax" type="text" id="fax"/>
+                                        </div>
+                                        </div>
+                                    
+                                    <div class="w-100 d-flex align-items-center my-2"></div>
+                                    
+                                 </div>
+                             </div>
+                              <div class="row">
+                                <div class="col-6 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                            <div class="md-form w-100 d-flex justify-content-between align-items-center">
+                                            <label for="email" class="d-block m-0 text-right w-35 pr-2" >Email</label>
+                                            <input class="w-65 form-control"  v-model="entiteForm.email" type="text" id="email"/>
+                                        </div>
+                                        </div>
+                                    
+                                    <div class="w-100 d-flex align-items-center my-2"></div>
+                                 </div>
+                                 <div class="col-6 my-2 d-flex flex-column">
                                        <div class="w-100 d-flex my-2">
                                             <div class="md-form w-100 d-flex justify-content-between">
                                             <label for="logo" class="d-block m-0 text-right w-35 pt-3 pr-2" >Logo</label>
@@ -207,6 +238,8 @@
                     adresse: '',
                     logo: '',
                     telephone: '',
+                    fax: '',
+                    email: '',
                     contenaires: [],
                     entrepotsValues: [],
                     entrepots: [],
@@ -259,6 +292,8 @@
                 data.append('nom', this.entiteForm.nom);
                 data.append('adresse', this.entiteForm.adresse);
                 data.append('telephone', this.entiteForm.telephone);
+                data.append('fax', this.entiteForm.fax);
+                data.append('email', this.entiteForm.email);
                 data.append('entrepots', JSON.stringify(this.entiteForm.entrepots));
                
                 // get entrepot
@@ -359,6 +394,8 @@
                 this.entiteForm.nom = entite.nom;
                 this.entiteForm.adresse = entite.adresse;
                 this.entiteForm.telephone= entite.telephone;
+                this.entiteForm.fax= entite.fax;
+                this.entiteForm.email= entite.email;
                 this.entiteForm.logo= entite.logo;
                 this.entiteForm.entrepots= this.getIdSelected(this.listEntrepots, entite.entrepots);
                 this.entiteForm.contenaires = this.getIdSelected(this.listContenaires, entite.contenaires);

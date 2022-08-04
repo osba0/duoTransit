@@ -50,10 +50,10 @@ class Reception extends Model
         $typeCmd = request('typeCmd');
         if(isset($typeCmd)){
             $query->where('type_commandes_id', $typeCmd)->where('receptions.clients_id', request('id'))
-                ->orderBy('redali', 'desc');
+                ->orderBy('recrea', 'desc');
         }else{
              $query->where('receptions.clients_id', request('id'))
-                ->orderBy('redali', 'asc');
+                ->orderBy('recrea', 'desc');
          
         }
     }

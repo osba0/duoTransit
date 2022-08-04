@@ -48,6 +48,7 @@ class EmpotageController extends Controller
             ->leftJoin('users', 'empotages.users_id', '=', 'users.id')
             ->leftJoin('type_commandes', 'empotages.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('contenaires', 'empotages.contenaires_id', '=', 'contenaires.id')
+            ->leftJoin('entrepots', 'empotages.entrepots_id', '=', 'entrepots.id')
             ->groupBy('empotages.id')
             ->select('receptions.dossier_empotage_id', 
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
@@ -70,6 +71,8 @@ class EmpotageController extends Controller
                 'empotages.created_at as created_at',
                 'empotages.rapport_pdf as rapport_pdf',
                 'users.username as user',
+                'entrepots.nomEntrepot as nomEntrepot', 
+                'entrepots.id as idEntrepot',
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.tcolor as tcolor',
                 'type_commandes.id as typecmdID',
@@ -124,6 +127,7 @@ class EmpotageController extends Controller
             "numContenaire" => request('tc'),
             "contenaires_id" => request('typetc'),
             "type_commandes_id" => request('typeCmd'),
+            "entrepots_id" => request('idEntrepot'),
             'plomb' => request('plomb'),
             "poidEmpote" => 0,
             "volumeEmpote" =>  0, 
@@ -183,7 +187,7 @@ class EmpotageController extends Controller
             ->leftJoin('empotages', 'empotages.id', '=', 'receptions.dossier_empotage_id')
             ->leftJoin('users as a', 'empotages.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
-            ->select('*','receptions.type_commandes_id as typeCmd','b.username as user_created','a.username as prechargeur')->where('receptions.clients_id', request('id'))->where('receptions.type_commandes_id', request('typecmd'))->paginate($paginate); 
+            ->select('*','receptions.type_commandes_id as typeCmd','b.username as user_created','a.username as prechargeur')->where('receptions.clients_id', request('id'))->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entrepots_id', request('idEntrepot'))->paginate($paginate); 
 
         }else{
            

@@ -21,7 +21,7 @@
                     <span></span>
                   </div>
                   <div class="text-center py-3">
-                    <h4 class="mb-0">{{ nbrCommande }}</h4>
+                    <h4 class="mb-0">{{ format_nbr(nbrCommande) }}</h4>
                   </div>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                     <span></span>
                   </div>
                   <div class="text-center py-3">
-                    <h4 class="mb-0">{{ nbrColis }}</h4>
+                    <h4 class="mb-0">{{ format_nbr(nbrColis) }}</h4>
                   </div>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                     <span></span>
                   </div>
                   <div class="text-center py-3">
-                    <h4 class="mb-0">{{ totalPoids }}</h4>
+                    <h4 class="mb-0">{{ format_nbr(totalPoids) }}</h4>
                   </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@
                     <span></span>
                   </div>
                   <div class="text-center py-3">
-                    <h4 class="mb-0">{{ totalVolume }}</h4>
+                    <h4 class="mb-0">{{ format_nbr(totalVolume) }}</h4>
                   </div>
                 </div>
             </div>
@@ -167,15 +167,15 @@
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
                         <td class="p-2 align-middle">
                         		<template v-if="dry.renbcl > 0">
-		                     			<label class="badge badge-secondary mr-1">{{dry.renbcl}} Colis</label>
+		                     			<label class="badge badge-secondary mr-1">{{(dry.renbcl)}} Colis</label>
 		                     	  </template>
 		                     	  <template v-if="dry.renbpl > 0">
-		                     		 <label class="badge badge-info mr-1">{{dry.renbpl}} Pal</label>
+		                     		 <label class="badge badge-info mr-1">{{(dry.renbpl)}} Pal</label>
 		                     	  </template>
                         
                         </td>
-                        <td class="p-2 align-middle text-right">{{ dry.repoid }}</td>
-                        <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
+                        <td class="p-2 align-middle text-right">{{ format_nbr(dry.repoid) }}</td>
+                        <td class="p-2 align-middle text-right">{{ (dry.revolu) }}</td>
                         
                         <td class="p-2 align-middle text-right">{{ dry.renufa }}</td>
                         <!--td class="p-2 align-middle text-right">{{ dry.revafa }}</td-->
@@ -205,9 +205,9 @@
                     </tr>
                     <tr class="thead-blue">
                         <td colspan="5" class="p-2 h5 align-middle text-right border-right thead-blue">TOTAL</td>
-                        <td class="p-2 align-middle h6 text-center border-right thead-blue">{{ nbrColis }}</td>
-                        <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ totalPoids }}</td>
-                        <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ totalVolume }}</td>
+                        <td class="p-2 align-middle h6 text-center border-right thead-blue">{{ format_nbr(nbrColis) }}</td>
+                        <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ format_nbr(totalPoids) }}</td>
+                        <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ format_nbr(totalVolume) }}</td>
                         <td colspan="4" class="p-2 h5 align-middle text-center  border-right" :class="[nbrJoursMoy<=8?'bg-success':'', (nbrJoursMoy>8 && nbrJoursMoy<=15)?'bg-warning':'', nbrJoursMoy>15?'bg-danger':'']">Nbr Jours Moyen: {{nbrJoursMoy}}</td>
                         
                     </tr>
@@ -378,7 +378,7 @@
                                                 <div class="d-flex align-items-center">
                                                     <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                                     <span class="ml-1 small">{{nameFacture}}</span>
-                                                    <button class="btn p-0" type="button" v-on:click="removePDF()"><i aria-hidden="true" class="fa fa-close text-danger"></i></button>
+                                                    <button class="btn p-0" type="button" v-on:click="removePDF(nameFacture)"><i aria-hidden="true" class="fa fa-close text-danger"></i></button>
                                                 </div>
                                                
                                             </template>
@@ -401,12 +401,12 @@
 			                    </div>
 			                  
                   		 	    <div class="w-100 my-2 d-flex justify-content-between align-items-center">
-			                        <label  for="poidstotal" class="d-block m-0 text-right w-35 pr-2">Poids</label>
+			                        <label  for="poidstotal" class="d-block m-0 text-right w-35 pr-2">Poids (KG)</label>
 			                        <input autocomplete="off" class="w-65 form-control" type="decimal" id="poidstotal" v-model="reception.poidstotal" :class="{ 'border-danger': submitted && !$v.reception.poidstotal.required }">
 			                    </div>
 			                     <div class="w-100 d-flex my-2 justify-content-between align-items-center">
 			                        <label for="volumetotal" class="d-block m-0 text-right w-35 pr-2" >
-			                        	Volume
+			                        	Volume (m<sup>3</sup>)
 			                        </label>
 			                        <input autocomplete="off" class="w-65 form-control" type="decimal" v-model="reception.volumetotal" id="volumetotal" :class="{ 'border-danger': submitted && !$v.reception.volumetotal.required }">
 			                    </div>
@@ -415,7 +415,7 @@
 			                        <input autocomplete="off" class="w-65 form-control" v-model="reception.numfact" readonly type="text" id="numfact">
 			                    </div>
 			                     <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
-			                        <label for="montfact" class="d-block m-0 text-right w-35 pr-2" >Montant Facture</label>
+			                        <label for="montfact" class="d-block m-0 text-right w-35 pr-2" >Montant Facture (&euro;)</label>
 			                        <input autocomplete="off" class="w-65 form-control" v-model="reception.montfact" type="text" id="montfact"  :class="{ 'border-danger': submitted && !$v.reception.montfact.required }">
 			                    </div>
 			                     <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
@@ -450,32 +450,8 @@
           </div>
         </div>
 
-        <!-- Modal Facture-->
-		<div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
-          aria-hidden="true" data-backdrop="static" data-keyboard="false">
-          <div class="modal-dialog modal-xl" role="document">
-          	 <div class="modal-content">
-          	 	
-          	 		<div class="modal-header text-left">
-	                    <h4 class="modal-title w-100 font-weight-bold">Facture</h4>
-	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
-	                      <span aria-hidden="true">&times;</span>
-	                    </button>
-                    </div>
-                    <div class="modal-body mx-3">
-                  	     <template v-if="pdfFile != null">
-	                     	<embed :src="'/assets/factures/'+pdfFile" frameborder="0" width="100%" height="450px">
-                     	  </template>
-                 	     <template  v-else> Auncun fichier </template>
-                    </div>
-                    <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" v-on:click="closeModalPdf()" class="btn btn-warning">Fermer</button>
-                  </div>
-          	 </div>
-            
-          </div>
-        </div>
-
+        
+        <modalFacture></modalFacture>
         <modalDetailsCommande></modalDetailsCommande>
 
           <!-- Modal incidents-->
@@ -549,8 +525,7 @@
 	</div>
 </template>
 <script type="text/ecmascript-6">
-
-
+    import modalFacture from '../../components/modal/facture.vue';
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
 	import { required, minLength, between } from 'vuelidate/lib/validators';
     import PageLoader from '../../components/PageLoader.vue';  
@@ -564,7 +539,8 @@
         ],
          components: {
             PageLoader,
-            modalDetailsCommande
+            modalDetailsCommande,
+            modalFacture
           },
 		data() { 
             return {
@@ -608,10 +584,10 @@
 					file: ''
 				},
 				dries: {},
-				paginate: 5,
+				paginate: 10,
 				search: "",
 
-				pdfFile: null,
+				
 				filterType: '',
 				show: true,
 				submitted: false,
@@ -790,10 +766,24 @@
                 }
                 return id;
             },
-            removePDF(){
-                this.hasPdf = false;
-                this.reception.file = '';
-                this.nameFacture = '';
+            removePDF(nameFact){
+
+                Vue.swal.fire({
+                  title: 'Confirmez la suppression de la facture',
+                  text: nameFact,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'Oui, supprimer!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                        this.hasPdf = false;
+                        this.reception.file = '';
+                        this.nameFacture = '';
+                  
+                  }
+                });
             },
         	handleFileUpload(){
 
@@ -993,14 +983,6 @@
                 this.initRecep.entrepot= "";
                 this.initRecep.fournisseur= "";
         	},
-
-        	showFacture(file){
-        		
-        		if(file!=''){
-        			this.pdfFile = file;
-        		}
-        	}, 
-
         	getClient(){
 	        	axios.get('/client/'+this.idClient).then(response => {
 	                console.log(response);
@@ -1014,7 +996,13 @@
                     fournisseur: this.listFournisseurs,
                     typeCommande: this.typeCmd,
                     entrepot: this.listEntrepots,
-                    idClient: this.idClient
+                    idClient: this.idClient,
+                    canDeleteIncident: true
+                }); 
+            },
+             showFacture(fact){
+                 EventBus.$emit('VIEW_FACT', {
+                    pdfFile: fact
                 }); 
             },
         	editDry(dry){
@@ -1093,32 +1081,6 @@
                 this.commentairesCurrent = incident.commentaires;
                 this.ispreviewModal = true;
             },
-            deleteIncident(incident){
-                Vue.swal.fire({
-                  title: 'Confirmez la suppression',
-                  text: incident.objet,
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#d33',
-                  cancelButtonColor: '#3085d6',
-                  confirmButtonText: 'Oui, supprimer!'
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                        axios.delete('/incidents/deleteIncident/'+incident.id+"?logos="+ JSON.stringify(incident.photos)+"&commande="+incident.commandes).then(response => {
-                            console.log(response);
-                             Vue.swal.fire(
-                              'Supprimé!',
-                              'Incident supprimé avec succés.',
-                              'success'
-                            );
-                             this.getIncident(1, incident.commandes);
-
-
-                        });
-                  
-                  }
-                })
-            },
             closeModalIncident(){
                 this.$refs.closePoupIncident.click();
             },
@@ -1128,6 +1090,9 @@
                   $('#detailReception').modal('show');
                 //  this.$refs.closePoupDetail.click();
                 //this.$refs.detailRep.classList.toggle("show");
+            },
+            format_nbr(mnt){
+                return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             }
         },
         

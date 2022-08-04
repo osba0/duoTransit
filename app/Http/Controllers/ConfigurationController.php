@@ -446,6 +446,8 @@ class ConfigurationController extends Controller
                 "slug" => \Str::slug(request('nom')),
                 "adresse" => request('adresse'),
                 "telephone" => request('telephone'),
+                "fax" => request('fax'),
+                "email" => request('email'),
                 'logo' => $filename,
                 "etat" => 1,
                 "entrepots_id" => array_unique(json_decode(request('entrepots'))), 
@@ -493,6 +495,8 @@ class ConfigurationController extends Controller
                 "nom" => request('nom'),
                 "adresse" => request('adresse'),
                 "telephone" => request('telephone'),
+                "fax" => request('fax'),
+                "email" => request('email'),
                 'logo' => $filename,
                 "entrepots_id" => array_unique(json_decode(request('entrepots'))), 
                 "contenaires_id" => array_unique(json_decode(request('contenaires')))

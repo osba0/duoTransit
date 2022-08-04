@@ -11,8 +11,8 @@
       <br/><br/>
       Cordialement,<br/><br/>
       <h3 style="margin:0"><u>{{ $societe['clnmcl'] }}</u></h3>
-      {{ $societe['cltele'] }}<br/>
-      {{ $societe['cladcl'] }}<br/>
+      Tél: {{ $societe['cltele'] }}<br/>
+      Adresse: {{ $societe['cladcl'] }}<br/>
    </div>
    
 

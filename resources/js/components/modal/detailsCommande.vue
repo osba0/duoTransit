@@ -85,14 +85,14 @@
                                 </div>
                               
                                 <div class="w-100 my-2 d-flex justify-content-between align-items-center">
-                                    <label  for="poidstotal" class="d-block m-0 text-right w-35 pr-2">Poids</label>
+                                    <label  for="poidstotal" class="d-block m-0 text-right w-35 pr-2">Poids (KG)</label>
                                      <div class="w-65 pl-2 bg-light">
                                          <span>{{ viewReception.repoid }}</span>
                                      </div>
                                 </div>
                                  <div class="w-100 d-flex my-2 justify-content-between align-items-center">
                                     <label for="volumetotal" class="d-block m-0 text-right w-35 pr-2" >
-                                        Volume
+                                        Volume (m<sup>3</sup>)
                                     </label>
                                      <div class="w-65 pl-2 bg-light">
                                          <span>{{ viewReception.revolu }}</span>
@@ -105,7 +105,7 @@
                                      </div>
                                 </div>
                                  <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
-                                    <label for="montfact" class="d-block m-0 text-right w-35 pr-2" >Montant Facture</label>
+                                    <label for="montfact" class="d-block m-0 text-right w-35 pr-2" >Montant Facture (&euro;)</label>
                                     <div class="w-65 pl-2 bg-light">
                                         <span>{{ viewReception.revafa }}</span>
                                     </div>
@@ -168,7 +168,7 @@
                                     <th class="p-2 border-right border-white h6">Objet</th>
                                     <th class="p-2 border-right border-white h6">Commentaire</th>
                                     <th class="p-2 border-right border-white h6">Photos</th>
-                                    <th class="text-right p-2 border-right border-white h6">Action</th>
+                                    <th v-if="canDeleteIncident==true" class="text-right p-2 border-right border-white h6">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -204,7 +204,8 @@
                                        
                                     </td>
                                     <td class="p-2 text-right align-middle">
-                                        <a title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1" v-on:click="deleteIncident(incident)">
+
+                                        <a v-if="canDeleteIncident==true" title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1" v-on:click="deleteIncident(incident)">
                                             <i class="fa fa-close text-danger" aria-hidden="true"></i>
                                         </a>
                                     </td>
@@ -249,6 +250,7 @@ export default {
                 selectedPhotosModal: [],
                 ispreviewModal: false,
                 commentairesCurrent:  '',
+                canDeleteIncident: false
             }
 
       },
@@ -298,6 +300,31 @@ export default {
             this.commentairesCurrent = incident.commentaires;
             this.ispreviewModal = true;
         },
+         deleteIncident(incident){
+                Vue.swal.fire({
+                  title: 'Confirmez la suppression',
+                  text: incident.objet,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'Oui, supprimer!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                        axios.delete('/incidents/deleteIncident/'+incident.id+"?logos="+ JSON.stringify(incident.photos)+"&commande="+incident.commandes).then(response => {
+                             Vue.swal.fire(
+                              'Supprimé!',
+                              'Incident supprimé avec succés.',
+                              'success'
+                            );
+                             this.getIncident(1, incident.commandes);
+
+
+                        });
+                  
+                  }
+                })
+            }
 
       },
          
@@ -310,6 +337,7 @@ export default {
               this.typeCmd = event.typeCommande;
               this.listEntrepots = event.entrepot;
               this.idClient = event.idClient;
+              this.canDeleteIncident = event.canDeleteIncident;
 
               this.getIncident(1, event.dry.rencmd);
               

@@ -19,7 +19,7 @@ class DossierPrechargement extends Model
 
     protected static $ignoreChangedAttributes = ['updated_at'];
 
-    protected static $logAttributes = ['contenaires_id', 'nbreContenaire', 'reetat', 'users_id', 'clients_id', 'type_commandes_id'];
+    protected static $logAttributes = ['contenaires_id', 'nbreContenaire', 'reetat', 'users_id', 'clients_id', 'type_commandes_id', 'entrepots_id'];
 
     protected static $recordEvents = ['created', 'updated', 'deleted'];
 

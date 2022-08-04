@@ -73,6 +73,7 @@ Vue.component('historique-prechargement', require('./components/historique/histo
 Vue.component('prechargement-client', require('./components/prechargement/index.vue').default);  
 
 Vue.component('modalDetailsCommande', require('./components/modal/detailsCommande.vue').default); 
+Vue.component('modalFacture', require('./components/modal/facture.vue').default); 
 
 Vue.component('empotage-entite', require('./components/gestion/empotage.vue').default);  
 

@@ -110,9 +110,9 @@
                                     <th class="p-2 border-right border-white h6">Nbre colis total</th>
                                     <th class="p-2 border-right border-white h6">Poids total</th>
                                     <th class="p-2 border-right border-white h6">Volume total</th>
-                                    <!--th class="p-2 border-right border-white h6">Type commande</th-->
+                                    <th class="p-2 border-right border-white h6">Entrepôt</th>
                                     <th class="p-2 border-right border-white h6">Etat</th>
-                                    <th class="text-nowrap p-2 border-right border-white h6">Date</th>
+                                    <th class="text-nowrap p-2 border-right border-white h6">Date de création</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
                                     
                                     <th class="text-nowrap p-2 border-right text-right border-white h6">Actions</th>
@@ -134,8 +134,8 @@
                                         <td class="align-middle">{{ parseInt(pre.total_colis) + parseInt(pre.total_pallette) }}</td>
                                         <td class="align-middle">{{ pre.total_poids }}</td>
                                         <td class="align-middle">{{ pre.total_volume }}</td>
-                                        <!--td>{{ pre.typecmd }}</td-->
-                                       
+                                        
+                                        <td class="align-middle">{{ pre.entrepot }}</td>
                                         <td class="align-middle">
                                             <template v-if="pre.etat==1">
                                                 <span class="badge badge-success">Validé</span>
@@ -146,6 +146,7 @@
                                             
                                             <span v-if="pre.etat==0" class="badge badge-warning">En cours</span>
                                         </td>
+
                                         <td class="align-middle">{{ pre.dateCrea }}</td>
                                         <td class="align-middle">{{ pre.user }}</td>
                                         
@@ -410,13 +411,22 @@
                                         </div>
                                     </div>
                                 </div>
-                                 <div class="col-6 my-2 d-flex flex-column align-items-center">
-                                    <div class="w-100 d-flex align-items-center my-2">
+                                 <div class="col-6 my-2 d-flex flex-row align-items-center justify-content-between">
+                                    <div class="w-49 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                           <label  class="d-block m-0 text-left pr-2 white-space-nowrap">Choix type commande</label>
+                                           <label  class="d-block m-0 text-left pr-2 white-space-nowrap">Type commande</label>
                                             <select class="form-control" v-model="initChargement.typeCommande" :class="{ 'border-danger': submitted_add && !$v.initChargement.typeCommande.required }">
                                                 <option value="">Choisir le type commande</option>
                                                 <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                     <div class="w-49 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                           <label  class="d-block m-0 text-left pr-2 white-space-nowrap">Entrepôt</label>
+                                            <select class="form-control" v-model="initChargement.entrepot" :class="{ 'border-danger': submitted_add && !$v.initChargement.entrepot.required }">
+                                                <option value="">Choisir l'entrepôt</option>
+                                                <option v-for="entrepot in listEntrepots"  :value="entrepot.id">{{entrepot.nomEntrepot}}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -539,6 +549,8 @@
                     isSelected: false,
                     typeCommande: '',
                     etat: 0,
+                    entrepot: '',
+                    idEntrepot: '',
                     currentPage: 1
                 },
                 capacite: this.defaultContenaire.volume,
@@ -549,6 +561,7 @@
                     dateDebut:   null,
                     dateCloture: null,
                     typeCommande: "",
+                    entrepot: ""
 
                 },
                 checkedCommandes: [],
@@ -578,6 +591,7 @@
                 dateDebut:    { required },
                 dateCloture:  { required },
                 typeCommande: { required },
+                entrepot: { required },
             }
              
         },
@@ -723,7 +737,7 @@
             },
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/gerer/dossier/pre/reception/'+this.idClient+"/"+this.selected.typeCommande+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id+"&etat="+this.selected.etat+"&filtreRate="+this.filtreRate+"&keysearch="+this.searchRecep).then(response => {
+            axios.get('/gerer/dossier/pre/reception/'+this.idClient+"/"+this.selected.typeCommande+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&idPre="+this.selected.id+"&etat="+this.selected.etat+"&filtreRate="+this.filtreRate+"&keysearch="+this.searchRecep).then(response => {
                 this.reception = response.data;
                 if(this.selected.etat==0){
                     this.selected.nbrCmd   = 0;
@@ -796,11 +810,12 @@
             }
             
             axios.post("/gerer/createDossier", {
-                'numdossier': this.initChargement.numDossier,
-                'datedebut' : this.initChargement.dateDebut,
+                'numdossier'  : this.initChargement.numDossier,
+                'datedebut'   : this.initChargement.dateDebut,
                 'datecloture' : this.initChargement.dateCloture, 
-                'typeCmd' : this.initChargement.typeCommande,
-                'clientID' : this.idClient
+                'typeCmd'     : this.initChargement.typeCommande,
+                'entrepot'    : this.initChargement.entrepot,
+                'clientID'    : this.idClient
 
             }).then(response => {
               
@@ -929,6 +944,22 @@
             this.initChargement.typeCommande= "";
 
         },
+        convertImgToBase64(url, callback, outputFormat){
+            var canvas = document.createElement('CANVAS');
+            var ctx = canvas.getContext('2d');
+            var img = new Image;
+            img.crossOrigin = 'Anonymous';
+            img.onload = function(){
+                canvas.height = img.height;
+                canvas.width = img.width;
+                ctx.drawImage(img,0,0);
+                var dataURL = canvas.toDataURL(outputFormat || 'image/png');
+                callback.call(this, dataURL);
+                // Clean up
+                canvas = null; 
+            };
+            img.src = url;
+        },
         generatePdf(isnotification=false){
 
             PdfMakeWrapper.setFonts(pdfFonts);
@@ -938,163 +969,182 @@
             pdf.defaultStyle({
                 fontSize: 10
             });
-
-            //var code = new QR('my code').end;
-
-            var entete=[];
-      
-            entete.push([{text: this.currentEntite['nom'], fontSize: 22, bold: true, alignment: 'left'},  {text: 'Date: '+ this.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}]); 
-            entete.push([{text:['Client: ', {text: this.currentClient['clnmcl'], fontSize: 14}]}, {text: ['Entrepôt: ', {text: 'CNM', fontSize: 14}],  alignment: 'right'}]);
-           
-            entete.push([{text: 'N°Dossier '+this.selected.id, fontSize: 15, alignment: 'center', lineHeight: 2, colSpan: 2}]);
-            entete.push([{text: 'Prévision de chargement pour le '+this.selected.dateDebut+' ET '+this.selected.dateCloture, fontSize: 11, alignment: 'center', colSpan: 2}]);
-           
-
-            var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
-
-            const data = [];
-
-            const headerTab = ['N°FE', 'N°ECV', 'N°CDE', 'Emballage', 'Fournisseurs', 'Poids(kg)', 'Volume(m3)', 'Factures'];
             
-            data.push(headerTab); 
-            //data.push(code); 
-           
-            for(var i=0; i< this.checkedCommandes.length; i++){
-                var obj = this.checkedCommandes[i];
-                var nbr = [];
-                var emballage = [];
-                var cmdCell=[];
-                var prio = "";
+            var that  = this;
+
+            this.convertImgToBase64('/images/logo/'+that.currentEntite['logo'], function(base64Img){
+                //var code = new QR('my code').end;
+
+                var entete=[];
+
+                entete.push([
+                   { image: base64Img, width: 100}, {text: ''}, 
+                   {text: 'Date: '+ that.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}
+                ]); 
+                 
+                entete.push([
+                    {text:that.currentEntite['nom']+"\nTél: "+ that.currentEntite['telephone']+"/ Fax: "+that.currentEntite['fax']+"\nEmail: "+that.currentEntite['email']+"\nAdresse: "+that.currentEntite['adresse']},
+
+                    {text: 'N°Dossier '+that.selected.id, fontSize: 20, bold: true, alignment: 'center', color: '#3490dc'}, 
+
+                    {text: ['Entrepôt: ', {text: that.selected.entrepot, fontSize: 14}],  alignment: 'right'}]);
 
 
-                if(obj.renbcl > 0){
-                    nbr.push(obj.renbcl);
-                    emballage.push((obj.renbcl).toString() + ' Colis');
-                }
+                entete.push([{text: "\n\nClient: "+that.currentClient['clnmcl'], fontSize: 13, alignment: 'left', colSpan: 3}]);
 
-                if(obj.renbpl > 0){
-                    nbr.push(obj.renbpl);
-                    emballage.push((obj.renbpl).toString() + ' Pal.');
-                }
+                entete.push([{text: 'Prévision de chargement pour le '+that.selected.dateDebut+' ET '+that.selected.dateCloture+"\n\n", fontSize: 12, alignment: 'center', colSpan: 3}]); 
+               
 
-                cmdCell.push(obj.rencmd);
+                var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
+
+                const data = [];
+
+                const headerTab = ['N°FE', 'N°ECV', 'N°CDE', 'Emballage', 'Fournisseurs', 'Poids(kg)', 'Volume(m3)', 'Factures'];
                 
+                data.push(headerTab); 
+               
+                for(var i=0; i< that.checkedCommandes.length; i++){
+                    var obj = that.checkedCommandes[i];
+                    var nbr = [];
+                    var emballage = [];
+                    var cmdCell=[];
+                    var prio = "";
 
-                var rateMinus = 3-obj.priorite;
-                
-                for(var p=0; p < obj.priorite+rateMinus; p++){
-                    if(p<obj.priorite){
-                        prio += '+ ';
-                    }else{
-                        prio += '- ';
+
+                    if(obj.renbcl > 0){
+                        nbr.push(obj.renbcl);
+                        emballage.push((obj.renbcl).toString() + ' Colis');
                     }
-                    
-                }
 
-                cmdCell.push(prio);
-
-                
-                const item = [obj.refere,obj.reecvr, cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
-                
-                data.push(item); 
-            }
-            if(this.checkedCommandes.length==0){
-                data.push([{text: 'Aucune commande selectionné', fontSize: 12, alignment: 'center', colSpan: 8}])
-            }
-           
-            var table = new Table(data).widths([70,70,70,70,'*',60,60,90]).layout({
-                color(columnIndex){
-                return columnIndex=== 0 ? "#cccccc": '';  
-                },
-                fillColor (columnIndex){
-                    if(columnIndex===0){
-                        return columnIndex === 0 ? "#bbb": '';  
-                    }else{
-                        return columnIndex%2 === 0 ? "white": '#eee';  
+                    if(obj.renbpl > 0){
+                        nbr.push(obj.renbpl);
+                        emballage.push((obj.renbpl).toString() + ' Pal.');
                     }
+
+                    cmdCell.push(obj.rencmd);
                     
-                }
-            }).end;
 
-            // totaux
-            var totaux = [[{text: 'Total commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume total', fontSize: 10, bold: true, alignment: 'center'} ]];
-            totaux.push([{text: this.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
-
-            var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
-                color(columnIndex){
-                return columnIndex=== 0 ? "#cccccc": '';  
-                },
-                fillColor (columnIndex){
-                    if(columnIndex===0){
-                        return columnIndex === 0 ? "#ccc": '';  
+                    var rateMinus = 3-obj.priorite;
+                    
+                    for(var p=0; p < obj.priorite+rateMinus; p++){
+                        if(p<obj.priorite){
+                            prio += '+ ';
+                        }else{
+                            prio += '- ';
+                        }
+                        
                     }
-                    
-                }
-            }).margin([0, 15, 8, 7]).end;
 
-            pdf.header = {
-                 exampleLayout: {
-                    hLineWidth: function (i, node) {
-                      if (i === 0 || i === node.table.body.length) {
-                        return 0;
+                    cmdCell.push(prio);
+
+                    
+                    const item = [obj.refere,obj.reecvr, cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
+                    
+                    data.push(item); 
+                }
+                if(that.checkedCommandes.length==0){
+                    data.push([{text: 'Aucune commande selectionné', fontSize: 12, alignment: 'center', colSpan: 8}])
+                }
+               
+                var table = new Table(data).widths([70,70,70,70,'*',60,60,90]).layout({
+                    color(columnIndex){
+                    return columnIndex=== 0 ? "#cccccc": '';  
+                    },
+                    fillColor (columnIndex){
+                        if(columnIndex===0){
+                            return columnIndex === 0 ? "#bbb": '';  
+                        }else{
+                            return columnIndex%2 === 0 ? "white": '#eee';  
+                        }
+                        
+                    }
+                }).end;
+
+                // totaux
+                var totaux = [[{text: 'Total commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume total', fontSize: 10, bold: true, alignment: 'center'} ]];
+                totaux.push([{text: that.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
+
+                var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
+                    color(columnIndex){
+                    return columnIndex=== 0 ? "#cccccc": '';  
+                    },
+                    fillColor (columnIndex){
+                        if(columnIndex===0){
+                            return columnIndex === 0 ? "#ccc": '';  
+                        }
+                        
+                    }
+                }).margin([0, 15, 8, 7]).end;
+
+                pdf.header = {
+                     exampleLayout: {
+                        hLineWidth: function (i, node) {
+                          if (i === 0 || i === node.table.body.length) {
+                            return 0;
+                          }
+                          return (i === node.table.headerRows) ? 2 : 1;
+                        },
+                        vLineWidth: function (i) {
+                          return 0;
+                        },
+                        hLineColor: function (i) {
+                          return i === 1 ? 'black' : '#aaa';
+                        },
+                        paddingLeft: function (i) {
+                          return i === 0 ? 0 : 8;
+                        },
+                        paddingRight: function (i, node) {
+                          return (i === node.table.widths.length - 1) ? 0 : 8;
+                        }
                       }
-                      return (i === node.table.headerRows) ? 2 : 1;
-                    },
-                    vLineWidth: function (i) {
-                      return 0;
-                    },
-                    hLineColor: function (i) {
-                      return i === 1 ? 'black' : '#aaa';
-                    },
-                    paddingLeft: function (i) {
-                      return i === 0 ? 0 : 8;
-                    },
-                    paddingRight: function (i, node) {
-                      return (i === node.table.widths.length - 1) ? 0 : 8;
-                    }
-                  }
-            }
+                }
 
-            pdf.footer(function(currentPage, pageCount) { return  { margin: [20, 0, 20, 0], height: 30, columns: [{alignment: "left",
-            text: 'DuoTransit'}, {text: currentPage.toString() + ' / ' + pageCount, alignment: "right"}]}; });
+                pdf.footer(function(currentPage, pageCount) { return  { margin: [20, 0, 20, 0], height: 30, columns: [{alignment: "left",
+                text: 'DuoTransit'}, {text: currentPage.toString() + ' / ' + pageCount, alignment: "right"}]}; });
 
-            pdf.add(header);
+                pdf.add(header);
 
 
 
-            pdf.add(table);
-            pdf.add(tabtotaux);
-            pdf.add(
-                pdf.ln(2)
-            );
+                pdf.add(table);
+                pdf.add(tabtotaux);
+                pdf.add(
+                    pdf.ln(2)
+                );
 
+                var endPage = [];
 
+                endPage.push([{text: '+ - -   Pas urgente \n+ + -  Normale \n+ + + Urgente', fontSize: 10, bold: true, alignment: 'left'}, new QR((that.selected.id).toString()).fit(80).alignment('right').end]);
 
-            pdf.add(new QR((this.selected.id).toString()).fit(80).alignment('right').end);
+                pdf.add(endPage);
 
-            if(isnotification){
-                
-               var that = this; 
-                pdf.create().getDataUrl(function(url) { 
+                if(isnotification){
+                    
+                   var self = that; 
+                    pdf.create().getDataUrl(function(url) { 
 
-                    console.log(url, "File PDF"); 
-                    axios.post("/gerer/createDossier/notification/"+that.currentClient['id'], {
-                        'idsCmd': that.commandeSelected,
-                        'id_dossier' : that.selected.id,
-                        'date_debut': that.selected.dateDebut.replaceAll("/", "-"),
-                        'date_fin': that.selected.dateCloture.replaceAll("/", "-"),
-                        'typeCmd': that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
-                        'base64_file_pdf': url
+                        console.log(url, "File PDF"); 
+                        axios.post("/gerer/createDossier/notification/"+self.currentClient['id'], {
+                            'idsCmd': self.commandeSelected,
+                            'id_dossier' : self.selected.id,
+                            'entrepot' : self.selected.idEntrepot,
+                            'date_debut': self.selected.dateDebut.replaceAll("/", "-"),
+                            'date_fin': self.selected.dateCloture.replaceAll("/", "-"),
+                            'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
+                            'base64_file_pdf': url
 
-                    }).then(response => {
+                        }).then(response => {
 
-                    });
+                        });
 
-               }); // download() or open() // getDataUrl
+                   }); // download() or open() // getDataUrl
 
-            }else{
-                pdf.create().download(); 
-            }
+                }else{
+                    pdf.create().download(); 
+                }
+            });
+
+            
            
     
            },
@@ -1114,6 +1164,8 @@
             this.selected.isSelected = true;
             this.selected.typeCommande = dossier.typecmdId;
             this.selected.etat = dossier.etat;
+            this.selected.entrepot = dossier.entrepot;
+            this.selected.idEntrepot = dossier.entrepotID; 
             this.setProgressCont(dossier.total_volume);
             this.getReception();
             this.getCmdSelected(this.selected.id, false);

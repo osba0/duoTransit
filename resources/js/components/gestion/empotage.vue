@@ -102,6 +102,7 @@
                                     <th class="p-2 border-right border-white h6">N°TC</th>
                                     <th class="p-2 border-right border-white h6">Type TC</th>
                                     <th class="p-2 border-right border-white h6">N°Plomb</th>
+                                    <th class="p-2 border-right border-white h6">Entrepôt</th>
                                     <th class="p-2 border-right border-white h6">Etat</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Date de création</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
@@ -126,6 +127,9 @@
                                         </td>
                                         <td class="p-2 align-middle">
                                            {{ empo.plomb }}
+                                        </td>
+                                        <td class="p-2 align-middle">
+                                           {{ empo.entrepot }}
                                         </td>
                                        
                                         <td class="align-middle">
@@ -375,23 +379,28 @@
                                         :class="{ 'border-danger': submitted && !$v.keyword.required }" />
                                          <ul class="dropdown-menu filterUl p-2" :class="{'d-block': showDropDown}" v-if="dossiers.length > 0">
                                             <li v-for="dossier in dossiers" :key="dossier.id" >
-                                                <a class="p-2" v-text="dossier.numDossier+' '+getTypeCommande(dossier.type_commandes_id)" v-on:click="say(dossier.numDossier, dossier.type_commandes_id)"></a>
+                                                <a class="p-2" v-text="dossier.numDossier+' '+getTypeCommande(dossier.type_commandes_id)" v-on:click="say(dossier.numDossier, dossier.type_commandes_id,  dossier.entrepots_id)"></a>
                                             </li>
                                         </ul>
                                     </div>
                                     
                                  </div>
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                        <label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                    <div class="w-100 d-flex align-items-center my-2 justify-content-between">
+                                        <!--label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
                                           Type Commande
-                                        </label>
+                                        </label-->
 
                                         <select readonly class="form-control mx-2" v-model="empotageForm.typeCmd">
-                                            <option value="">Choisir le type commande</option>
+                                            <option value="">Type commande</option>
                                             <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
                                         </select>
+                                        <select readonly class="form-control mx-2" v-model="empotageForm.idEntrepot">
+                                            <option value="">Entrepot</option>
+                                            <option v-for="entrepot in listEntrepots" :value="entrepot.id">{{entrepot.nomEntrepot}}</option>
+                                        </select>
                                     </div>
+                                    
                                     
                                     
                                  </div>
@@ -490,7 +499,7 @@
     import { EventBus } from '../../event-bus';
 
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
-    import { PdfMakeWrapper, Table, QR } from 'pdfmake-wrapper';
+    import { PdfMakeWrapper, Table, QR, Img} from 'pdfmake-wrapper';
 
     import { ITable } from 'pdfmake-wrapper/lib/interfaces'; 
 
@@ -544,7 +553,9 @@
                     numtc:'',
                     IDContenaire: '',
                     capacite: '',
-                    isClosed: false
+                    isClosed: false,
+                    entrepot: '',
+                    idEntrepot:''
                 },
                 modeModify: false,
                 capacite: this.defaultContenaire.volume,
@@ -556,7 +567,8 @@
                     tc: '',
                     typetc: '',
                     plomb: '',
-                    typeCmd: ''
+                    typeCmd: '',
+                    idEntrepot:''
 
                 },
                 checkedCommandes: [],
@@ -692,7 +704,7 @@
         }, 
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant).then(response => {
+            axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant).then(response => {
 
                 this.reception = response.data;
 
@@ -744,42 +756,6 @@
                 }
                
                 this.isLoading = false;
-            });
-        },
-        save(){
-            this.submitted_add = true;
-             // stop here if form is invalid
-            this.$v.initChargement.$touch();
-            if (this.$v.initChargement.$invalid) {
-                return;
-            }
-            
-            axios.post("/gerer/createDossier", {
-                'numdossier': this.initChargement.numDossier,
-                'datedebut' : this.initChargement.dateDebut,
-                'datecloture' : this.initChargement.dateCloture, 
-                'typeCmd' : this.initChargement.typeCommande,
-                'clientID' : this.idClient
-
-            }).then(response => {
-              
-                if(response.data.code==0){
-                    Vue.swal.fire(
-                      'succés!',
-                      'Crée avec succés!',
-                      'success'
-                    );
-                    this.submitted_add = false;
-                    this.getEmpotage();
-                    
-                }else{
-                    this.submitted_add = false;
-                     Vue.swal.fire(
-                      'error!',
-                      response.data.message,
-                      'error'
-                    )
-                }  
             });
         },
         currentDateTime() {
@@ -879,6 +855,22 @@
 
             
         },
+        convertImgToBase64(url, callback, outputFormat){
+            var canvas = document.createElement('CANVAS');
+            var ctx = canvas.getContext('2d');
+            var img = new Image;
+            img.crossOrigin = 'Anonymous';
+            img.onload = function(){
+                canvas.height = img.height;
+                canvas.width = img.width;
+                ctx.drawImage(img,0,0);
+                var dataURL = canvas.toDataURL(outputFormat || 'image/png');
+                callback.call(this, dataURL);
+                // Clean up
+                canvas = null; 
+            };
+            img.src = url;
+        },
         generatePdf(isnotification=false){
 
 
@@ -890,31 +882,39 @@
             pdf.defaultStyle({
                 fontSize: 10
             });
+            
+            var that  = this;
 
+            this.convertImgToBase64('/images/logo/'+that.currentEntite['logo'], function(base64Img){
 
+                var entete=[];
+                entete.push([{ image: base64Img, width: 100}, {text: ''}, {text: 'Date: '+ that.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}]); 
+                entete.push([
+                    {text:that.currentEntite['nom']+"\nTél: "+ that.currentEntite['telephone']+"/ Fax: "+that.currentEntite['fax']+"\nEmail: "+that.currentEntite['email']+"\nAdresse: "+that.currentEntite['adresse']},
 
-            var entete=[];
-             entete.push([{text: this.currentEntite['nom'], fontSize: 22, bold: true, alignment: 'left'}, {text: 'Date: '+ this.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}]); 
-            entete.push([{text:''}, {text: ['Entrepôt: ', {text: 'CNM', fontSize: 14}],  alignment: 'right'}]);
-           
-            entete.push([{text: 'N°Dossier '+this.selected.dossier, fontSize: 15, alignment: 'center', lineHeight: 2, colSpan: 2}]);
-             entete.push([{text: "Destination: "+this.clientCurrent.pays, fontSize: 13, alignment: 'left', colSpan: 2}]);
-            entete.push([{text: "Rapport d'empotage pour le compte de: "+this.currentEntite['nom']+" "+this.clientCurrent.clnmcl, fontSize: 13, alignment: 'left', colSpan: 2}]);
-           
+                    {text: 'N°Dossier '+that.selected.dossier, fontSize: 20, bold: true, alignment: 'center', color: '#3490dc'}, 
 
-            var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
+                    {text: ['Entrepôt: ', {text: that.selected.entrepot, fontSize: 14}],  alignment: 'right'}]);
+                
+                //entete.push([{text: 'N°Dossier '+that.selected.dossier, fontSize: 15, alignment: 'center', lineHeight: 2, colSpan: 3}]);
+                entete.push([{text: "\n\nDestination: "+that.clientCurrent.pays, fontSize: 13, alignment: 'left', colSpan: 3}]);
+                entete.push([{text: "Rapport d'empotage pour le compte de: "+" "+that.clientCurrent.clnmcl+"\n", fontSize: 16, alignment: 'center', colSpan: 3}]);
+                
+              
 
-            var infos_contenaire = [];
-            infos_contenaire.push([
-                {text:['N° TC: ', {text: this.selected.numtc, fontSize:12, bold: true}]},
-                {text:['TYPE TC: ', {text: this.selected.typetc+' DRY', fontSize:12, bold: true}]},{text:['PLOMB: ', {text: this.selected.plomb, fontSize:12, bold: true}]}]);
+                var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
 
-            var contenaire = new Table(infos_contenaire).widths(['28%', '28%', '28%', '28%']).margin([0, 0, 0, 7]).end;
+                var infos_contenaire = [];
+                infos_contenaire.push([
+                {text:['N° TC: ', {text: that.selected.numtc, fontSize:12, bold: true}]},
+                {text:['TYPE TC: ', {text: that.selected.typetc+' DRY', fontSize:12, bold: true}]},{text:['PLOMB: ', {text: that.selected.plomb, fontSize:12, bold: true}]}]);
 
-            var totaux = [[{text: 'Nb de commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis empoté', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids empoté', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume empoté', fontSize: 10, bold: true, alignment: 'center'} ]];
-            totaux.push([{text: this.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
+                var contenaire = new Table(infos_contenaire).widths(['28%', '28%', '28%', '28%']).margin([0, 0, 0, 7]).end;
 
-            var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
+                var totaux = [[{text: 'Nb de commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis empotés', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids(KG) empoté', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume m3 empoté', fontSize: 10, bold: true, alignment: 'center'} ]];
+                totaux.push([{text: that.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
+
+                var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
                 color(columnIndex){
                 return columnIndex=== 0 ? "#cccccc": '';  
                 },
@@ -924,16 +924,16 @@
                     }
                     
                 }
-            }).margin([0, 15, 8, 7]).end;
+                }).margin([0, 15, 8, 7]).end;
 
-            const data = [];
+                const data = [];
 
-            const headerTab = ['Référence', 'Emballage', 'Designation', 'Poids', 'Volume', 'Factures', 'Douanes'];
-            
-            data.push(headerTab); 
+                const headerTab = ['Référence', 'Emballage', 'Designation', 'Poids(KG)', 'Volume(m3)', 'Factures', 'Douanes'];
 
-            for(var i=0; i< this.checkedCommandes.length; i++){
-                var obj = this.checkedCommandes[i];
+                data.push(headerTab); 
+
+                for(var i=0; i< that.checkedCommandes.length; i++){
+                var obj = that.checkedCommandes[i];
                 var nbr = [];
                 var emballage = [];
 
@@ -947,12 +947,12 @@
                     nbr.push(obj.renbpl);
                     emballage.push((obj.renbpl).toString() + ' Pal.');
                 }
-                
+
                 const item = [obj.refere, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa, obj.douane];
                 data.push(item);
-            }
+                }
 
-            var table = new Table(data).widths([70,70,'*',60,60,80,80]).layout({
+                var table = new Table(data).widths([70,70,'*',60,60,80,80]).layout({
                 color(columnIndex){
                 return columnIndex=== 0 ? "#cccccc": '';  
                 },
@@ -964,9 +964,9 @@
                     }
                     
                 }
-            }).end;
+                }).end;
 
-            pdf.header = {
+                pdf.header = {
                  exampleLayout: {
                     hLineWidth: function (i, node) {
                       if (i === 0 || i === node.table.body.length) {
@@ -987,47 +987,49 @@
                       return (i === node.table.widths.length - 1) ? 0 : 8;
                     }
                   }
-            }
+                }
 
-            pdf.footer(function(currentPage, pageCount) { return  { margin: [20, 0, 20, 0], height: 30, columns: [{alignment: "left",
-            text: 'DuoTransit'}, {text: currentPage.toString() + ' / ' + pageCount, alignment: "right"}]}; });
+                pdf.footer(function(currentPage, pageCount) { return  { margin: [20, 0, 20, 0], height: 30, columns: [{alignment: "left",
+                text: 'DuoTransit'}, {text: currentPage.toString() + ' / ' + pageCount, alignment: "right"}]}; });
 
-            pdf.add(header);
+                pdf.add(header);
 
-            pdf.add(contenaire);
+                pdf.add(contenaire);
 
-            pdf.add(table);
+                pdf.add(table);
 
-            pdf.add(tabtotaux);
-            
-
-            pdf.add(new QR((this.selected.dossier).toString()).fit(80).alignment('right').end);
+                pdf.add(tabtotaux);
 
 
-            if(isnotification){
-                
-               var that = this; 
+                pdf.add(new QR((that.selected.dossier).toString()).fit(80).alignment('right').end);
+
+
+                if(isnotification){
+
+                var self = that; 
                 pdf.create().getDataUrl(function(url) { 
 
                     console.log(url, "File PDF"); 
-                    axios.post("/gerer/empotage/notification/"+that.clientCurrent['id'], {
-                        'idsCmd': that.commandeSelected,
-                        'id_dossier' : that.selected.dossier,
-                        'numtc': that.selected.numtc,
-                        'typetc': that.selected.typetc,
-                        'plomb':  that.selected.plomb,
-                        'typeCmd': that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
+                    axios.post("/gerer/empotage/notification/"+self.clientCurrent['id'], {
+                        'idsCmd': self.commandeSelected,
+                        'id_dossier' : self.selected.dossier,
+                        'numtc': self.selected.numtc,
+                        'typetc': self.selected.typetc,
+                        'plomb':  self.selected.plomb,
+                        'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
                         'base64_file_pdf': url
 
                     }).then(response => {
 
                     });
 
-               }); // download() or open() // getDataUrl
+                }); // download() or open() // getDataUrl
 
-            }else{
-                pdf.create().download(); 
-            }
+                }else{
+                    pdf.create().download(); 
+                }
+
+            });
            
 
             /* pdf.create().open(); // download() or open()
@@ -1072,6 +1074,9 @@
                 this.selected.capacite   = dossier.capaciteContenaire;
                 this.selected.isClosed   = dossier.is_close;
                 this.capacite = dossier.capaciteContenaire;
+                this.selected.entrepot   = dossier.entrepot;
+                this.selected.idEntrepot = dossier.entrepotID;
+
                 this.setProgressCont(dossier.total_volume);
                 this.getReception();
                 this.getCmdSelected(this.selected.identifiant, false);
@@ -1091,10 +1096,11 @@
                     .then(res => this.dossiers = res.data)
                     .catch(error => {});
             },
-            say: function (message, typecmd) { 
+            say: function (message, typecmd, entrepot) { 
                 this.keyword = message;
                 this.showDropDown=false;
                 this.empotageForm.typeCmd = typecmd;
+                this.empotageForm.idEntrepot = entrepot;
             },
             isFocus(){
                this.showDropDown=true;
@@ -1129,6 +1135,7 @@
                 data.append('typetc', this.empotageForm.typetc);
                 data.append('plomb', this.empotageForm.plomb);
                 data.append('idClient', this.idClient);
+                data.append('idEntrepot', this.empotageForm.idEntrepot);
 
                 let action = "createEmpotage";
 
@@ -1167,6 +1174,7 @@
                 this.empotageForm.typetc= "";
                 this.empotageForm.plomb= "";
                 this.empotageForm.typeCmd = "";
+                this.empotageForm.idEntrepot = "";
             },
              saveDouane(cmd){ 
                 $(".loader_"+cmd.reidre).show();
@@ -1177,11 +1185,18 @@
                     $(".loader_"+id).hide(); 
                 });*/
 
+                var douane = this.douane[cmd.reidre];
+
+
+                if(!(typeof(douane) !== 'undefined') || !(douane !== null)){
+                    douane='';
+                }
+
 
                 const data = new FormData();
                 data.append('idEmpotage', this.selected.identifiant);
                 data.append('idreception', cmd.reidre);
-                data.append('douane', this.douane[cmd.reidre]);
+                data.append('douane', douane);
 
 
 
@@ -1241,6 +1256,7 @@
                 this.empotageForm.typetc   =empotage.IDContenaire;
                 this.empotageForm.plomb    =empotage.plomb;
                 this.empotageForm.typeCmd  =empotage.typeCommandeID;
+                this.empotageForm.idEntrepot = empotage.idEntrepot;
            },
            deleteEmpotage(empotage){
                 Vue.swal.fire({
@@ -1275,7 +1291,8 @@
                     fournisseur: this.listFournisseurs,
                     typeCommande: this.typeCmd,
                     entrepot: this.listEntrepots,
-                    idClient: this.idClient
+                    idClient: this.idClient,
+                    canDeleteIncident: false
                 });
 
             },

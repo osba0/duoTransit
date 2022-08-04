@@ -13,7 +13,8 @@
             </div>
             <historique-empotage :list-fournisseurs = "{{ json_encode($fournisseurs) }}" 
                 :type-cmd="{{ json_encode($typeCmd) }}"
-                :client-current="{{ json_encode($client) }}"></historique-empotage>
+                :client-current="{{ json_encode($client) }}"
+                :list-entrepots="{{ json_encode($entrepots) }}"></historique-empotage>
             
         </div>
     </div>

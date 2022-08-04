@@ -118,7 +118,7 @@ $config = [
           </div>
         </div>
 
-        @userCan(\App\Models\UserRole::ROLE_CLIENT)
+        @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))
             <div class="row">
                 <div class="col-md-3 mt-3">
                     <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4">
@@ -173,7 +173,7 @@ $config = [
                     </div>
                 </div>
             </div>
-        @endUserCan
+        @endif
 
         @userCan(\App\Models\UserRole::ROLE_ADMIN)
             <div class="row">

@@ -332,8 +332,9 @@
 
                         <div class="d-flex align-items-center justify-content-end">
 
-                            <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                            <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
+                                     <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                                 </a>
                             
                             <label class="switch"  v-bind:style="[dry.dossier_id > 0 || selected.etat == 1 ? {'opacity': 0.5} : {'opacity': '1'}]">
@@ -423,12 +424,12 @@
             return {
                 isLoading: true,
                 submitted_add: false,
-                paginate: 5,
+                paginate: 10,
                 selectedTypeCmd: "",
                 typeCommandeUsed: {},
                 prechargement:{},
                 reception: {},
-                paginateRecep: 5,
+                paginateRecep: 10,
                 typeCommande: "",
                 choose:'',
                 selected: {
@@ -702,6 +703,22 @@
 
             return dateTime;
         },
+        convertImgToBase64(url, callback, outputFormat){
+            var canvas = document.createElement('CANVAS');
+            var ctx = canvas.getContext('2d');
+            var img = new Image;
+            img.crossOrigin = 'Anonymous';
+            img.onload = function(){
+                canvas.height = img.height;
+                canvas.width = img.width;
+                ctx.drawImage(img,0,0);
+                var dataURL = canvas.toDataURL(outputFormat || 'image/png');
+                callback.call(this, dataURL);
+                // Clean up
+                canvas = null; 
+            };
+            img.src = url;
+        },
         generatePdf(isnotification=false){
 
             PdfMakeWrapper.setFonts(pdfFonts);
@@ -712,160 +729,176 @@
                 fontSize: 10
             });
 
-            //var code = new QR('my code').end;
+             var that  = this;
 
-            var entete=[];
-      
-            entete.push([{text: this.currentClient['clnmcl'], fontSize: 22, bold: true, alignment: 'left'},  {text: 'Date: '+ this.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}]); 
-            entete.push([{text:['Tel: ', {text: this.currentClient['cltele'], fontSize: 14}]}, {text: ['Transitaire: ', {text: this.currentEntite['nom'], fontSize: 14}],  alignment: 'right'}]);
-           
-            entete.push([{text: 'Préchargement N° '+this.selected.id, fontSize: 15, alignment: 'center', lineHeight: 2, colSpan: 2}]);
-            
-           
+            this.convertImgToBase64('/images/logo/'+that.currentEntite['logo'], function(base64Img){
+                //var code = new QR('my code').end;
 
-            var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
+                var entete=[];
+          
+                entete.push([
+                       { image: base64Img, width: 100}, {text: ''}, 
+                       {text: 'Date: '+ that.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}
+                    ]); 
 
-            const data = [];
+                entete.push([
+                    {text:that.currentEntite['nom']+"\nTél: "+ that.currentEntite['telephone']+"/ Fax: "+that.currentEntite['fax']+"\nEmail: "+that.currentEntite['email']+"\nAdresse: "+that.currentEntite['adresse']},
 
-            const headerTab = ['N°FE', 'N°ECV', 'N°CDE', 'Emballage', 'Fournisseurs', 'Poids(kg)', 'Volume(m3)', 'Factures'];
-            
-            data.push(headerTab); 
-            //data.push(code); 
-           
-            for(var i=0; i< this.checkedCommandes.length; i++){
-                var obj = this.checkedCommandes[i];
-                var nbr = [];
-                var emballage = [];
-                var cmdCell=[];
-                var prio = "";
+                    {text: 'N°Préchargement '+that.selected.id, fontSize: 14, bold: true, alignment: 'center', color: '#3490dc'}, 
 
+                    {text: ['Client: ', {text: that.currentClient['clnmcl']+"\n"+ that.currentClient['cltele']+"\n"+that.currentClient['clmail']+"\n"+that.currentClient['cladcl']+", "+that.currentClient['pays']+"\n\n", fontSize: 11}],  alignment: 'right'}]);
 
-                if(obj.renbcl > 0){
-                    nbr.push(obj.renbcl);
-                    emballage.push((obj.renbcl).toString() + ' Colis');
-                }
-
-                if(obj.renbpl > 0){
-                    nbr.push(obj.renbpl);
-                    emballage.push((obj.renbpl).toString() + ' Pal.');
-                }
-
-                cmdCell.push(obj.rencmd);
+               
+                /*entete.push([
+                    {text: 'Préchargement N° '+that.selected.id, fontSize: 15, alignment: 'center', lineHeight: 2, colSpan: 3}
+                    ]);*/
                 
+               
 
-                var rateMinus = 3-obj.priorite;
+                var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
+
+                const data = [];
+
+                const headerTab = ['N°FE', 'N°ECV', 'N°CDE', 'Emballage', 'Fournisseurs', 'Poids(kg)', 'Volume(m3)', 'Factures'];
                 
-                for(var p=0; p < obj.priorite+rateMinus; p++){
-                    if(p<obj.priorite){
-                        prio += '+ ';
-                    }else{
-                        prio += '- ';
+                data.push(headerTab); 
+                //data.push(code); 
+               
+                for(var i=0; i< that.checkedCommandes.length; i++){
+                    var obj = that.checkedCommandes[i];
+                    var nbr = [];
+                    var emballage = [];
+                    var cmdCell=[];
+                    var prio = "";
+
+
+                    if(obj.renbcl > 0){
+                        nbr.push(obj.renbcl);
+                        emballage.push((obj.renbcl).toString() + ' Colis');
                     }
-                    
-                }
 
-                cmdCell.push(prio);
-                
-                console.log(cmdCell, "DEDE");
-                
-                const item = [obj.refere,obj.reecvr, cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
-                
-                data.push(item);
-            }
-            if(this.checkedCommandes.length==0){
-                data.push([{text: 'Aucune commande selectionné', fontSize: 12, alignment: 'center', colSpan: 8}])
-            }
-           
-            var table = new Table(data).widths([70,70,70,70,'*',60,60,90]).layout({
-                color(columnIndex){
-                return columnIndex=== 0 ? "#cccccc": '';  
-                },
-                fillColor (columnIndex){
-                    if(columnIndex===0){
-                        return columnIndex === 0 ? "#bbb": '';  
-                    }else{
-                        return columnIndex%2 === 0 ? "white": '#eee';  
+                    if(obj.renbpl > 0){
+                        nbr.push(obj.renbpl);
+                        emballage.push((obj.renbpl).toString() + ' Pal.');
                     }
+
+                    cmdCell.push(obj.rencmd);
                     
-                }
-            }).end;
 
-            // totaux
-            var totaux = [[{text: 'Total commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume total', fontSize: 10, bold: true, alignment: 'center'} ]];
-            totaux.push([{text: this.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: this.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
-
-            var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
-                color(columnIndex){
-                return columnIndex=== 0 ? "#cccccc": '';  
-                },
-                fillColor (columnIndex){
-                    if(columnIndex===0){
-                        return columnIndex === 0 ? "#ccc": '';  
+                    var rateMinus = 3-obj.priorite;
+                    
+                    for(var p=0; p < obj.priorite+rateMinus; p++){
+                        if(p<obj.priorite){
+                            prio += '+ ';
+                        }else{
+                            prio += '- ';
+                        }
+                        
                     }
-                    
-                }
-            }).margin([0, 15, 8, 7]).end;
 
-            pdf.header = {
-                 exampleLayout: {
-                    hLineWidth: function (i, node) {
-                      if (i === 0 || i === node.table.body.length) {
-                        return 0;
+                    cmdCell.push(prio);
+                    
+                    console.log(cmdCell, "DEDE");
+                    
+                    const item = [obj.refere,obj.reecvr, cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
+                    
+                    data.push(item);
+                }
+                if(that.checkedCommandes.length==0){
+                    data.push([{text: 'Aucune commande selectionné', fontSize: 12, alignment: 'center', colSpan: 8}])
+                }
+               
+                var table = new Table(data).widths([70,70,70,70,'*',60,60,90]).layout({
+                    color(columnIndex){
+                    return columnIndex=== 0 ? "#cccccc": '';  
+                    },
+                    fillColor (columnIndex){
+                        if(columnIndex===0){
+                            return columnIndex === 0 ? "#bbb": '';  
+                        }else{
+                            return columnIndex%2 === 0 ? "white": '#eee';  
+                        }
+                        
+                    }
+                }).end;
+
+                // totaux
+                var totaux = [[{text: 'Total commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume total', fontSize: 10, bold: true, alignment: 'center'} ]];
+                totaux.push([{text: that.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
+
+                var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
+                    color(columnIndex){
+                    return columnIndex=== 0 ? "#cccccc": '';  
+                    },
+                    fillColor (columnIndex){
+                        if(columnIndex===0){
+                            return columnIndex === 0 ? "#ccc": '';  
+                        }
+                        
+                    }
+                }).margin([0, 15, 8, 7]).end;
+
+                pdf.header = {
+                     exampleLayout: {
+                        hLineWidth: function (i, node) {
+                          if (i === 0 || i === node.table.body.length) {
+                            return 0;
+                          }
+                          return (i === node.table.headerRows) ? 2 : 1;
+                        },
+                        vLineWidth: function (i) {
+                          return 0;
+                        },
+                        hLineColor: function (i) {
+                          return i === 1 ? 'black' : '#aaa';
+                        },
+                        paddingLeft: function (i) {
+                          return i === 0 ? 0 : 8;
+                        },
+                        paddingRight: function (i, node) {
+                          return (i === node.table.widths.length - 1) ? 0 : 8;
+                        }
                       }
-                      return (i === node.table.headerRows) ? 2 : 1;
-                    },
-                    vLineWidth: function (i) {
-                      return 0;
-                    },
-                    hLineColor: function (i) {
-                      return i === 1 ? 'black' : '#aaa';
-                    },
-                    paddingLeft: function (i) {
-                      return i === 0 ? 0 : 8;
-                    },
-                    paddingRight: function (i, node) {
-                      return (i === node.table.widths.length - 1) ? 0 : 8;
-                    }
-                  }
-            }
+                }
 
-            pdf.footer(function(currentPage, pageCount) { return  { margin: [20, 0, 20, 0], height: 30, columns: [{alignment: "left",
-            text: 'DuoTransit'}, {text: currentPage.toString() + ' / ' + pageCount, alignment: "right"}]}; });
+                pdf.footer(function(currentPage, pageCount) { return  { margin: [20, 0, 20, 0], height: 30, columns: [{alignment: "left",
+                text: 'DuoTransit'}, {text: currentPage.toString() + ' / ' + pageCount, alignment: "right"}]}; });
 
-            pdf.add(header);
+                pdf.add(header);
 
 
 
-            pdf.add(table);
-            pdf.add(tabtotaux);
-            pdf.add(
-                pdf.ln(2)
-            );
+                pdf.add(table);
+                pdf.add(tabtotaux);
+                pdf.add(
+                    pdf.ln(2)
+                );
 
 
-            pdf.add(new QR((this.selected.id).toString()).fit(80).alignment('right').end);
+                pdf.add(new QR((that.selected.id).toString()).fit(80).alignment('right').end);
 
-            if(isnotification){
-                var that = this; 
-               pdf.create().getDataUrl(function(url) { 
+                if(isnotification){
+                    var self = that; 
+                   pdf.create().getDataUrl(function(url) { 
+                    
+                        axios.post("/prechargementClient/notification/"+self.currentClient['id'], {
+                            'idsCmd': self.commandeSelected,
+                            'id_prechargement' : self.selected.id,
+                            'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
+                            'base64_file_pdf': url
 
-                    console.log(url, "File PDF"); 
+                        }).then(response => {
 
-                
-                    axios.post("/prechargementClient/notification/"+that.currentClient['id'], {
-                        'idsCmd': that.commandeSelected,
-                        'id_prechargement' : that.selected.id,
-                        'typeCmd': that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
-                        'base64_file_pdf': url
+                        });
 
-                    }).then(response => {
+                   }); // download() or open() // getDataUrl
+                }else{
+                    pdf.create().download(); 
+                }
 
-                    });
+            });
 
-               }); // download() or open() // getDataUrl
-            }else{
-                pdf.create().download(); 
-            }
+            
            
     
             },
@@ -905,7 +938,8 @@
                     fournisseur: this.listFournisseurs,
                     typeCommande: this.typeCmd,
                     entrepot: this.listEntrepots,
-                    idClient: this.idClient
+                    idClient: this.idClient,
+                    canDeleteIncident: false
                 });
 
             },

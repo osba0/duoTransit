@@ -99,20 +99,15 @@ class GestionController extends Controller
             ChargementCreation::setIDClient(request('clientID'), $user->entites_id); 
 
             $store = ChargementCreation::create([
-                "numDossier"  => request('numdossier'),
-                "dateDebut"   => request('datedebut'),
-                "dateCloture" => request('datecloture'),
-                "clients_id"   => request('clientID'),
-                "users_id"    => $user->id,
+                "numDossier"           => request('numdossier'),
+                "dateDebut"            => request('datedebut'),
+                "dateCloture"          => request('datecloture'),
+                "clients_id"           => request('clientID'),
+                "users_id"             => $user->id,
                 "type_commandes_id"    => request('typeCmd'),
-                "reetat" => false
+                "entrepots_id"         => request('entrepot'),
+                "reetat"               => false
             ]); 
-
-
-
-
-           
-
 
         }catch(\Exceptions $e){
               return response([
@@ -158,6 +153,7 @@ class GestionController extends Controller
             ->leftJoin('receptions', 'receptions.dossier_id', '=', 'chargement_creations.numdossier')
             ->leftJoin('users', 'chargement_creations.users_id', '=', 'users.id')
             ->leftJoin('type_commandes', 'chargement_creations.type_commandes_id', '=', 'type_commandes.id')
+            ->leftJoin('entrepots', 'chargement_creations.entrepots_id', '=', 'entrepots.id')
             ->groupBy('chargement_creations.id')
             ->select('receptions.dossier_id', 
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
@@ -173,6 +169,8 @@ class GestionController extends Controller
                 'chargement_creations.reetat as etat',
                 'chargement_creations.created_at as creation_dos',
                 'users.username as user',
+                'entrepots.nomEntrepot as nomEntrepot', 
+                'entrepots.id as idEntrepot',
                 'type_commandes.id as idTypeCmd',
                 'type_commandes.tcolor as tcolor',
                 'type_commandes.typcmd as typecmd')->where('chargement_creations.clients_id', request('id'))->orderBy('chargement_creations.created_at', 'desc');
@@ -229,7 +227,7 @@ class GestionController extends Controller
             ->leftJoin('dossier_prechargements', 'dossier_prechargements.id', '=', 'receptions.dossier_prechargements_id')
             ->leftJoin('users as a', 'dossier_prechargements.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
-            ->select('*','b.username as user_created','a.username as prechargeur')->where("dossier_prechargements.reetat", true)->where('receptions.type_commandes_id', request('typecmd')); 
+            ->select('*','b.username as user_created','a.username as prechargeur')->where("dossier_prechargements.reetat", true)->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entrepots_id', request('idEntrepot')); 
 
             if($keyword!=''){
                 $dries = $dries->search($keyword);
@@ -395,7 +393,8 @@ class GestionController extends Controller
         $commandes = Reception::whereIn('reidre',request('idsCmd'));
 
 
-        $getMailEntrepot = Entrepot::leftJoin('receptions', 'entrepots.id','=', 'receptions.entrepots_id')->select('email')->whereIn('reidre', request('idsCmd'))->distinct()->get();
+        //$getMailEntrepot = Entrepot::leftJoin('receptions', 'entrepots.id','=', 'receptions.entrepots_id')->select('email')->whereIn('reidre', request('idsCmd'))->distinct()->get();
+        $getMailEntrepot = Entrepot::where('id',request('entrepot'))->get();
 
         $emailSent=[];
 

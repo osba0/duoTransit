@@ -47,7 +47,16 @@
 
         <template v-if="showResult">
 
-            <template v-if="!isDetail">      
+            <template v-if="!isDetail">    
+                <div class="row d-flex align-items-center justify-content-between mb-3">
+                    <ul class="legend mt-4 mb-2 pl-3 flex-1">
+                        <li v-for="type in typeCmd" class="d-flex align-items-center">
+                            <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
+                            <label class="m-0 mr-2">{{type.typcmd}}</label>
+                        </li>
+                    </ul>
+                    
+                </div>
                 <div class="row mt-3">
                     <div class="col-sm-12 ">
                         <div class="d-flex justify-content-between align-content-center mb-2">
@@ -74,12 +83,10 @@
                                 <thead class="thead-blue" :class="[isloading ? '' : 'hasborder']">
                                      <tr>
                                         <th class="p-2 border-right border-white h6">ID</th>
-                                        <th class="p-2 border-right border-white h6">Type commande</th>
                                         <th class="p-2 border-right border-white h6">Nbre colis total</th>
                                         <th class="p-2 border-right border-white h6">Poids total (KG)</th>
                                         <th class="p-2 border-right border-white h6">Volume total (m<sup>3</sup>)</th>
                                         <th class="p-2 border-right border-white h6">Contenaire</th>
-                                        <th class="p-2 border-right border-white h6">Etat</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Date</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
                                         <th class="p-2 border-right border-white h6 text-right">Actions</th>
@@ -92,22 +99,15 @@
                                     </template>
                                     <template v-else>
                                         <tr v-for="res in result.data" :key="res.id" class="bg-white position-relative">
-                                            <td class="p-2 align-middle">{{ res.id }}</td>
-                                          
-                                            <td class="p-2 align-middle">
-                                                {{ res.typecmd }}
-                                            </td>
-                                            
+                                            <td class="p-2 align-middle position-relative">
+                                                <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div>
+                                                {{ res.id }}
+                                            </td>                    
                                             <td class="p-2 align-middle">{{ parseInt(res.total_colis) + parseInt(res.total_pallette) }}</td>
                                             <td class="p-2 align-middle">{{ res.total_poids }}</td>
                                             <td class="p-2 align-middle">{{ res.total_volume }}</td>
                                             <td class="p-2 align-middle">
                                                 {{ res.nbre_contenaire }} ({{ res.contenaire }})
-                                            </td>
-                                            <td class="p-2 align-middle">
-                                                <span v-if="res.etat==1" class="badge badge-success">Validé</span>
-                                                <span v-if="res.is_close==1" class="badge badge-secondary">Cloturé</span>
-                                                <span v-if="res.etat==0" class="badge badge-warning">En cours</span>
                                             </td>
                                             <td class="p-2 align-middle">{{ res.updated_at }}</td>
                                             <td class="p-2 align-middle">{{ res.user }}</td>
@@ -149,7 +149,7 @@
                         <div class="h5 mb-0 rounded bg-white py-2 px-3 border">Plomb: <b>{{ selected.plomb }}</b></div>
                     </div-->
                 </div>
-                                <table class="table">
+                    <table class="table">
                     <thead class="thead-blue borderorange">
                          <tr>
                             <th class="p-2 border-right border-white h6">N°CDE</th>
@@ -161,7 +161,8 @@
                             <th class="text-right p-2 border-right border-white h6">Volume (m<sup>3</sup>)</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Date livraison</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Crée par</th>
-                            <th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th>
+                            <th class="p-2 border-right border-white text-left h6">Utilisateur</th>
+                            <th class="p-2 border-right border-white text-left h6">Etat</th>
                             <th class="text-nowrap p-2 border-right border-white h6 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -191,14 +192,11 @@
                         <td class="p-2 align-middle"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
                         <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td>
                         <td class="p-2 align-middle">
-                            
-                            <template v-if="dry.idPre > 0">
-                                 <span class="badge badge-success">oui</span> {{dry.prechargeur}}
-                            </template>
-                            <template v-else>
-                                  <span class="badge badge-warning">non</span>
-                            </template>
-                           
+                            {{dry.prechargeur}}
+                        </td>
+                        <td>
+                            <span  class="badge badge-success" v-if="dry.dossier_id > 0">Préchargée</span>
+                            <span  class="badge badge-warning" v-else>En attente</span>
                         </td>
                          <td class="p-2 align-middle text-right">
                             <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
@@ -366,6 +364,8 @@ export default {
             this.isDetail=false;
         },
         showInvoice(pre){
+            this.pdfFileModal = null;
+            this.pdfFile = null;
             var labelCmd = pre.typecmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
         
             this.pdfFileModal = 'prechargement-'+pre.id+'_'+labelCmd+".pdf";
@@ -375,7 +375,8 @@ export default {
              this.$refs.closePoupPdf.click();
         },
         showFacture(file){
-                
+            this.pdfFileModal = null;
+            this.pdfFile = null;    
             if(file!=''){
                 this.pdfFile = file;
             }
@@ -388,7 +389,8 @@ export default {
                 fournisseur: this.listFournisseurs,
                 typeCommande: this.typeCmd,
                 entrepot: this.listEntrepots,
-                idClient: this.clientCurrent.id
+                idClient: this.clientCurrent.id,
+                canDeleteIncident: false
             });
 
         }

@@ -47,8 +47,9 @@ class HistoActionController extends Controller
         $contenaires = Contenaire::whereIn('id',$entite->contenaires_id)->get(); 
 
         $entrepots = Entrepot::get();  
+
         
-        return  view('backend.historique_empotage.index', ['logo' => $client->cllogo, 'id_client' => $client->id, 'typeCmd' => $typeCmd, 'client' => $client, 'fournisseurs' => $fournis, 'listContenaire' => $contenaires]);
+        return  view('backend.historique_empotage.index', ['logo' => $client->cllogo, 'id_client' => $client->id, 'typeCmd' => $typeCmd, 'client' => $client, 'fournisseurs' => $fournis, 'listContenaire' => $contenaires, "entrepots" => $entrepots]);
     }
 
     public function searchHisto(Request $request){
@@ -65,6 +66,7 @@ class HistoActionController extends Controller
             ->leftJoin('users', 'empotages.users_id', '=', 'users.id')
             ->leftJoin('type_commandes', 'empotages.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('contenaires', 'empotages.contenaires_id', '=', 'contenaires.id')
+            ->leftJoin('entrepots', 'empotages.entrepots_id', '=', 'entrepots.id')
             ->groupBy('empotages.id')
             ->select('receptions.dossier_empotage_id', 
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
@@ -87,15 +89,27 @@ class HistoActionController extends Controller
                 'empotages.rapport_pdf as rapport_pdf',
                 'empotages.created_at as created_at',
                 'users.username as user',
+                'entrepots.nomEntrepot as nomEntrepot', 
+                'entrepots.id as idEntrepot',
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.id as typecmdID',
-                'contenaires.nom as contenaire')->where('receptions.clients_id', request('id'))->whereBetween('empotages.created_at', [request('filtre.dateDebut'), request('filtre.dateFin')]);
+                'contenaires.nom as contenaire')->where('empotages.reetat', true)->where('receptions.clients_id', request('id'))->whereBetween('empotages.updated_at', [request('filtre.dateDebut').' 00:00:00', request('filtre.dateFin').' 23:59:59']);
 
             if(request('filtre.typeCmd')!=''){
                 $req = $req->where('receptions.type_commandes_id', request('filtre.typeCmd'));
             }
             if(request('filtre.fournisseur')!=''){
                 $req = $req->where('receptions.fournisseurs_id', request('filtre.fournisseur'));
+            }
+            if(request('filtre.commande')!=''){
+                $cmd = request('filtre.commande');
+                $term = "$cmd%";
+                $req = $req->where('receptions.rencmd', 'like', $term);
+            }
+            if(request('filtre.dossier')!=''){
+                $cmd = request('filtre.dossier');
+                $term = "$cmd%";
+                $req = $req->where('empotages.reference', 'like', $term);
             }
             $req = $req->paginate($paginate); 
 
