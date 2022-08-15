@@ -38,7 +38,11 @@ class EmpotageResource extends JsonResource
             "etat"           => $this->etat,
             "rapport_pdf"    => $this->rapport_pdf,
             "typeCmd_color"  =>  isset($this->tcolor)? $this->tcolor : '' ,
-            "date"           => Carbon::parse($this->created_at)->format('d/m/Y h:i:s')
+            "dateDepart"     => $this->dateDepart!=null ? Carbon::parse($this->dateDepart)->format('d/m/Y'):'',
+            "dateArrivee"    => $this->dateArrivee!=null ? Carbon::parse($this->dateArrivee)->format('d/m/Y'): '',
+            "date"           => Carbon::parse($this->created_at)->format('d/m/Y'),
+            "dateDepartEng"     => $this->dateDepart!=null ? $this->dateDepart:'',
+            "dateArriveeEng"    => $this->dateArrivee!=null ? $this->dateArrivee: '',
         ];
     }
 }

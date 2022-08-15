@@ -173,7 +173,7 @@ class GestionController extends Controller
                 'entrepots.id as idEntrepot',
                 'type_commandes.id as idTypeCmd',
                 'type_commandes.tcolor as tcolor',
-                'type_commandes.typcmd as typecmd')->where('chargement_creations.clients_id', request('id'))->orderBy('chargement_creations.created_at', 'desc');
+                'type_commandes.typcmd as typecmd')->where('chargement_creations.is_empote', false)->where('chargement_creations.clients_id', request('id'))->orderBy('chargement_creations.created_at', 'desc');
             if($keyword!=''){
                 $term = "%$keyword%";
 
@@ -255,12 +255,29 @@ class GestionController extends Controller
         if(request('ischecked')==1){
             $value=request('idPrehargement');
         }
+        
+
+        Reception::whereIn('reidre', request('listCmdNoSelect'))
+          ->update([
+            "dossier_id" => null
+        ]);
+
         Reception::where('reidre', request('idreception'))
           ->update([
             "dossier_id" => $value
         ]);
 
-        $results = DB::table('chargement_creations')
+        
+
+
+        $results = DB::table('receptions')->select(DB::raw("SUM(repoid) as total_poids")
+                              ,DB::raw("SUM(revolu) as total_volume")
+                              ,DB::raw("SUM(renbcl) as total_colis")
+                              ,DB::raw("SUM(renbpl) as total_palette"))->whereIn('reidre',request('listCmd'))->get();
+
+      // var_dump($results); die();
+
+        /*$results = DB::table('chargement_creations')
             ->leftJoin('receptions', 'receptions.dossier_id', '=', 'chargement_creations.numdossier')
             ->leftJoin('users', 'chargement_creations.users_id', '=', 'users.id')
             ->leftJoin('type_commandes', 'chargement_creations.type_commandes_id', '=', 'type_commandes.id')
@@ -279,18 +296,29 @@ class GestionController extends Controller
                 'chargement_creations.reetat as etat',
                 'chargement_creations.created_at as creation_dos',
                 'users.username as user',
-                'type_commandes.typcmd as typecmd')->where('chargement_creations.numdossier', request('idPrehargement'))->get(); 
+                'type_commandes.typcmd as typecmd')->where('chargement_creations.numdossier', request('idPrehargement'))->get(); */
+
+
+            $details=[];
+
+         
       
         foreach ($results as $key) {
-           
-           $details[] = (object) ['total_poids'    => $key->total_poids,
-                                  'total_volume'   => $key->total_volume,
-                                  'total_palette'  => $key->total_palette,
-                                  'total_colis'    => $key->total_colis,
-                                  'total_cmd'      => $key->total_cmd
-                                  
-                                  ];
-
+            $details[] = (object) [
+              'total_poids'   => $key->total_poids,
+              'total_volume'   => $key->total_volume,
+              'total_palette'  => $key->total_palette,
+              'total_colis'    => $key->total_colis,
+             // 'total_cmd'      => $key->total_cmd
+            ];         
+        }
+        if(sizeof($details)==0){
+            $details[] = (object) [
+              'total_poids'   => 0,
+              'total_volume'   => 0,
+              'total_palette'  => 0,
+              'total_colis'    => 0
+            ];         
         }
         return response([
             "code" => 0,
@@ -298,7 +326,7 @@ class GestionController extends Controller
         ]);
     }
     public function getCommande(){
-        $results = Reception::where('dossier_id',request('id'))->get(); 
+        $results = Reception::where('dossier_id',request('id'))->where('type_commandes_id', request('typecommande'))->get(); 
         $details=[];
 
         foreach ($results as $key) {
@@ -402,7 +430,25 @@ class GestionController extends Controller
             $emailSent[] = $entrepot['email'];
         }
 
-        Notification::route('mail', [])->notify(new prechargementCommandesTransitaire($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_dossier'), request('date_debut'), request('date_fin'))); 
+        try{
+
+            Notification::route('mail', [])->notify(new prechargementCommandesTransitaire($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_dossier'), request('date_debut'), request('date_fin'))); 
+            $res = [
+                "code" => 0,
+                "result" => "OK"
+            ];
+
+        }catch (Exception $e) {
+            $res = [
+                "code" => 1,
+                "result" => $e->getMessage()
+            ];
+            
+        }
+
+        return response($res);
+
+       
     }
 
     public function deletePre(Request $request)
@@ -489,10 +535,19 @@ class GestionController extends Controller
 
         $entrepots = Entrepot::get(); 
 
+        $listeDossier =  DB::table('chargement_creations')
+            ->leftJoin('empotages as empo', function($join){
+                $join->on('empo.reference', '=', 'chargement_creations.numdossier');
+                $join->on('empo.type_commandes_id','=','chargement_creations.type_commandes_id');    
+            })->select('*','chargement_creations.type_commandes_id as type_commandes', 'chargement_creations.entrepots_id as entrepots', 'chargement_creations.id as idpre')->where(function($query){
+                $query->orWhereNull('empo.reference')->orWhereNull('empo.type_commandes_id')->orWhereNull('empo.entrepots_id');
+
+            })->where('chargement_creations.reetat', true)->get();
+
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
         }else{
-            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client, 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires,"entite" => $entite, 'client' => $client, 'entrepots' => $entrepots];
+            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client, 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires,"entite" => $entite, 'client' => $client, 'entrepots' => $entrepots, 'listeDossier' => $listeDossier];
         }
 
         activity(TypActivity::LISTER)->performedOn($client)->log('Affichage empotage');

@@ -366,11 +366,21 @@ class PrechargementController extends Controller
             $emailSent[] = $user['email'];
         }
 
-        Notification::route('mail', [])->notify(new prechargementCommandesClient($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_prechargement'))); 
+        //$response = Notification::route('mail', [])->notify(new prechargementCommandesClient($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_prechargement'))); 
+
+        $response = Notification::send($getMailTransitaire, new prechargementCommandesClient($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_prechargement'))); 
+
+        $rep = [
+            "code" => 0,
+            "message" => "OK"
+        ];
+
+        return response($rep);
+
     }
 
     public function getCommande(){
-        $results = Reception::where('dossier_prechargements_id',request('id'))->get(); 
+        $results = Reception::where('dossier_prechargements_id',request('id'))->orderBy('priorite', 'DESC')->get(); 
         $details=[];
 
         foreach ($results as $key) {

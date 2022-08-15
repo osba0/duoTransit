@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 
 use App\Mail\empoCommandesTransitaireMail;
 
@@ -22,13 +23,14 @@ class empotageCommandesTransitaire extends Notification
     public $plomb;
     public $transitaire;
     public $societe;
+    public $typeCommande;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($transitaire, $societe, $emails, $commandes, $pathFile, $numeroDossier, $numtc, $typetc, $plomb)
+    public function __construct($transitaire, $societe, $emails, $commandes, $pathFile, $numeroDossier, $numtc, $typetc, $plomb, $typeCommande)
     {
         $this->commandes    = $commandes;
         $this->emails        = $emails;
@@ -39,6 +41,7 @@ class empotageCommandesTransitaire extends Notification
         $this->plomb         = $plomb;
         $this->transitaire   = $transitaire;
         $this->societe       = $societe;
+        $this->typeCommande  = $typeCommande;
     }
 
     /**
@@ -49,7 +52,7 @@ class empotageCommandesTransitaire extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['database', 'mail'];
     }
 
     /**
@@ -60,7 +63,7 @@ class empotageCommandesTransitaire extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new empoCommandesTransitaireMail($this->transitaire, $this->societe, $this->commandes, $this->numeroDossier, $this->numtc, $this->typetc, $this->plomb))->to($this->emails)->attach(public_path() . '/' .$this->pathFile)->subject('Rapport d\'empotage   n° dossier: '.$this->numeroDossier);
+        return (new empoCommandesTransitaireMail($this->transitaire, $this->societe, $this->commandes, $this->numeroDossier, $this->numtc, $this->typetc, $this->plomb, $this->typeCommande))->to($this->emails)->attach(public_path() . '/' .$this->pathFile)->subject('Rapport d\'empotage   n° dossier: '.$this->numeroDossier);
     }
 
     /**
@@ -71,8 +74,12 @@ class empotageCommandesTransitaire extends Notification
      */
     public function toArray($notifiable)
     {
-        return [
-            //
+       return [
+            'title' => 'Validation rapport d\'empotage n°'.$this->numeroDossier.', '.$this->typeCommande,
+            'description' => 'TC: '.$this->numtc.' TypeTC: '.$this->typetc.' Plomb:'.$this->plomb,
+            'fichier' => '/' .$this->pathFile,
+            'user' => Auth::user(),
+            'slug' => $this->societe['slug']   
         ];
     }
 }

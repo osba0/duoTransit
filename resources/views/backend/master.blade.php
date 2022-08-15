@@ -95,6 +95,12 @@ $config = [
                                   <p style="line-height: 18px; margin-top:3px">Historique <br> préchargement</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('historique-empotage', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-empotage/*')) ? 'active' : '' }}">
+                                  <i class="fa  fa-clock-o nav-icon"></i>
+                                  <p>Histo empotage</p>
+                                </a>
+                            </li>
                             @endif
 
 
@@ -170,12 +176,12 @@ $config = [
 
                         @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
                             @if (!\Request::is('configuration/*'))
-                                <li class="nav-item">
+                                <!--li class="nav-item">
                                     <a href="/incidents/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('incidents/*')) ? 'active' : '' }}">
                                       <i class="fa fa-exclamation-triangle nav-icon"></i>
                                       <p>Incidents</p>
                                     </a>
-                                </li>
+                                </li-->
                                <li class="nav-item">
                                 <a href="/activity/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('activity/*')) ? 'active' : '' }}">
                                   <i class="fa fa-history nav-icon"></i>

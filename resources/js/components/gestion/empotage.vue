@@ -103,6 +103,8 @@
                                     <th class="p-2 border-right border-white h6">Type TC</th>
                                     <th class="p-2 border-right border-white h6">N°Plomb</th>
                                     <th class="p-2 border-right border-white h6">Entrepôt</th>
+                                    <th class="p-2 border-right border-white h6">Date Départ</th>
+                                    <th class="p-2 border-right border-white h6">Date Arrivée</th>
                                     <th class="p-2 border-right border-white h6">Etat</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Date de création</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
@@ -130,6 +132,12 @@
                                         </td>
                                         <td class="p-2 align-middle">
                                            {{ empo.entrepot }}
+                                        </td>
+                                        <td class="p-2 align-middle">
+                                           {{ empo.dateDepart }}
+                                        </td>
+                                        <td class="p-2 align-middle">
+                                           {{ empo.dateArrivee }}
                                         </td>
                                        
                                         <td class="align-middle">
@@ -244,16 +252,46 @@
                 </tr>
             </table>
             </div>
-            <div class="d-flex justify-content-between align-items-center mb-3 sucesss"> 
-                <button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button>
+            <div class="d-flex justify-content-end align-items-center mb-3 sucesss"> 
+                <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
     
                 <div>
-                     <button class="btn btn-lg btn-secondary text-white mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button>
+                     <!--button class="btn btn-lg btn-secondary text-white mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button-->
                     <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()">Valider</button>
                 </div>
                
             </div>
             <hr>
+
+            <div class="d-flex justify-content-between align-content-center mb-2">
+                <div class="d-flex align-items-end">
+                    <div>
+                        <div class="d-flex align-items-center">
+                            <label for="paginateRecep" class="text-nowrap mr-2 mb-0"
+                                >Nbre de ligne par Page</label> 
+                            <select
+                                v-model="paginate"
+                                class="form-control form-control-sm">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                            </select>
+                        </div>
+                    </div>
+            
+                </div>
+                
+                <div class="d-flex px-0 align-items-end col-md-4">
+                    <input
+                        v-model.lazy="searchRecep"
+                        type="search"
+                        class="form-control"
+                        placeholder="Rechercher par n°cmd, n°fe, n°ecv,n°fact, utilisateur, fournisseur..."
+                    />
+                </div>
+               
+            </div>  
                 
                 <table class="table">
                     <thead class="thead-blue">
@@ -314,8 +352,9 @@
                          </td>
                         <td class="p-2 text-right">
                             <div class="d-flex justify-content-end align-items-center">
-                                <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                                <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3 position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
+                                    <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                                 </a>
                                 <span v-if="dry.dossier_empotage_id > 0" class="d-none"><i class="fa fa-check-circle"></i></span>
                                 <label class="switch d-none">
@@ -346,8 +385,8 @@
                     
                 </div>
                 <hr>
-                <div class="d-flex justify-content-between mb-3 sucesss"> 
-                    <button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button>
+                <div class="d-flex justify-content-end mb-3 sucesss"> 
+                    <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
                     <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()">Valider</button>
                 </div>
         </template>
@@ -372,30 +411,39 @@
                             <div class="row">
                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
-                                       <label for="numDossier"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        N°Reference
-                                       </label>
-                                        <input class="w-65 form-control" autocomplete="off" id="numDossier" aria-haspopup="true" aria-expanded="false" v-model="keyword" @focus="isFocus"  @blur="handleBlur"
+                                        <label for="numDossier"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                            N°Reference
+                                        </label>
+                                        <template v-if="modeModify">
+                                            <input  class="w-65 form-control" type="text" readonly disabled v-model="numDossierEdit">
+                                        </template>
+                                        <template v-else>
+                                            <select  class="form-control w-65" @change="setData($event)">
+                                                <option value="">Choisir</option>
+                                                <option v-for="dossier in listeDossier" :value="dossier.idpre">{{dossier.numDossier}} {{ getTypeCommande(dossier.type_commandes) }}</option>
+                                            </select>
+                                        </template>
+                                        <!--input class="w-65 form-control" autocomplete="off" id="numDossier" aria-haspopup="true" aria-expanded="false" v-model="keyword" @focus="isFocus"  @blur="handleBlur"
                                         :class="{ 'border-danger': submitted && !$v.keyword.required }" />
                                          <ul class="dropdown-menu filterUl p-2" :class="{'d-block': showDropDown}" v-if="dossiers.length > 0">
                                             <li v-for="dossier in dossiers" :key="dossier.id" >
                                                 <a class="p-2" v-text="dossier.numDossier+' '+getTypeCommande(dossier.type_commandes_id)" v-on:click="say(dossier.numDossier, dossier.type_commandes_id,  dossier.entrepots_id)"></a>
                                             </li>
-                                        </ul>
+                                        </ul-->
                                     </div>
                                     
                                  </div>
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    <div class="w-100 d-flex align-items-center my-2 justify-content-between">
+                                    <div class="w-100 d-flex align-items-center my-2 justify-content-between position-relative">
                                         <!--label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
                                           Type Commande
                                         </label-->
-
-                                        <select readonly class="form-control mx-2" v-model="empotageForm.typeCmd">
+                                        <div class="position-absolute w-100 h-100"></div>
+                                        <select readonly class="form-control mr-2" v-model="empotageForm.typeCmd">
                                             <option value="">Type commande</option>
                                             <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
                                         </select>
-                                        <select readonly class="form-control mx-2" v-model="empotageForm.idEntrepot">
+                                        <select readonly class="form-control ml-2" v-model="empotageForm.idEntrepot">
                                             <option value="">Entrepot</option>
                                             <option v-for="entrepot in listEntrepots" :value="entrepot.id">{{entrepot.nomEntrepot}}</option>
                                         </select>
@@ -409,18 +457,25 @@
                               <div class="row">
                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
-                                       <label for="tc"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                         <label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                       Plomb
+                                       </label>
+                                        <input class="w-65 form-control" id="plomb" v-model="empotageForm.plomb"/>
+                                    </div>
+                                    
+                                 </div>
+                                  <div class="col-6 my-2 d-flex flex-row justify-content-between align-items-center">
+                                    
+
+                                    <div class="w-49 d-flex align-items-center my-2">
+                                       <label for="tc"  class="d-block m-0 text-left pr-2" style='white-space: nowrap;'>
                                         N° TC
                                        </label>
                                         <input class="w-65 form-control" id="tc" v-model="empotageForm.tc" />
                                     </div>
                                     
-                                 </div>
-                                  <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="typetc"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                    <div class="w-49 d-flex align-items-center my-2">
+                                         <label for="typetc"  class="d-block m-0 text-left  w-35 pr-2" style='white-space: nowrap;'>
                                        Type TC
                                        </label>
                                        
@@ -428,7 +483,7 @@
                                             <option value="4">20 DRY</option>
                                             <option value="3">40 DRY</option>
                                         </select-->
-                                        <select class="form-control mx-2" v-model="empotageForm.typetc">
+                                        <select class="form-control ml-2" v-model="empotageForm.typetc">
                                             <option value=''>Choisir le contenaire</option>
                                             <option v-for="contenaire in listContenaire"  :value="contenaire.id">{{contenaire.nom}}</option>
                                         </select>
@@ -439,15 +494,19 @@
                              </div>
                              <div class="row">
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                       Plomb
-                                       </label>
-                                        <input class="w-65 form-control" id="plomb" v-model="empotageForm.plomb"/>
+                                    <div class="w-100 d-flex align-items-center my-2 dateW65">
+                                        <label class="d-block m-0 text-right  w-35 pr-2">Date Départ</label>
+                                        <date-picker v-model="empotageForm.dateDepart" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                                    </div>
+                                 </div>
+                                  <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2 dateW65">
+                                        <label class="d-block m-0 text-left pr-2">Date Arrivée</label>
+                                        <date-picker v-model="empotageForm.dateArrivee" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
                                     </div>
                                  </div>
                              </div>
-                             <div class="modal-footer d-flex justify-content-center"> 
+                             <div class="modal-footer d-flex justify-content-center mt-2"> 
 
                                 <template v-if="modeModify">
                                         <button type="submit" class="btn btn-success">Modifier</button>
@@ -498,6 +557,11 @@
 <script>
     import { EventBus } from '../../event-bus';
 
+    import DatePicker from 'vue2-datepicker';
+    import 'vue2-datepicker/index.css';
+    import VueTimepicker from 'vue2-timepicker';
+    import 'vue2-timepicker/dist/VueTimepicker.css'; 
+
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
     import { PdfMakeWrapper, Table, QR, Img} from 'pdfmake-wrapper';
 
@@ -515,7 +579,8 @@
             'listContenaire',
             'clientCurrent',
             'currentEntite',
-            'listEntrepots'
+            'listEntrepots',
+            'listeDossier'
         ],  
         components: {
             PageLoader
@@ -525,7 +590,7 @@
                 isLoading: true,
                 submitted_add: false,
                 submitted: false,
-                paginate: 5,
+                paginate: 10,
                 selectedTypeCmd: "",
                 typeCommandeUsed: {},
                 empotage:{},
@@ -555,7 +620,8 @@
                     capacite: '',
                     isClosed: false,
                     entrepot: '',
-                    idEntrepot:''
+                    idEntrepot:'',
+                    
                 },
                 modeModify: false,
                 capacite: this.defaultContenaire.volume,
@@ -568,7 +634,9 @@
                     typetc: '',
                     plomb: '',
                     typeCmd: '',
-                    idEntrepot:''
+                    idEntrepot:'',
+                    dateDepart: '',
+                    dateArrivee: ''
 
                 },
                 checkedCommandes: [],
@@ -588,7 +656,10 @@
                 search: "",
                 etatFiltre: "",
                 checking: false,
-                pdfFileModal: null
+                pdfFileModal: null,
+                numDossier: "",
+                searchRecep: '',
+                numDossierEdit: ''
             }
 
         },
@@ -609,6 +680,9 @@
             },
             search: function(value) {
                 this.getEmpotage();
+            },
+            searchRecep: function(value) {
+                this.getReception();
             },
             etatFiltre: function(value) {
                 this.getEmpotage();
@@ -666,7 +740,7 @@
                 this.setProgressCont(res[0].total_volume);
                 this.getEmpotage(); // refresh tableau prechargement
                 
-                this.getCmdSelected(this.selected.identifiant, false);
+                this.getCmdSelected(this.selected.identifiant,this.selected.idCmd, false);
                 this.getReception();
 
            
@@ -704,7 +778,7 @@
         }, 
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant).then(response => {
+            axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&keysearch="+this.searchRecep).then(response => {
 
                 this.reception = response.data;
 
@@ -766,8 +840,8 @@
 
             return dateTime;
         },
-        getCmdSelected(id, genererPDF){
-            axios.get('/gerer/getCmd/empoter/'+id).then(response => {
+        getCmdSelected(id, typeCommande, genererPDF){
+            axios.get('/gerer/getCmd/empoter/'+id+'/'+typeCommande).then(response => {
                 this.checkedCommandes = response.data.result;
                  if(genererPDF){
                     this.generatePdf(true);
@@ -808,7 +882,7 @@
 
             Vue.swal.fire({
                   title: 'Confirmez la validation',
-                  text: "Dossier n° "+this.selected.identifiant,
+                  text: "Dossier n° "+this.selected.dossier,
                   icon: 'warning',
                   showCancelButton: true,
                   confirmButtonColor: '#3085d6',
@@ -816,24 +890,40 @@
                   confirmButtonText: 'Oui, Valider!'
                 }).then((result) => {
                   if (result.isConfirmed) {
+
+                         Vue.swal({
+                            title: 'Validation',
+                            html: '<b>En cours...</b>',
+                            timerProgressBar: true,
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Vue.swal.showLoading()
+                            },
+                            willClose: () => {
+
+                            }
+                        }).then((result) => {});
+
                        axios.post("/gerer/validationEmpotage/valider/"+this.idClient, {
                             'idsCmd': this.commandeSelected,
                             'ignored': this.commandeNoSelected,
-                            'idEmpotage' : this.selected.identifiant
+                            'idEmpotage' : this.selected.identifiant,
+                            'typeCmd' : this.selected.idCmd,
+                            'id_dossier': this.selected.dossier
 
                         }).then(response => {
 
 
                             // Envoi notification avec le fichier PDF
 
-                            this.getCmdSelected(this.selected.identifiant, true);
+                            this.getCmdSelected(this.selected.identifiant,this.selected.idCmd, true);
                           
                             if(response.data.code==0){
-                                Vue.swal.fire(
+                                /*Vue.swal.fire(
                                   'succés!',
                                   'validé avec succés!',
                                   'success'
-                                );
+                                );*/
                                 this.selected.etat = 1;
                                 //this.getPrechargement();
                                 this.getReception();
@@ -932,24 +1022,44 @@
 
                 data.push(headerTab); 
 
+                var legend1 = "";
+                var legend2 = "";
+
                 for(var i=0; i< that.checkedCommandes.length; i++){
-                var obj = that.checkedCommandes[i];
-                var nbr = [];
-                var emballage = [];
+                    var obj = that.checkedCommandes[i];
+                    var nbr = [];
+                    var emballage = [];
+
+                    var cmdCell=[];
+                    var prio = "";
 
 
-                if(obj.renbcl > 0){
-                    nbr.push(obj.renbcl);
-                    emballage.push((obj.renbcl).toString() + ' Colis');
-                }
+                    if(obj.renbcl > 0){
+                        nbr.push(obj.renbcl);
+                        emballage.push((obj.renbcl).toString() + ' Colis');
+                    }
 
-                if(obj.renbpl > 0){
-                    nbr.push(obj.renbpl);
-                    emballage.push((obj.renbpl).toString() + ' Pal.');
-                }
+                    if(obj.renbpl > 0){
+                        nbr.push(obj.renbpl);
+                        emballage.push((obj.renbpl).toString() + ' Pal.');
+                    }
+                    
 
-                const item = [obj.refere, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa, obj.douane];
-                data.push(item);
+                    if(obj.priorite==1){
+                        prio = '*';
+                        legend1 = '(*) Pas urgente';
+
+                    }
+
+                    if(obj.priorite==3){
+                        prio = '***';
+                        legend2 = '(***) Urgente';
+                    }
+
+                    cmdCell.push(obj.refere+" "+prio);
+
+                    const item = [cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa, obj.douane];
+                    data.push(item);
                 }
 
                 var table = new Table(data).widths([70,70,'*',60,60,80,80]).layout({
@@ -998,29 +1108,76 @@
 
                 pdf.add(table);
 
-                pdf.add(tabtotaux);
+                
+                pdf.add(
+                    pdf.ln(2)
+                );
 
 
-                pdf.add(new QR((that.selected.dossier).toString()).fit(80).alignment('right').end);
+                // formater le nom du fichier
+
+                var labelCmd1 =  that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+            
+                var nameFile = 'dossier-'+that.selected.dossier+'_'+labelCmd1+"_numtc-"+that.selected.numtc+"_plomb-"+that.selected.plomb+".pdf";
 
 
+                var qrTotaux = [];
+
+                var legendTotaux = [];
+
+                legendTotaux.push([tabtotaux, {text: legend1+' '+legend2, fontSize: 10, bold: true, alignment: 'left'}]);
+
+                qrTotaux.push([legendTotaux, new QR(location.origin+"/pdf/empotage/"+nameFile).fit(80).alignment('right').end]); 
+
+                var tableQR = new Table(qrTotaux).widths(['*', 80]).layout('noBorders').end;
+
+                pdf.add(tableQR);
+
+                
                 if(isnotification){
 
                 var self = that; 
                 pdf.create().getDataUrl(function(url) { 
 
                     console.log(url, "File PDF"); 
+
+
                     axios.post("/gerer/empotage/notification/"+self.clientCurrent['id'], {
                         'idsCmd': self.commandeSelected,
                         'id_dossier' : self.selected.dossier,
                         'numtc': self.selected.numtc,
                         'typetc': self.selected.typetc,
                         'plomb':  self.selected.plomb,
+                        'typeCommande': self.selected.typeCmd,
                         'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
-                        'base64_file_pdf': url
+                        'base64_file_pdf': url,
+                        'IDclient': self.idClient
 
                     }).then(response => {
+                        Vue.swal.close();
+                            Vue.swal.fire(
+                          'succés!',
+                          'validé avec succés!',
+                          'success'
+                        ).then((result) => {
+                            // redirection   
+                            location.reload();
+                        });
+                    }).catch(err => {
+                        Vue.swal.close();
+                        console.log(err.code);
+                        console.log(err.message);
 
+                        Vue.swal.close();
+                            Vue.swal.fire(
+                          'Warning!',
+                          'Echec envoi de mail!',
+                          'warning'
+                        ).then((result) => {
+                            // redirection   
+                            location.reload();
+                        });
+                        // console.log(err.stack);
                     });
 
                 }); // download() or open() // getDataUrl
@@ -1079,7 +1236,7 @@
 
                 this.setProgressCont(dossier.total_volume);
                 this.getReception();
-                this.getCmdSelected(this.selected.identifiant, false);
+                this.getCmdSelected(this.selected.identifiant, this.selected.idCmd, false);
 
            },
            back(){
@@ -1122,20 +1279,18 @@
             saveEmpotage(){
                 this.submitted = true;
 
-                // stop here if form is invalid
-                this.$v.keyword.$touch();
-                if (this.$v.keyword.$invalid) {
-                    return;
-                }
+                
                 
                 const data = new FormData();
-                data.append('reference', this.keyword);
+                data.append('reference', this.empotageForm.reference);
                 data.append('typeCmd', this.empotageForm.typeCmd);
                 data.append('tc', this.empotageForm.tc);
                 data.append('typetc', this.empotageForm.typetc);
                 data.append('plomb', this.empotageForm.plomb);
                 data.append('idClient', this.idClient);
                 data.append('idEntrepot', this.empotageForm.idEntrepot);
+                data.append('date_depart', this.empotageForm.dateDepart);
+                data.append('date_arrivee', this.empotageForm.dateArrivee);
 
                 let action = "createEmpotage";
 
@@ -1176,7 +1331,18 @@
                 this.empotageForm.typeCmd = "";
                 this.empotageForm.idEntrepot = "";
             },
-             saveDouane(cmd){ 
+            setData(event) { 
+                for(var i=0; i< this.listeDossier.length; i++){
+                    if(this.listeDossier[i].idpre==event.target.value){
+                        this.empotageForm.reference = this.listeDossier[i].numDossier;
+                        this.empotageForm.typeCmd = this.listeDossier[i].type_commandes;
+                        this.empotageForm.idEntrepot = this.listeDossier[i].entrepots;
+                    }
+                }
+               
+              
+            },
+            saveDouane(cmd){ 
                 $(".loader_"+cmd.reidre).show();
                 /*const data = new FormData();
                 data.append('id', id);
@@ -1187,12 +1353,23 @@
 
                 var douane = this.douane[cmd.reidre];
 
+                var placeholder = $(".val-douane[data-id='"+cmd.reidre+"']").attr("placeholder");
+
 
                 if(!(typeof(douane) !== 'undefined') || !(douane !== null)){
-                    douane='';
-                }
+                    douane='';                    
+                }    
 
+                if(douane==''){
+                    if(!(typeof(placeholder) !== 'undefined') || !(placeholder !== null)){
+                        
+                    }else{
+                        douane = placeholder;
+                        this.douane[cmd.reidre] = douane;
+                    }
+                }          
 
+               
                 const data = new FormData();
                 data.append('idEmpotage', this.selected.identifiant);
                 data.append('idreception', cmd.reidre);
@@ -1213,7 +1390,7 @@
                     this.setProgressCont(res[0].total_volume);
                     this.getEmpotage(); // refresh tableau prechargement
                     
-                    this.getCmdSelected(this.selected.identifiant, false);
+                    this.getCmdSelected(this.selected.identifiant,this.selected.idCmd, false);
                     this.getReception();
                     $(".loader_"+cmd.reidre).hide(); 
 
@@ -1251,17 +1428,21 @@
            editEmpotage(empotage){
                 this.modeModify=true;
                 this.empotageForm.id = empotage.id;
-                this.keyword=empotage.reference;
+                //this.keyword=empotage.reference;
+                this.empotageForm.reference =empotage.reference;
                 this.empotageForm.tc       =empotage.numContenaire;
                 this.empotageForm.typetc   =empotage.IDContenaire;
                 this.empotageForm.plomb    =empotage.plomb;
                 this.empotageForm.typeCmd  =empotage.typeCommandeID;
-                this.empotageForm.idEntrepot = empotage.idEntrepot;
+                this.empotageForm.idEntrepot = empotage.entrepotID;
+                this.empotageForm.dateDepart= empotage.dateDepartEng;
+                this.empotageForm.dateArrivee= empotage.dateArriveeEng;
+                this.numDossierEdit = empotage.reference;
            },
            deleteEmpotage(empotage){
                 Vue.swal.fire({
                   title: 'Confirmez la suppression',
-                  text: "Dossier n° "+empotage.id,
+                  text: "Dossier n° "+empotage.reference,
                   icon: 'warning',
                   showCancelButton: true,
                   confirmButtonColor: '#d33',
@@ -1271,14 +1452,14 @@
                   if (result.isConfirmed) {
                         axios.delete('/gerer/deleteEmpotage/'+empotage.id+"?idClient="+this.idClient).then(response => {
                              Vue.swal.fire(
-                              'Deleted!',
-                              'Your file has been deleted.',
+                              'Supprimé!',
+                              'Dossier supprimé avec succés.',
                               'success'
                             );
-                             this.modeModify = false;
-                             this.getEmpotage();
+                            /* this.modeModify = false;
+                             this.getEmpotage();*/
 
-
+                              location.reload();
                         });
                   
                   }
@@ -1313,7 +1494,7 @@
         },
         mounted() {
           this.getEmpotage();
-          console.log(this.typeCmd);
+          console.log("dddd", this.listeDossier);
         }
     }
 </script>

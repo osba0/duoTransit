@@ -18,6 +18,8 @@ class Entite extends Migration
             $table->string('slug')->unique();
             $table->string('nom');
             $table->string('telephone')->nullable();
+            $table->string('fax')->nullable();
+            $table->string('email')->nullable();
             $table->string('adresse')->nullable();
             $table->string('logo')->nullable();
             $table->string('etat');

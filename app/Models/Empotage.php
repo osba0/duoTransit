@@ -15,7 +15,7 @@ class Empotage extends Model
     public static $idClient=0;
     public static $idEntite=0;
 
-    protected $fillable = ['id','reference', 'numContenaire', 'typeContenaire', 'plomb', 'poidEmpote','volumeEmpote','colisEmpote','reetat','is_close', 'users_id', 'clients_id','type_commandes_id','entrepots_id', 'contenaires_id','rapport_pdf', 'created_at'];
+    protected $fillable = ['id','reference', 'numContenaire', 'typeContenaire', 'plomb', 'poidEmpote','volumeEmpote','colisEmpote','reetat','is_close', 'users_id', 'clients_id','type_commandes_id','entrepots_id', 'contenaires_id','rapport_pdf','date_depart','date_arrivee', 'created_at'];
 
 
     protected static $ignoreChangedAttributes = ['updated_at'];

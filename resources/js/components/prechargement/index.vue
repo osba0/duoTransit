@@ -333,9 +333,14 @@
                         <div class="d-flex align-items-center justify-content-end">
 
                             <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
-                                    <i class="fa fa-eye" aria-hidden="true"></i>
-                                     <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
-                                </a>
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                 <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
+                            </a>
+
+                            <a href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)">
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
+                            </a>
                             
                             <label class="switch"  v-bind:style="[dry.dossier_id > 0 || selected.etat == 1 ? {'opacity': 0.5} : {'opacity': '1'}]">
                                 <input :disabled="dry.dossier_id > 0 || selected.etat == 1" class="switch-input inputCmd" :checked="selected.id == dry.idPre" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
@@ -385,6 +390,7 @@
             
           </div>
         </div>
+        <modalFacture></modalFacture>
         <modalDetailsCommande></modalDetailsCommande>
 
     </div>
@@ -392,7 +398,7 @@
 <script type="text/ecmascript-6">
     import { EventBus } from '../../event-bus';
 
-
+    import modalFacture from '../../components/modal/facture.vue';
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
 
 
@@ -418,7 +424,8 @@
         ],  
         components: {
             /*PageLoader*/
-            modalDetailsCommande
+            modalDetailsCommande,
+            modalFacture
           },
         data() { 
             return {
@@ -618,6 +625,7 @@
             this.isDetail = false;
            },
         valider(){
+        
             this.commandeSelected = [];
             this.commandeNoSelected = [];
 
@@ -651,6 +659,21 @@
                   confirmButtonText: 'Oui, Valider!'
                 }).then((result) => {
                   if (result.isConfirmed) {
+
+                        Vue.swal({
+                            title: 'Validation',
+                            html: '<b>En cours...</b>',
+                            timerProgressBar: true,
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Vue.swal.showLoading()
+                            },
+                            willClose: () => {
+
+                            }
+                        }).then((result) => {});
+
+
                         axios.post("/prechargementClient/valider/"+this.currentClient['id'], {
                             'idsCmd': this.commandeSelected,
                             'ignored': this.commandeNoSelected,
@@ -667,11 +690,14 @@
 
                                 this.getCmdSelected(this.selected.id, true);
                                 
-                                Vue.swal.fire(
+                                /*Vue.swal.fire(
                                   'succés!',
                                   'validé avec succés!',
                                   'success'
-                                );
+                                );*/
+
+
+                               
 
                                 
                             }else{
@@ -762,7 +788,10 @@
                 const headerTab = ['N°FE', 'N°ECV', 'N°CDE', 'Emballage', 'Fournisseurs', 'Poids(kg)', 'Volume(m3)', 'Factures'];
                 
                 data.push(headerTab); 
-                //data.push(code); 
+                
+
+                var legend1 = "";
+                var legend2 = "";
                
                 for(var i=0; i< that.checkedCommandes.length; i++){
                     var obj = that.checkedCommandes[i];
@@ -782,23 +811,19 @@
                         emballage.push((obj.renbpl).toString() + ' Pal.');
                     }
 
-                    cmdCell.push(obj.rencmd);
-                    
+                    if(obj.priorite==1){
+                        prio = '*';
+                        legend1 = '(*) Pas urgente';
 
-                    var rateMinus = 3-obj.priorite;
-                    
-                    for(var p=0; p < obj.priorite+rateMinus; p++){
-                        if(p<obj.priorite){
-                            prio += '+ ';
-                        }else{
-                            prio += '- ';
-                        }
-                        
                     }
 
-                    cmdCell.push(prio);
-                    
-                    console.log(cmdCell, "DEDE");
+                    if(obj.priorite==3){
+                        prio = '***';
+                        legend2 = '(***) Urgente';
+                    }
+
+
+                    cmdCell.push(obj.rencmd+" "+prio);
                     
                     const item = [obj.refere,obj.reecvr, cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
                     
@@ -866,19 +891,31 @@
 
                 pdf.add(header);
 
-
-
                 pdf.add(table);
-                pdf.add(tabtotaux);
+
                 pdf.add(
                     pdf.ln(2)
                 );
 
+                var labelCmd1 = that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+            
+                var nameFile = 'prechargement-'+that.selected.id+'_'+labelCmd1+".pdf";
 
-                pdf.add(new QR((that.selected.id).toString()).fit(80).alignment('right').end);
+
+                var qrTotaux = [];
+
+                var legendTotaux = [];
+
+                legendTotaux.push([tabtotaux, {text: legend1+' '+legend2, fontSize: 10, bold: true, alignment: 'left'}]);
+
+                qrTotaux.push([legendTotaux, new QR(location.origin+"/pdf/prechargementClient/"+nameFile).fit(80).alignment('right').end]); 
+
+                var tableQR = new Table(qrTotaux).widths(['*', 80]).layout('noBorders').end;
+
+                pdf.add(tableQR);
 
                 if(isnotification){
-                    var self = that; 
+                   var self = that; 
                    pdf.create().getDataUrl(function(url) { 
                     
                         axios.post("/prechargementClient/notification/"+self.currentClient['id'], {
@@ -889,7 +926,40 @@
 
                         }).then(response => {
 
-                        });
+                            Vue.swal.close();
+
+                            if(response.data.code==0){
+                                Vue.swal.fire(
+                                  'succés!',
+                                  'validé avec succés!',
+                                  'success'
+                                ).then((result) => {
+                                    // redirection   
+                                    self.back();
+                                });
+                            }else{
+                                 Vue.swal.fire(
+                                  'Erreur!',
+                                  '',
+                                  'error'
+                                )
+                            } 
+                        }).catch(err => {
+                            Vue.swal.close();
+                            console.log(err.code);
+                            console.log(err.message);
+
+                            Vue.swal.close();
+                                Vue.swal.fire(
+                              'Warning!',
+                              'Echec envoi de mail!',
+                              'warning'
+                            ).then((result) => {
+                                // redirection   
+                                location.reload();
+                            });
+                            // console.log(err.stack);
+                        });;
 
                    }); // download() or open() // getDataUrl
                 }else{
@@ -943,7 +1013,7 @@
                 });
 
             },
-             deletePre(pre){
+            deletePre(pre){
                 Vue.swal.fire({
                   title: 'Confirmez la suppression',
                   text: "Préchargement n° "+pre.id,
@@ -969,6 +1039,11 @@
                   
                   }
                 })
+            },
+            showFacture(fact){
+                 EventBus.$emit('VIEW_FACT', {
+                    pathFile: fact
+                }); 
             }
 
         }, 

@@ -22,6 +22,7 @@ class CreateChargementInitsTable extends Migration
             $table->foreignId('clients_id')->constrained();
             $table->foreignId('users_id')->constrained();
             $table->boolean('reetat');  
+            $table->boolean('is_empote');  
             $table->timestamps();
             
         });

@@ -238,15 +238,15 @@
                 </tr>
             </table>
             </div>
-            <div class="d-flex justify-content-between align-items-center mb-3 sucesss"> 
-                <button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button>
+            <div class="d-flex justify-content-center align-items-center mb-3 sucesss"> 
+                <!--button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
                 <!--div class="h5 m-0">
                     <span class="py-0 px-0 text-uppercase font-weight-bold">{{ selected.typeCmd }} </span> 
                 </div-->
                
                     
                 
-                <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()">Valider</button>
+                <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
             </div>
             <hr>
             <div class="d-flex justify-content-between align-content-center mb-2">
@@ -347,8 +347,9 @@
                         </td>
                         <td class="p-2 text-right">
                             <div class="d-flex justify-content-end align-items-center">
-                                <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                                <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3 position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
+                                    <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                                 </a>
                                 <span v-if="dry.dossier_id > 0"><i class="fa fa-check-circle"></i></span>
                                 <label class="switch" :style= "[selected.etat==1 ? {opacity: 0.5} : {opacity: 1}]">
@@ -379,9 +380,9 @@
                     
                 </div>
                 <hr>
-                <div class="d-flex justify-content-between mb-3 sucesss"> 
-                    <button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button>
-                    <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()">Valider</button>
+                <div class="d-flex justify-content-center mb-3 sucesss"> 
+                    <!--button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
+                    <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
         </template>
         
@@ -438,7 +439,7 @@
                                         <div class="md-form w-100">
                                             <label for="dateDeb" class="m-0 text-left w-35 pr-2 white-space-nowrap" >Date début</label>
 
-                                             <date-picker v-model="initChargement.dateDebut" class="w-100" :disabled-date="disabledFutureDate"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add && !$v.initChargement.dateDebut.required }"></date-picker>
+                                             <date-picker v-model="initChargement.dateDebut" class="w-100" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add && !$v.initChargement.dateDebut.required }"></date-picker>
                                            
                                         </div>
                                     </div>
@@ -447,7 +448,7 @@
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
                                            <label for="dateClo" class="d-block m-0 text-left w-35 pr-2 text-nowrap" >Date cloture</label>
-                                            <date-picker v-model="initChargement.dateCloture" class="w-100" :disabled-date="disabledFutureDate"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add  && !$v.initChargement.dateCloture.required}"></date-picker>
+                                            <date-picker v-model="initChargement.dateCloture" class="w-100"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add  && !$v.initChargement.dateCloture.required}"></date-picker>
                                         </div>
                                     </div>
                                 </div>
@@ -465,7 +466,7 @@
 
 
         <!-- Modal Facture-->
-        <div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+        <div class="modal fade fullscreenModal" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
           aria-hidden="true" data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
              <div class="modal-content">
@@ -577,7 +578,7 @@
                 etatFiltre: "",
                 submitted_circle: false,
                 checking: false,
-                pdfFileModal: '',
+                pdfFileModal: null,
                 searchRecep: '',
                 filtreRate: ''
             }
@@ -646,17 +647,41 @@
                 }
                 this.eventCmdSelected.ischecked=ischecked;
                 this.eventCmdSelected.idcmd = cmd.reidre;
+
+
+
+                this.commandeSelected = [];
+                this.commandeNoSelected = [];
+                
+                var self = this;
+                $(".inputCmd").each(function(){
+                    if($(this).is(':checked')){
+                        console.log("OK", $(this).val());
+                        self.commandeSelected.push(parseInt($(this).val()));
+                    }else{
+                        self.commandeNoSelected.push($(this).val());
+                    }
+                    
+                });
                 
                 
-                const data = new FormData();
+                 /*const data = new FormData();
                 data.append('idPrehargement', this.selected.id);
                 data.append('idreception', cmd.reidre);
                 data.append('ischecked', ischecked);
+                data.append('listCmd',  JSON.stringify(this.commandeSelected))*/
 
-                axios.post("/gerer/dossier/setPrechargement", data).then(response => {
+                axios.post("/gerer/dossier/setPrechargement", {
+                            'idPrehargement' :  this.selected.id,
+                            'idreception' :  cmd.reidre,
+                            'ischecked' :  ischecked,
+                            'listCmd' :  this.commandeSelected,
+                            'listCmdNoSelect' :  this.commandeNoSelected
+
+                        }).then(response => {
                 let res = response.data.result;
     
-                this.selected.nbrCmd   = res[0].total_cmd;
+                this.selected.nbrCmd   =  this.commandeSelected.length; //res[0].total_cmd;
                 this.selected.nbrColis = parseInt(res[0].total_colis==null ? 0 : res[0].total_colis) + parseInt(res[0].total_palette==null ? 0 : res[0].total_palette);
                 this.selected.poids    = res[0].total_poids==null ? 0 : res[0].total_poids;
                 this.selected.volume   = res[0].total_volume==null ? 0 : res[0].total_volume;
@@ -666,12 +691,10 @@
                 this.setProgressCont(res[0].total_volume);
                 this.getPrechargement(); // refresh tableau prechargement
                 
-                this.getCmdSelected(this.selected.id, false);
-                this.getReception();
-
-           
+                this.getCmdSelected(this.selected.id, this.selected.typeCommande, false);
+               // this.getReception(); 
               
-            });
+                });
         },
         closeModalDossier(){
             this.$refs.closePoupDossier.click();
@@ -739,6 +762,8 @@
             this.isLoading=true;
             axios.get('/gerer/dossier/pre/reception/'+this.idClient+"/"+this.selected.typeCommande+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&idPre="+this.selected.id+"&etat="+this.selected.etat+"&filtreRate="+this.filtreRate+"&keysearch="+this.searchRecep).then(response => {
                 this.reception = response.data;
+
+                console.log(this.reception, "reception");
                 if(this.selected.etat==0){
                     this.selected.nbrCmd   = 0;
                     this.selected.nbrColis  = 0;
@@ -849,13 +874,12 @@
 
             return dateTime;
         },
-        getCmdSelected(idDossier, genererPDF){
-            axios.get('/gerer/getCmd/'+idDossier).then(response => {
+        getCmdSelected(idDossier, typeCommande, genererPDF){
+            axios.get('/gerer/getCmd/'+idDossier+'/'+typeCommande).then(response => {
                 this.checkedCommandes = response.data.result;
                 if(genererPDF){
                     this.generatePdf(true);
                 }
-                
                 
             });
         },
@@ -894,6 +918,23 @@
                   confirmButtonText: 'Oui, Valider!'
                 }).then((result) => {
                   if (result.isConfirmed) {
+
+
+
+                        Vue.swal({
+                            title: 'Validation',
+                            html: '<b>En cours...</b>',
+                            timerProgressBar: true,
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Vue.swal.showLoading()
+                            },
+                            willClose: () => {
+
+                            }
+                        }).then((result) => {});
+
+
                         axios.post("/gerer/createDossier/valider/"+this.currentClient['id'], {
                             'idsCmd': this.commandeSelected,
                             'ignored': this.commandeNoSelected,
@@ -906,13 +947,13 @@
 
                                 // Envoi notification avec le fichier PDF
 
-                                this.getCmdSelected(this.selected.id, true);
+                                this.getCmdSelected(this.selected.id, this.selected.typeCommande, true);
                                 
-                                Vue.swal.fire(
+                                /*Vue.swal.fire(
                                   'succés!',
                                   'validé avec succés!',
                                   'success'
-                                );
+                                );*/
                                 this.selected.etat = 1;
                                 //this.getPrechargement();
                                 this.getReception();
@@ -1002,6 +1043,9 @@
                 const headerTab = ['N°FE', 'N°ECV', 'N°CDE', 'Emballage', 'Fournisseurs', 'Poids(kg)', 'Volume(m3)', 'Factures'];
                 
                 data.push(headerTab); 
+
+                var legend1 = "";
+                var legend2 = "";
                
                 for(var i=0; i< that.checkedCommandes.length; i++){
                     var obj = that.checkedCommandes[i];
@@ -1009,6 +1053,7 @@
                     var emballage = [];
                     var cmdCell=[];
                     var prio = "";
+                    
 
 
                     if(obj.renbcl > 0){
@@ -1021,22 +1066,19 @@
                         emballage.push((obj.renbpl).toString() + ' Pal.');
                     }
 
-                    cmdCell.push(obj.rencmd);
-                    
+                    if(obj.priorite==1){
+                        prio = '*';
+                        legend1 = '(*) Pas urgente';
 
-                    var rateMinus = 3-obj.priorite;
-                    
-                    for(var p=0; p < obj.priorite+rateMinus; p++){
-                        if(p<obj.priorite){
-                            prio += '+ ';
-                        }else{
-                            prio += '- ';
-                        }
-                        
                     }
 
-                    cmdCell.push(prio);
+                    if(obj.priorite==3){
+                        prio = '***';
+                        legend2 = '(***) Urgente';
+                    }
 
+
+                    cmdCell.push(obj.rencmd+" "+prio);
                     
                     const item = [obj.refere,obj.reecvr, cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
                     
@@ -1104,19 +1146,30 @@
 
                 pdf.add(header);
 
-
-
                 pdf.add(table);
-                pdf.add(tabtotaux);
+
                 pdf.add(
                     pdf.ln(2)
                 );
 
                 var endPage = [];
 
-                endPage.push([{text: '+ - -   Pas urgente \n+ + -  Normale \n+ + + Urgente', fontSize: 10, bold: true, alignment: 'left'}, new QR((that.selected.id).toString()).fit(80).alignment('right').end]);
+                // formater le nom du fichier
+                var labelCmd1 = that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+            
+                var nameFile = 'dossier-'+that.selected.id+'_'+labelCmd1+"_du_"+that.selected.dateDebut.replaceAll("/", "-")+"_au_"+that.selected.dateCloture.replaceAll("/", "-")+".pdf";
 
-                pdf.add(endPage);
+                var qrTotaux = [];
+
+                var legendTotaux = [];
+
+                legendTotaux.push([tabtotaux, {text: legend1+' '+legend2, fontSize: 10, bold: true, alignment: 'left'}]);
+
+                qrTotaux.push([legendTotaux, new QR(location.origin+"/pdf/prechargement/"+nameFile).fit(80).alignment('right').end]); 
+
+                var tableQR = new Table(qrTotaux).widths(['*', 80]).layout('noBorders').end;
+
+                pdf.add(tableQR);
 
                 if(isnotification){
                     
@@ -1135,7 +1188,45 @@
 
                         }).then(response => {
 
-                        });
+                            Vue.swal.close();
+
+                             if(response.data.code == 0){
+                                Vue.swal.fire(
+                                  'succés!',
+                                  'validé avec succés!',
+                                  'success'
+                                ).then((result) => {
+                                    // reload   
+                                    location.reload();
+                                });
+                             }else{
+                                Vue.swal.fire(
+                                  'Error!',
+                                  response.data.result,
+                                  'error'
+                                ).then((result) => {
+                                    // reload   
+                                    location.reload();
+                                });
+                             }
+                                 
+
+                        }).catch(err => {
+                            Vue.swal.close();
+                            console.log(err.code);
+                            console.log(err.message);
+
+                            Vue.swal.close();
+                                Vue.swal.fire(
+                              'Warning!',
+                              'Echec envoi de mail!',
+                              'warning'
+                            ).then((result) => {
+                                // redirection   
+                                location.reload();
+                            });
+                            // console.log(err.stack);
+                        });;
 
                    }); // download() or open() // getDataUrl
 
@@ -1168,7 +1259,7 @@
             this.selected.idEntrepot = dossier.entrepotID; 
             this.setProgressCont(dossier.total_volume);
             this.getReception();
-            this.getCmdSelected(this.selected.id, false);
+            this.getCmdSelected(this.selected.id, this.selected.typeCommande, false);
 
 
 
@@ -1218,7 +1309,6 @@
             var labelCmd = pre.typecmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
             
                 this.pdfFileModal = 'dossier-'+pre.id+'_'+labelCmd+"_du_"+pre.dateDebut.replaceAll("/", "-")+"_au_"+pre.dateCloture.replaceAll("/", "-")+".pdf";
-                console.log(this.pdfFileModal);
            },
            closeModalPdf(){
                  this.$refs.closePoupPdf.click();

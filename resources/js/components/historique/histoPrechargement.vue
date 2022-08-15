@@ -149,6 +149,8 @@
                         <div class="h5 mb-0 rounded bg-white py-2 px-3 border">Plomb: <b>{{ selected.plomb }}</b></div>
                     </div-->
                 </div>
+                   
+
                     <table class="table">
                     <thead class="thead-blue borderorange">
                          <tr>
@@ -199,8 +201,9 @@
                             <span  class="badge badge-warning" v-else>En attente</span>
                         </td>
                          <td class="p-2 align-middle text-right">
-                            <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                            <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
                                 <i class="fa fa-eye" aria-hidden="true"></i>
+                                   <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                             </a>
                             <a href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
                                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i>

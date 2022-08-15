@@ -17,7 +17,8 @@
                 :list-contenaire="{{ json_encode($listContenaire) }}"
                 :client-current="{{ json_encode($client) }}"
                 :current-entite="{{ json_encode($entite) }}"
-                :list-entrepots="{{ json_encode($entrepots) }}"></empotage-entite>
+                :list-entrepots="{{ json_encode($entrepots) }}"
+                :liste-dossier="{{json_encode($listeDossier)}}"></empotage-entite>
             @else
                 <div class="badge badge-warning p-3">Client non autorisé ou inexistant!</div>
             @endif

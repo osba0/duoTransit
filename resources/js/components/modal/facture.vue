@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- Modal Facture-->
-        <div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+        <div class="modal fade" id="openFacturePop" tabindex="-1" role="dialog" aria-labelledby="myModalFacturePops"
           aria-hidden="true" data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
           	 <div class="modal-content">
@@ -35,26 +35,27 @@ export default {
      components: {
        
       },
-        data() { 
+      data() { 
         return {
            pdfFile: null,
         }
       },
       methods: {
-        showFacture(file){
-            if(file!=''){
-                this.pdfFile = file;
-            }
-        }
+        closeModalPdf(){
+             this.$refs.closePoupPdf.click();
+             this.pdfFile=null;
+        },
 
       },
          
       mounted() {
 
           EventBus.$on('VIEW_FACT', (event) => {
-              this.pdfFile = event.pathFact;
+              this.pdfFile = event.pathFile;
+
               
-              $('#openFacture').modal('show');
+              
+              $('#openFacturePop').modal('show');
           });
       }
   }

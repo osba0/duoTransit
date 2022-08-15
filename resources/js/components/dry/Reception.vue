@@ -906,7 +906,22 @@
 	                this.submitted = false;
                     this.isRun = false;
 	               
-	            });
+	            }).catch(err => {
+                        Vue.swal.close();
+                        console.log(err.code);
+                        console.log(err.message);
+
+                        Vue.swal.close();
+                            Vue.swal.fire(
+                          'Warning!',
+                          err.message,
+                          'warning'
+                        ).then((result) => {
+                            // redirection   
+                            location.reload();
+                        });
+                        // console.log(err.stack);
+                    });;
         		
         	},
 
@@ -955,10 +970,6 @@
                  this.closePreview();
             },
 
-	        closeModalPdf(){
-	          	 this.$refs.closePoupPdf.click();
-	        },
-
         	flushData(){
 				this.reception.typeCmd = "";
 				this.reception.fournisseur = "";
@@ -1002,7 +1013,7 @@
             },
              showFacture(fact){
                  EventBus.$emit('VIEW_FACT', {
-                    pdfFile: fact
+                    pathFile: fact
                 }); 
             },
         	editDry(dry){

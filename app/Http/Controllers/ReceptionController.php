@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ReceptionResource;
 use App\Http\Resources\TypeCommandeResource;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\receptionCommandes;
 
 use App\Models\Reception;
 use App\Models\TypeCommande;
@@ -13,7 +15,8 @@ use App\Models\Fournisseur;
 use App\Models\UserRole;
 use App\Models\TypActivity;
 use App\Models\LogActivity;
-
+use App\Models\Entite;
+use App\Models\User; 
 use Illuminate\Http\Request;
 
 use App\Http\Resources\ClientResource;
@@ -214,8 +217,6 @@ class ReceptionController extends Controller
           
             $store = Reception::create($params);
 
-           // activity(TypActivity::CREER)->withProperties($params)->log('Nouvelle réception');
-
         }catch(\Exceptions $e){
               return response([
                 "code" => 1,
@@ -224,6 +225,30 @@ class ReceptionController extends Controller
         }
 
         if($store){
+            
+            // Notifier
+            $transitaire = Entite::where('id', $user->entites_id)->get()->first();
+            $societe = Client::where('id', request('client'))->get()->first();
+
+            // add fournisseur
+            $params["fournisseur"] = Fournisseur::where('id', $params['fournisseurs_id'])->get()->first()['fonmfo'];
+            $params["entrepot"] = Entrepot::where('id', $params['entrepots_id'])->get()->first()['nomEntrepot'];
+            $params["typeCmd"] = TypeCommande::where('id', $params['type_commandes_id'])->get()->first()['typcmd'];
+
+
+            $getMailClient = User::where("entites_id", $transitaire['id'])->whereJsonContains('roles', UserRole::ROLE_CLIENT)->whereJsonContains('client_supervisor', intval(request('client')))->get();
+
+            $emailSent=[];
+
+            foreach($getMailClient as $user){
+            
+                $emailSent[] = $user['email'];
+            }
+            
+            $pathFile = "assets/factures/". $filename;
+
+            Notification::send($getMailClient, new receptionCommandes($transitaire, $societe, $emailSent, $params, $pathFile));
+
             return response([
                 "code" => 0,
                 "message" => "OK"

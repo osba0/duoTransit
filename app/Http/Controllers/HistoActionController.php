@@ -30,10 +30,6 @@ class HistoActionController extends Controller
 
         $user = Auth::user();
 
-        if(!($user->hasRole(UserRole::ROLE_ADMIN) || $user->hasRole(UserRole::ROLE_ROOT))){
-             abort(401);
-        }
-
         $entite = Entite::where('id', $user->entites_id)->get()->first();
         
         $client = Client::get()->where('slug', request('id'))->first();
@@ -83,6 +79,8 @@ class HistoActionController extends Controller
                 'contenaires.volume as capacite',
                 'empotages.users_id', 
                 'empotages.plomb as plomb', 
+                'empotages.date_depart as dateDepart', 
+                'empotages.date_arrivee as dateArrivee', 
                 'empotages.is_close as cloture',
                 'empotages.created_at as created_at_empotage',
                 'empotages.reetat as etat',
@@ -127,10 +125,12 @@ class HistoActionController extends Controller
 
         $paginate = request('paginate');
 
+        $keyword = request('keysearch');
+
         if (isset($paginate)) {
 
-            $histo = DB::table('receptions')
-            ->leftJoin('empotages', 'empotages.id', '=', 'receptions.dossier_empotage_id')
+            $histo =Reception::
+            leftJoin('empotages', 'empotages.id', '=', 'receptions.dossier_empotage_id')
             ->leftJoin('fournisseurs as four', 'receptions.fournisseurs_id', '=', 'four.id')
             ->leftJoin('users as a', 'empotages.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
@@ -138,6 +138,11 @@ class HistoActionController extends Controller
             if(request('filtre_four')!=''){
                 $histo = $histo->where('receptions.fournisseurs_id', request('filtre_four'));
             }
+
+            if($keyword!=''){
+                $histo = $histo->search($keyword);
+            }
+
             $histo = $histo->paginate($paginate); 
 
         }else{
@@ -162,7 +167,7 @@ class HistoActionController extends Controller
         
         $client = Client::get()->where('slug', request('id'))->first();
 
-        if(!$client)  abort(404);
+        if(!$client) abort(404);
 
         $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get(); 
 

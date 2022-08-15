@@ -44,13 +44,17 @@ class IndexController extends Controller
         $typeCmdTotal = 0;
 
         if($user->hasRole(UserRole::ROLE_CLIENT)){
+            
+           
+
             $req = Reception::where(function($query){
                 $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', 0);
             })->where(function($query){
                 $query->orWhere('dossier_prechargements_id', 0)->orWhere('dossier_prechargements_id', NULL);
             })->where(function($query){
                 $query->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
-            })->where('reetat', true);
+            })->where('reetat', true)->where('clients_id', $user['client_supervisor'][0]);
+
             $receptions = $req->get()->count();
 
             

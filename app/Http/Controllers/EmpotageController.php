@@ -50,7 +50,7 @@ class EmpotageController extends Controller
             ->leftJoin('contenaires', 'empotages.contenaires_id', '=', 'contenaires.id')
             ->leftJoin('entrepots', 'empotages.entrepots_id', '=', 'entrepots.id')
             ->groupBy('empotages.id')
-            ->select('receptions.dossier_empotage_id', 
+            ->select('receptions.dossier_empotage_id',
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
                 DB::raw('SUM(receptions.revolu) as total_volume'), 
                 DB::raw('SUM(receptions.renbcl) as total_colis'), 
@@ -65,6 +65,8 @@ class EmpotageController extends Controller
                 'contenaires.volume as capacite',
                 'empotages.users_id', 
                 'empotages.plomb as plomb', 
+                'empotages.date_depart as dateDepart', 
+                'empotages.date_arrivee as dateArrivee', 
                 'empotages.is_close as cloture',
                 'empotages.created_at as created_at_empotage',
                 'empotages.reetat as etat',
@@ -76,7 +78,7 @@ class EmpotageController extends Controller
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.tcolor as tcolor',
                 'type_commandes.id as typecmdID',
-                'contenaires.nom as contenaire')->where('empotages.clients_id', request('id'))->orderBy('empotages.created_at', 'desc');
+                'contenaires.nom as contenaire')->where('empotages.reetat', false)->where('empotages.clients_id', request('id'))->orderBy('empotages.created_at', 'desc');
 
             if(request('etatFiltre')!=""){
                  $query = $query->where('empotages.reetat', request('etatFiltre')); 
@@ -133,6 +135,8 @@ class EmpotageController extends Controller
             "volumeEmpote" =>  0, 
             "colisEmpote" => 0,
             "clients_id" => request('idClient'), 
+            "date_depart" => request('date_depart'), 
+            "date_arrivee" => request('date_arrivee'), 
             "users_id" => Auth::user()->id,
             "reetat" => 0
         ]);
@@ -155,7 +159,9 @@ class EmpotageController extends Controller
             "numContenaire" => request('tc'),
             "contenaires_id" => request('typetc'),
             "type_commandes_id" => request('typeCmd'),
-            'plomb' => request('plomb')
+            'plomb' => request('plomb'),
+            "date_depart" => request('date_depart'), 
+            "date_arrivee" => request('date_arrivee')
         ]);
 
         return response([
@@ -179,6 +185,8 @@ class EmpotageController extends Controller
 
         $paginate = request('paginate');
 
+        $keyword = request('keysearch');
+
         if (isset($paginate)) {
 
             $dries = Reception::where('dossier_id', request('ref'))->where(function($query){
@@ -187,7 +195,14 @@ class EmpotageController extends Controller
             ->leftJoin('empotages', 'empotages.id', '=', 'receptions.dossier_empotage_id')
             ->leftJoin('users as a', 'empotages.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
-            ->select('*','receptions.type_commandes_id as typeCmd','b.username as user_created','a.username as prechargeur')->where('receptions.clients_id', request('id'))->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entrepots_id', request('idEntrepot'))->paginate($paginate); 
+            ->select('*','receptions.type_commandes_id as typeCmd','b.username as user_created','a.username as prechargeur')->where('receptions.clients_id', request('id'))->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entrepots_id', request('idEntrepot')); 
+
+
+            if($keyword!=''){
+                $dries = $dries->search($keyword);
+            }
+
+            $dries = $dries->paginate($paginate);
 
         }else{
            
@@ -302,7 +317,7 @@ class EmpotageController extends Controller
 
 
     public function getCommandeEmpoter(){
-        $results = Reception::where('dossier_empotage_id',request('id'))->get(); 
+        $results = Reception::where('dossier_empotage_id',request('id'))->where('type_commandes_id', request('typecommande'))->get(); 
         $details=[];
 
         foreach ($results as $key) {
@@ -335,6 +350,15 @@ class EmpotageController extends Controller
         }
         $response = true;
 
+
+        // Réinitialiser les commandes qui n'ont pas été choisi (Pas de num de douane)
+        if(sizeof(request('ignored')) > 0){
+            Reception::whereIn('reidre',request('ignored'))->update([
+                "dossier_id" => null
+            ]);
+        }
+        
+        // Empoter les commandes qui ont été choisies
         if(sizeof(request('idsCmd')) > 0){
             $response = Reception::whereIn('reidre',request('idsCmd'))
               ->update([
@@ -343,14 +367,16 @@ class EmpotageController extends Controller
 
 
             // Associer les commandes à un numero de dossier
-
-            activity(TypActivity::MODIFIER)->withProperties(request('idsCmd'))->performedOn($client)->log('Validation empotage n°dossier'.request('id_dossier'));
+            activity(TypActivity::MODIFIER)->withProperties(request('idsCmd'))->performedOn($client)->log('Validation empotage n°dossier'.request('typeCmd'));
             $lastID = LogActivity::latest('id')->first();
             $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $user->entites_id]);
 
         }
 
-        
+        // Desactiver le dossier dans Prechargement
+        DB::table('chargement_creations')->where("numdossier", request('id_dossier'))->where("type_commandes_id", request('typeCmd'))->update([
+                "is_empote" => true
+            ]);
 
         if($response){
             if(sizeof(request('ignored')) > 0){
@@ -359,20 +385,26 @@ class EmpotageController extends Controller
                     "dossier_empotage_id" => Null
                 ]);
             }
-
+            
+            // Valider et cloturer en meme temps
             $resp = Empotage::where('id',request('idEmpotage'))
               ->update([
-                "reetat" => true
+                "reetat" => true,
+                "is_close" => true
             ]);
-             return response([
+
+            return response([
                 "code" => 0,
                 "result" => 'Success'
             ]);
+
          }else{
-             return response([
+
+            return response([
                 "code" => 1,
                 "result" => $response
             ]);
+
          }
     }
 
@@ -404,20 +436,17 @@ class EmpotageController extends Controller
     {
         $user = Auth::user();
 
-        $res = Empotage::select('id')->where('reference', request('id'))->get()->toArray();
+        /*$res = Empotage::select('id')->where('reference', request('id'))->get()->toArray();
         $ids = [];
 
         foreach($res as $item){
             $ids[] = $item['id'];
             
-        }
+        }*/
 
-        Reception::whereIn('dossier_empotage_id', $ids)->update([
-            "dossier_empotage_id" => ''
+        Reception::where('dossier_empotage_id', request('id'))->update([
+            "dossier_empotage_id" => null
         ]);
-
-
-
         
         $rapport = Empotage::where('id', request('id'))->firstOrFail();
 
@@ -451,7 +480,7 @@ class EmpotageController extends Controller
         $commandes = Reception::whereIn('reidre',request('idsCmd'));
 
 
-        $getMailClient = User::where("entites_id", $transitaire['id'])->whereJsonContains('roles', UserRole::ROLE_CLIENT)->get();
+        $getMailClient = User::where("entites_id", $transitaire['id'])->whereJsonContains('roles', UserRole::ROLE_CLIENT)->whereJsonContains('client_supervisor', intval(request('IDclient')))->get();
 
         $emailSent=[];
 
@@ -460,6 +489,9 @@ class EmpotageController extends Controller
             $emailSent[] = $user['email'];
         }
 
-        Notification::route('mail', [])->notify(new empotageCommandesTransitaire($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_dossier'), request('numtc'), request('typetc'), request('plomb'))); 
+        //Notification::route('mail', [])->notify(new empotageCommandesTransitaire($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_dossier'), request('numtc'), request('typetc'), request('plomb'))); 
+
+
+        Notification::send($getMailClient, new empotageCommandesTransitaire($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_dossier'), request('numtc'), request('typetc'), request('plomb'), request('typeCommande')));
     }
 }

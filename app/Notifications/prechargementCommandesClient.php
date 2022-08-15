@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
 
 use App\Mail\preCommandesClientMail;
 
@@ -43,7 +44,7 @@ class prechargementCommandesClient extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['database', 'mail'];
     }
 
     /**
@@ -65,8 +66,12 @@ class prechargementCommandesClient extends Notification
      */
     public function toArray($notifiable)
     {
-        return [
-            //
+       return [
+            'title' => 'Nouveau Préchargement n°'.$this->numeroPre.', '.$this->societe['clnmcl'],
+            'description' => '',
+            'fichier' => '/' .$this->pathFile,
+            'user' => Auth::user(),
+            'slug' => $this->societe['slug']   
         ];
     }
 }

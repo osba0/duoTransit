@@ -24,11 +24,14 @@ class CreateEmpotagesTable extends Migration
             $table->double('colisEmpote')->nullable(); 
             $table->integer('nbreContenaire')->nullable();
             $table->foreignId('type_commandes_id')->constrained();
+            $table->foreignId('entrepots_id')->constrained();
             $table->foreignId('users_id')->constrained();
             $table->foreignId('clients_id')->constrained();
             $table->boolean('reetat');
             $table->boolean('is_close');   
-            $table->text('rapport_pdf');    
+            $table->text('rapport_pdf');  
+            $table->date('date_depart')->nullable();  
+            $table->date('date_arrivee')->nullable();  
             $table->timestamps();
         });
     }

@@ -12,6 +12,7 @@ use App\Http\Controllers\PrechargementController;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\EmpotageController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\NotificationController;
 use App\Models\Contenaire;
 use App\Models\Entrepot;
 use App\Models\UserRole;
@@ -133,7 +134,7 @@ Route::middleware(['web','auth'])->group(function () {
         Route::get('/dossier/list/{id}', [GestionController::class, 'listing'])->middleware(['auth']);
         Route::get('/dossier/pre/reception/{id}/{typecmd}', [GestionController::class, 'listingReception'])->middleware(['auth']);
         Route::post('/dossier/setPrechargement', [GestionController::class, 'precharger'])->middleware(['auth']);
-        Route::get('/getCmd/{id}', [GestionController::class, 'getCommande'])->middleware(['auth']);
+        Route::get('/getCmd/{id}/{typecommande}', [GestionController::class, 'getCommande'])->middleware(['auth']);
         Route::delete('/deletePre/{id}', [GestionController::class, 'deletePre']);
         Route::post('/reactiver/{id}', [GestionController::class, 'reactiver'])->name('reactiverPrechargement');
 
@@ -150,7 +151,7 @@ Route::middleware(['web','auth'])->group(function () {
         Route::get('/dossier/empotage/reception/{id}/{typecmd}', [EmpotageController::class, 'listingReceptionEmpotage'])->middleware(['auth']); 
         Route::post('/updateDouane', [EmpotageController::class, 'updateDouane']);
         Route::post('/dossier/setEmpotage', [EmpotageController::class, 'empoter'])->middleware(['auth']);
-        Route::get('/getCmd/empoter/{id}', [EmpotageController::class, 'getCommandeEmpoter'])->middleware(['auth']);
+        Route::get('/getCmd/empoter/{id}/{typecommande}', [EmpotageController::class, 'getCommandeEmpoter'])->middleware(['auth']);
         Route::post('/validationEmpotage/valider/{id}', [EmpotageController::class, 'valider'])->middleware(['auth']);
         Route::post('/empotage/cloturer/{ref}', [EmpotageController::class, 'cloturer']);
         Route::post('/empotage/savepdf', [EmpotageController::class, 'savepdf']);
@@ -224,6 +225,15 @@ Route::get('/prechargementClient/getCmdChoisi/{id}', [PrechargementController::c
 Route::post('/prechargementClient/notification/{id}', [PrechargementController::class, 'notifier'])->middleware(['auth']); 
 
 Route::delete('/prechargementClient/delete/{id}', [PrechargementController::class, 'deletePre']);
+
+
+
+Route::get('/qrcode', function () {
+        return view('qrcode.facture-prechargement', ['contenaires' => '123']);
+    })->name('qrcode');
+
+
+Route::get('/notifications/mark-as-read/{client}/{notification_id}', [NotificationController::class, 'show'])->middleware(['auth']);
 
 
 
