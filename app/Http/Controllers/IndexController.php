@@ -11,6 +11,7 @@ use App\Models\Reception;
 use App\Models\TypeCommande;
 use App\Models\Entite;
 use App\Models\Contenaire;
+use App\Models\LogActivity;
 use App\Http\Resources\TypeCommandeResource;
 use App\Http\Resources\FournisseurResource;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +29,9 @@ class IndexController extends Controller
     public function index(Request $request)
     {
         $user = Auth::getUser();
+        if(is_null($user)){
+            return  redirect(route('login'));
+        }
         $client = Client::get()->count();
 
         $receptions = 0;
@@ -42,6 +46,7 @@ class IndexController extends Controller
         $recap = [];
         $typeCmdNbr = 0;
         $typeCmdTotal = 0;
+        $journal = 0;
 
         if($user->hasRole(UserRole::ROLE_CLIENT)){
             
@@ -87,6 +92,8 @@ class IndexController extends Controller
             $entite = Entite::get()->count();
             $contenaire = Contenaire::get()->count();
 
+            $journal = LogActivity::get()->count();
+
 
             $users = User::where("entites_id", $user->entites_id)->get()->count();
           
@@ -114,7 +121,7 @@ class IndexController extends Controller
         $request->session()->put('clientSup', $user->getClientSupervisor()); 
 
        
-        return  view('home', ['roles' => $user->roles[0],'totalCmdAttente' => $receptions,'totalClient' => $client, 'totalEntite' => $entite,'totalContenaire' => $contenaire, 'totalUser' => $users,'totalFournisseur' => $fournisseur, 'four'=>$four , 'totaEntrepot' => $entrepot,"typeCmdNbr" => $typeCmd->count(),"fourNbr" => $fournis->count(), 'totalCommande'=> $dry, 'recap'=> $recap, 'typeCmdTotal' => $typeCmdTotal, 'fournis' => FournisseurResource::collection($fournis), 'clientSup'=> json_encode($user->getClientSupervisor())]);
+        return  view('home', ['roles' => $user->roles[0],'totalCmdAttente' => $receptions,'totalClient' => $client, 'totalEntite' => $entite,'totalContenaire' => $contenaire, 'totalJournal' => $journal, 'totalUser' => $users,'totalFournisseur' => $fournisseur, 'four'=>$four , 'totaEntrepot' => $entrepot,"typeCmdNbr" => $typeCmd->count(),"fourNbr" => $fournis->count(), 'totalCommande'=> $dry, 'recap'=> $recap, 'typeCmdTotal' => $typeCmdTotal, 'fournis' => FournisseurResource::collection($fournis), 'clientSup'=> json_encode($user->getClientSupervisor())]);
     }
 
     /**
@@ -122,9 +129,9 @@ class IndexController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function checksession()
     {
-        //
+       $user = Auth::getUser();
     }
 
     /**

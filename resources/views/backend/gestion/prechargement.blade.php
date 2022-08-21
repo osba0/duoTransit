@@ -18,6 +18,7 @@
                 :current-client="{{ json_encode($client) }}"
                 :current-entite="{{ json_encode($entite) }}"
                 :list-entrepots="{{ json_encode($entrepots) }}"
+                :cmd-a-precharger="{{ json_encode($nbrCmdACharger) }}"
                >
                 
                 </prechargement-entite>

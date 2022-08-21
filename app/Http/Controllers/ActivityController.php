@@ -68,8 +68,8 @@ class ActivityController extends Controller
             }else{
                 $query = $query->orWhere('subject_type',$client['clenti'])->where("subject_id", $client['id'])->orWhere('subject_id',null);
             }
-
-            $query = $query->orderBy('activity_log.created_at', 'desc')->paginate($paginate);
+            // A decommanter pour obtenir le log des connexion -> where("log_name",'!=', TypActivity::CONNEXION) 
+            $query = $query->where("log_name",'!=', TypActivity::CONNEXION)->orderBy('activity_log.created_at', 'desc')->paginate($paginate);
 
         }else{
            
@@ -83,7 +83,7 @@ class ActivityController extends Controller
          $user = Auth::user();
 
 
-        $query = DB::table('activity_log')->orWhere("subject_id", request('client_id'));
+        $query = DB::table('activity_log')->where("subject_id", request('client_id'));
 
         try {
             switch($type){

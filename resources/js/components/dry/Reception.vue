@@ -129,16 +129,19 @@
                      <tr>
                         <th class="p-2 border-right border-white h6">#</th>
                         <!--th class="p-2 border-right border-white h6">Type Commande</th-->
-                        <th class="p-2 border-right border-white h6">N°CDE</th>
-                        <th class="p-2 border-right border-white h6">N°FE</th>
-                        <th class="p-2 border-right border-white h6">N°ECV</th>
-                        <th class="p-2 border-right border-white h6">Fournisseur</th>
+                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[0])">N°CDE 
+                            <i class="fa fa-sort" aria-hidden="true" ></i>
+                        </th>
+                        <th class="p-2 border-right border-white h6 cursor-pointer"  v-on:click="sortByColumn(columns[1])">
+                        N°FE <i class="fa fa-sort" aria-hidden="true"></i></th>
+                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true"></i></th>
+                        <th class="p-2 border-right border-white h6 ">Fournisseur</th>
                         <th class="p-2 border-right border-white h6">Emballage</th>
-                        <th class="text-right p-2 border-right border-white h6">Poids(KG)</th>
-                        <th class="text-right p-2 border-right border-white h6">Volume (m<sup>3</sup>)</th>
-                        <th class="p-2 border-right border-white h6">Num Fact</th>
+                        <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[5])">Poids(KG)  <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                        <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true"></i></th>
+                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[3])">Num Fact <i class="fa fa-sort" aria-hidden="true" ></i></th>
                         <!--th class="text-right p-2 border-right border-white h6">Montant Facture</th-->
-                        <th class="text-nowrap p-2 border-right border-white h6">Date livraison</th>
+                        <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true"></i></th>
                         <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
                     </tr>
@@ -316,17 +319,26 @@
                   <div class="modal-body mx-3">
                   	<div class="row">
                   		 <div class="col-6 my-2 d-flex flex-column align-items-center">
-                		 		<div class="w-100 d-flex align-items-center my-2">
-			                        <label class="d-block m-0 text-right w-35 pr-2">
-			                        	Entrepot
-			                        </label>
-			                        <div class="w-65" >
-				                       <select class="form-control" v-model="reception.entrepot" readonly>
-				                        	<option value="">Choisir</option>
-                                            <option :value="entrepot.id"  v-for="entrepot in listEntrepots">{{entrepot.nomEntrepot}}</option>
-				                        </select>
-				                    </div>
-			                    </div>
+                                <div class="w-100 d-flex align-items-center my-2">
+                                   <label for="formname"  class="d-block m-0 text-right w-35 pr-2" >
+                                    Fournisseur
+                                   </label>
+                                   <div class="w-65" >                                     
+                                       <select class="form-control" v-model="reception.fournisseur" readonly>
+
+                                            <option :value="four.id" v-for="four in listFournisseurs" v-if = "reception.fournisseur == four.id">{{four.fonmfo}}</option>
+                                            
+                                        </select>
+                                   </div>
+                                </div>
+                                <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
+                                    <label for="numfact" class="d-block m-0 text-right w-35 pr-2" >N° Facture</label>
+                                    <input autocomplete="off" class="w-65 form-control" v-model="reception.numfact" readonly type="text" id="numfact">
+                                </div>
+                                 <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
+                                    <label for="montfact" class="d-block m-0 text-right w-35 pr-2" >Montant Facture (&euro;)</label>
+                                    <input autocomplete="off" class="w-65 form-control" v-model="reception.montfact" type="text" id="montfact"  :class="{ 'border-danger': submitted && !$v.reception.montfact.required }">
+                                </div>
 			                     <div class="w-100 d-flex align-items-center my-2">
 			                        <label class="d-block m-0 text-right w-35 pr-2">
 			                        	Type Commande <span class="red">*</span>
@@ -349,31 +361,17 @@
 			                        <label class="d-block m-0 text-right w-35 pr-2" for="numecv">N°ECV</label>
 			                        <input autocomplete="off" class="w-65 form-control" type="text" id="numecv" v-model="reception.numecv" :class="{ 'border-danger': submitted && !$v.reception.numecv.required }" >
 			                    </div>
-			                    <div class="w-100 d-flex align-items-center my-2">
-			                       <label for="formname"  class="d-block m-0 text-right w-35 pr-2" >
-			                       	Fournisseur
-			                       </label>
-			                       <div class="w-65" >			                       	   
-				                       <select class="form-control" v-model="reception.fournisseur" readonly>
 
-				                        	<option :value="four.id" v-for="four in listFournisseurs" v-if = "reception.fournisseur == four.id">{{four.fonmfo}}</option>
-				                        	
-				                        </select>
-			                       </div>
-			                    </div>
-			                     <div class="w-100 my-2 d-flex justify-content-between align-items-center">
-			                        <label class="d-block m-0 text-right w-35 pr-2" for="numCommande">N°Commande</label>
-			                        <input autocomplete="off" class="w-65 form-control" v-model="reception.numCommande" readonly type="text" id="numCommande">
-			                    </div>
-			                    <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
+			                    
+			                    <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center dateLiv">
 				                        <label data-error="wrong" data-success="right" for="formname" class="d-block m-0 text-right w-35 pr-2">Date de livraison</label>
-                                        <date-picker v-model="reception.datalivr" class="flex-1" :disabled-date="disabledFutureDate"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted && !$v.reception.datalivr.required }"></date-picker>
+                                        <date-picker v-model="reception.datalivr" class="flex-1" :disabled-date="disabledFutureDate"  required valueType="YYYY-MM-DD" input-class="form-control w-100" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :input-class="{ 'border-danger': submitted && !$v.reception.datalivr.required }"></date-picker>
 				                    </div>
 				                   <div class="md-form w-100 d-flex my-3 justify-content-between align-items-start">
 				                        <label for="formname" class="d-block m-0 text-right w-35 pr-2">Facture scanné</label>
 				                        <div class="w-65">
 				                        	<!--input type="file" id="formname" v-on:change="onFileChange" accept=".pdf,.doc"-->
-				                        	 <input type="file" id="file" name="file" ref="file" v-on:change="handleFileUpload()" :disabled = "hasPdf"/>
+				                        	 <input type="file" id="file" name="file" ref="file" v-on:change="handleFileUpload()" :disabled = "modeModify && hasPdf"/>
                                              <template v-if="modeModify && hasPdf">
                                                 <div class="d-flex align-items-center">
                                                     <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
@@ -387,6 +385,21 @@
 				                    </div>
                   		 </div>
                   		  <div class="col-6 my-2 d-flex flex-column align-items-center">
+                                <div class="w-100 d-flex align-items-center my-2">
+                                    <label class="d-block m-0 text-right w-35 pr-2">
+                                        Entrepot
+                                    </label>
+                                    <div class="w-65" >
+                                       <select class="form-control" v-model="reception.entrepot" readonly>
+                                            <option value="">Choisir</option>
+                                            <option :value="entrepot.id"  v-for="entrepot in listEntrepots">{{entrepot.nomEntrepot}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="w-100 my-2 d-flex justify-content-between align-items-center">
+                                    <label class="d-block m-0 text-right w-35 pr-2" for="numCommande">N°Commande</label>
+                                    <input autocomplete="off" class="w-65 form-control" v-model="reception.numCommande" readonly type="text" id="numCommande">
+                                </div>
                   		  	    <div class="w-100 d-flex my-2 justify-content-between align-items-center">
 			                        <label class="d-block m-0 text-right w-35 pr-2" for="nbrpalette">
 			                        Nbr Palette
@@ -410,14 +423,8 @@
 			                        </label>
 			                        <input autocomplete="off" class="w-65 form-control" type="decimal" v-model="reception.volumetotal" id="volumetotal" :class="{ 'border-danger': submitted && !$v.reception.volumetotal.required }">
 			                    </div>
-			                     <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
-			                        <label for="numfact" class="d-block m-0 text-right w-35 pr-2" >N° Facture</label>
-			                        <input autocomplete="off" class="w-65 form-control" v-model="reception.numfact" readonly type="text" id="numfact">
-			                    </div>
-			                     <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
-			                        <label for="montfact" class="d-block m-0 text-right w-35 pr-2" >Montant Facture (&euro;)</label>
-			                        <input autocomplete="off" class="w-65 form-control" v-model="reception.montfact" type="text" id="montfact"  :class="{ 'border-danger': submitted && !$v.reception.montfact.required }">
-			                    </div>
+			                     
+			                    
 			                     <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
 			                        <label for="commentaire" class="d-block m-0 text-right w-35 pr-2" >Commentaires</label>
 			                        <textarea class="w-65 form-control" v-model="reception.commentaire" id="commentaire"></textarea>   
@@ -607,7 +614,11 @@
 
                 },
                 attachments: [],
-                checking: false
+                checking: false,
+                // Sort column
+                columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu'],
+                sortedColumn: '',
+                order: 'asc'
             }
         },
 
@@ -634,7 +645,7 @@
 	        },
             incidentForm : {
                 objet: { required }
-            },
+            }
             
 
         },
@@ -648,12 +659,28 @@
 	       selectedTypeCmd: function(value) {
 	            this.getDries();
 	       },
-            search: function(value) {
-            this.getDries();
-            }
+           search: function(value) {
+                this.getDries();
+           },
+           order: function(value) {
+                this.getDries();
+           }
 		},
 
         methods : {
+             /**
+             * Sort the data by column.
+             * */
+            sortByColumn(column) {
+             /* if (column === this.sortedColumn) {
+                this.order = (this.order === 'asc') ? 'desc' : 'asc'
+              } else {
+                this.sortedColumn = column
+                this.order = 'asc'
+              } */
+              this.sortedColumn = column;
+              this.order = (this.order === 'asc') ? 'desc' : 'asc';
+            },
             closePreview(){
                 this.ispreviewModal=false;
             },
@@ -894,11 +921,12 @@
                           'succés!',
                           msgSuc,
                           'success'
-                        )
+                        );
 	                    this.getDries();
 	                    this.flushData();
 	                    this.show = true;
-	                    
+
+                        this.sendNotification(response.data.message);
 
 	                }else{
 
@@ -914,38 +942,57 @@
                         Vue.swal.close();
                             Vue.swal.fire(
                           'Warning!',
-                          err.message,
+                          'Echec envoi de mail',
                           'warning'
                         ).then((result) => {
                             // redirection   
                             location.reload();
                         });
-                        // console.log(err.stack);
-                    });;
+                    });
         		
         	},
+
+            sendNotification(data){
+                axios.post("/sendNotificationReception", {'data':data});
+            },
 
 	        getDries(page = 1){
                 if(this.search==''){
                     this.isLoading=true;
                 }
-	        	axios.get('/dries/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search).then(response => {
-	                this.dries = response.data;
-                    if(this.dries.data.length > 0){
-                        axios.get('/driesState/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search).then(response => {
-                            this.totalPoids = response.data.poidsTotal;
-                            this.nbrColis = response.data.nbreColis;
-                            this.totalVolume = response.data.volumeTotal;
-                            this.nbrCommande = response.data.commandesTotal; 
-                            this.nbrJoursMoy = response.data.nbrJourMoyen;
-                            this.typeCommandeUsed = response.data.typeCmd;
+
+                const requestOne = 
+	        	axios.get('/dries/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&column="+this.sortedColumn+"&order="+this.order);
+
+                const requestTwo =  axios.get('/driesState/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search);
+
+                axios.all([requestOne, requestTwo]).then(responses => {
+
+                      const responseOne = responses[0];
+
+                      const responseTwo = responses[1]; 
+
+                       this.dries = responseOne.data;
+                        if(this.dries.data.length > 0){
+                           
+                        }else{
+                             this.checking=true;
+                        }
+
+                         this.totalPoids = responseTwo.data.poidsTotal;
+                            this.nbrColis = responseTwo.data.nbreColis;
+                            this.totalVolume = responseTwo.data.volumeTotal;
+                            this.nbrCommande = responseTwo.data.commandesTotal; 
+                            this.nbrJoursMoy = responseTwo.data.nbrJourMoyen;
+                            this.typeCommandeUsed = responseTwo.data.typeCmd;
                             this.checking=true;
-                        });
-                    }else{
-                         this.checking=true;
-                    }
-                    this.closeLoader();
-	            });
+                        this.closeLoader();
+
+                    }).catch(errors => {
+
+                      // react on errors.
+
+                    })
         	},
 
         	closeModal(){
@@ -1110,8 +1157,8 @@
         mounted() {
 	        this.getDries();
             this.totalFourniseur = this.listFournisseurs.length;
+            this.sortedColumn = this.columns[0];
 
-            
 	    }
 
 	}

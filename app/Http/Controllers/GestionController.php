@@ -46,6 +46,10 @@ class GestionController extends Controller
     {
         $user = Auth::user();
 
+         if(is_null($user)){
+            return  redirect(route('login'));
+        }
+
         if(!($user->hasRole(UserRole::ROLE_ADMIN) || $user->hasRole(UserRole::ROLE_ROOT))){
              abort(401);
         }
@@ -64,14 +68,27 @@ class GestionController extends Controller
 
         $contenaires = Contenaire::whereIn('id',$entite->contenaires_id)->get(); 
 
-        $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
+        $defaultContenaire = Contenaire::get()->where("isdefault", true)->first();
+
+        $nbrCmdACharger =  DB::table('receptions')
+                 ->select('type_commandes_id', DB::raw('count(*) as total'))
+                 ->groupBy('type_commandes_id')->whereNotNull('dossier_prechargements_id')->where(function($query){
+                        $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
+                        
+                        })
+                 ->get();  
+
+
+       
+
+       // var_dump($nbrCmdACharger[0]->type_commandes_id); die();
 
         $entrepots = Entrepot::get(); 
 
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
         }else{
-            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client ,'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires, "entite" => $entite, "entrepots" => $entrepots];
+            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client ,'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires, "entite" => $entite, "entrepots" => $entrepots, 'nbrCmdACharger' => $nbrCmdACharger];
         }
 
         activity(TypActivity::LISTER)->performedOn($client)->log('Affichage validation préchargement');
@@ -513,7 +530,9 @@ class GestionController extends Controller
      public function indexEmpotage()
     {
         $user = Auth::user();
-       
+        if(is_null($user)){
+            return  redirect(route('login'));
+        }
         if(!($user->hasRole(UserRole::ROLE_ADMIN) || $user->hasRole(UserRole::ROLE_ROOT))){
              abort(401);
         }

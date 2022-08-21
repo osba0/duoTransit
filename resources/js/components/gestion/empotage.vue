@@ -252,12 +252,12 @@
                 </tr>
             </table>
             </div>
-            <div class="d-flex justify-content-end align-items-center mb-3 sucesss"> 
+            <div class="d-flex justify-content-end align-items-center mr-3  mb-3 sucesss"> 
                 <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
     
                 <div>
-                     <!--button class="btn btn-lg btn-secondary text-white mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button-->
-                    <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()">Valider</button>
+                     <!--button class="btn btn-lg btn-secondary text-white mr-3  mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button-->
+                    <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
                
             </div>
@@ -385,9 +385,9 @@
                     
                 </div>
                 <hr>
-                <div class="d-flex justify-content-end mb-3 sucesss"> 
+                <div class="d-flex justify-content-end mr-3  mb-3 sucesss"> 
                     <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
-                    <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()">Valider</button>
+                    <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
         </template>
         <!-- Modal Empotage-->
@@ -919,11 +919,19 @@
                             this.getCmdSelected(this.selected.identifiant,this.selected.idCmd, true);
                           
                             if(response.data.code==0){
-                                /*Vue.swal.fire(
-                                  'succés!',
-                                  'validé avec succés!',
-                                  'success'
-                                );*/
+                                setTimeout(function(){
+                                    Vue.swal.close();
+                                     Vue.swal.fire(
+                                      'succés!',
+                                      'validé avec succés!',
+                                      'success'
+                                    ).then((result) => {
+                                        // redirection   
+                                        location.reload();
+                                    });   
+                                  
+                                }, 5000);
+
                                 this.selected.etat = 1;
                                 //this.getPrechargement();
                                 this.getReception();
@@ -982,7 +990,7 @@
                 entete.push([
                     {text:that.currentEntite['nom']+"\nTél: "+ that.currentEntite['telephone']+"/ Fax: "+that.currentEntite['fax']+"\nEmail: "+that.currentEntite['email']+"\nAdresse: "+that.currentEntite['adresse']},
 
-                    {text: 'N°Dossier '+that.selected.dossier, fontSize: 20, bold: true, alignment: 'center', color: '#3490dc'}, 
+                    {text: 'N°Dossier '+that.selected.dossier+'\n'+that.selected.typeCmd, fontSize: 20, bold: true, alignment: 'center', color: '#3490dc'}, 
 
                     {text: ['Entrepôt: ', {text: that.selected.entrepot, fontSize: 14}],  alignment: 'right'}]);
                 
@@ -1153,7 +1161,7 @@
                         'base64_file_pdf': url,
                         'IDclient': self.idClient
 
-                    }).then(response => {
+                    }); /*.then(response => {
                         Vue.swal.close();
                             Vue.swal.fire(
                           'succés!',
@@ -1178,7 +1186,7 @@
                             location.reload();
                         });
                         // console.log(err.stack);
-                    });
+                    });*/
 
                 }); // download() or open() // getDataUrl
 
@@ -1278,6 +1286,21 @@
             },
             saveEmpotage(){
                 this.submitted = true;
+                
+                var date1 = new Date(this.empotageForm.dateDepart);
+                var date2 = new Date(this.empotageForm.dateArrivee);
+
+                 if(date1.getTime() > date2.getTime()){
+                    Vue.swal.fire(
+                          'warning!',
+                          'Date départ incorrecte!',
+                          'warning'
+                        );
+                    this.submitted_circle=false;
+
+                    return false;
+                }
+            
 
                 
                 

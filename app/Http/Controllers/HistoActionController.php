@@ -55,6 +55,8 @@ class HistoActionController extends Controller
 
         $paginate = request('paginate');
 
+        $sort = request('column');
+
         if (isset($paginate)) {
 
             $req = DB::table('empotages')
@@ -69,6 +71,7 @@ class HistoActionController extends Controller
                 DB::raw('SUM(receptions.revolu) as total_volume'), 
                 DB::raw('SUM(receptions.renbcl) as total_colis'), 
                 DB::raw('SUM(receptions.renbpl) as total_palette'), 
+                DB::raw('SUM(receptions.renbpl + receptions.renbcl) as colis_total'),
                 DB::raw('count(receptions.rencmd) as total_cmd'), 
                 'empotages.nbreContenaire', 
                 'empotages.id as IdEmpotage', 
@@ -90,8 +93,11 @@ class HistoActionController extends Controller
                 'entrepots.nomEntrepot as nomEntrepot', 
                 'entrepots.id as idEntrepot',
                 'type_commandes.typcmd as typecmd',
+                'type_commandes.tcolor as tcolor',
                 'type_commandes.id as typecmdID',
                 'contenaires.nom as contenaire')->where('empotages.reetat', true)->where('receptions.clients_id', request('id'))->whereBetween('empotages.updated_at', [request('filtre.dateDebut').' 00:00:00', request('filtre.dateFin').' 23:59:59']);
+
+
 
             if(request('filtre.typeCmd')!=''){
                 $req = $req->where('receptions.type_commandes_id', request('filtre.typeCmd'));
@@ -109,6 +115,13 @@ class HistoActionController extends Controller
                 $term = "$cmd%";
                 $req = $req->where('empotages.reference', 'like', $term);
             }
+            if($sort!=''){
+                $order = request('order');
+                $req = $req->orderBy(strval($sort), $order);
+            }else{
+                 $req = $req->orderBy("created_at", "DESC"); 
+            }
+
             $req = $req->paginate($paginate); 
 
         }else{
@@ -127,6 +140,10 @@ class HistoActionController extends Controller
 
         $keyword = request('keysearch');
 
+        $order = request('order');
+
+        $sortedColumn = request('column');
+
         if (isset($paginate)) {
 
             $histo =Reception::
@@ -141,6 +158,10 @@ class HistoActionController extends Controller
 
             if($keyword!=''){
                 $histo = $histo->search($keyword);
+            }
+
+            if($sortedColumn!=""){
+                $histo = $histo->orderBy($sortedColumn, $order);
             }
 
             $histo = $histo->paginate($paginate); 

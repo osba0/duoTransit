@@ -3,7 +3,14 @@
         <li class="nav-item dropdown">
         <a class="notif p-2 d-flex align-items-center text-primary" data-toggle="dropdown" href="#" aria-expanded="false">
           <i class="fa fa-bell-o"></i>
-          <span class="badge {{Auth::user()->roles[0]=='root'?'badge-danger ':''}} {{Auth::user()->roles[0]=='client'?'badge-warning ':''}} {{Auth::user()->roles[0]=='user'?'badge-secondary ':''}} {{Auth::user()->roles[0]=='admin'?'badge-info ':''}} navbar-badge p-0" id="js-count">{{ auth()->user()->unreadNotifications->count() }}</span>
+          <span class="badge badge-danger navbar-badge p-0" id="js-count">
+            @if(auth()->user()->unreadNotifications->count() >= 10)
+                +9
+            @else
+                {{ auth()->user()->unreadNotifications->count() }}
+            @endif
+            
+          </span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             <span class="dropdown-item dropdown-header">
@@ -31,7 +38,7 @@
             </div>
             @if(auth()->user()->unreadNotifications->count()>0)
            <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer text-center">Afficher toutes les notifications</a>
+          <a href="/notifications/{{ $notification->data['slug'] }}" class="dropdown-item dropdown-footer text-center">Afficher toutes les notifications</a>
            @endif  
         </div>
       </li>

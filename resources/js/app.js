@@ -82,6 +82,9 @@ Vue.component('prechargement-entite', require('./components/gestion/prechargemen
 Vue.component('activity-index', require('./components/activity/index.vue').default);  
 
 
+Vue.component('activity-journal', require('./components/configuration/journal.vue').default); 
+
+Vue.component('notification-list', require('./components/notification/index.vue').default); 
    
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -92,5 +95,42 @@ Vue.component('activity-index', require('./components/activity/index.vue').defau
 const app = new Vue({
     el: '#app_run'
 });
+
+// return to login 
+window.axios.interceptors.response.use(
+    (response) => {
+        if(response.status === 401) {
+            Vue.swal.fire(
+              'Authorisation!',
+              'You are not authorized',
+              'warning'
+            ).then((result) => {
+                 // redirect to login page
+                 window.location.href = "/login";
+            });
+        }
+        return response;
+    },
+    error => {
+        if (error.response && (419 === error.response.status || 401 === error.response.status)) {
+
+            Vue.swal.fire(
+              'Session exprirée!',
+              'Veuillez vous reconnecter!',
+              'warning'
+            ).then((result) => {
+                 // redirect to login page
+                 window.location.href = "/login";
+            });
+          
+        }
+    }
+);
+
+
+
+/* setInterval( function(){ 
+      axios.get('/checksession').then(resp => {});
+}.bind(this), 6500);*/
 
 

@@ -27,6 +27,7 @@ class EmpotageResource extends JsonResource
             "nbrCmd"         => $this->total_cmd!=''?$this->total_cmd:0,
             "total_colis"    => $this->total_colis!=''?$this->total_colis:0,
             "total_pallette" => $this->total_palette!=''?$this->total_palette:0,
+            "colis_total"    => isset($this->colis_total)? $this->colis_total: '',
             "typeCommande"   => $this->typecmd,
             "typeCommandeID" => $this->typecmdID,
             "entrepot"       => $this->nomEntrepot,

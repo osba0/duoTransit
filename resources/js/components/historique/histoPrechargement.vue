@@ -226,7 +226,7 @@
             </template>
         </template>
          <!-- Modal Facture-->
-        <div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+        <div class="modal fade fullscreenModal" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
           aria-hidden="true" data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
              <div class="modal-content">

@@ -29,6 +29,7 @@
                     <li v-for="type in typeCmd" class="d-flex align-items-center">
                         <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
                         <label class="m-0 mr-2">{{type.typcmd}}</label>
+                        <label class="m-0 mr-2">({{ getNbreCmd(type.id) }})</label>
                     </li>
                 </ul>
                 <div class="mt-2 mr-3">
@@ -238,7 +239,7 @@
                 </tr>
             </table>
             </div>
-            <div class="d-flex justify-content-center align-items-center mb-3 sucesss"> 
+            <div class="d-flex justify-content-end align-items-center mr-3 mb-3 sucesss"> 
                 <!--button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
                 <!--div class="h5 m-0">
                     <span class="py-0 px-0 text-uppercase font-weight-bold">{{ selected.typeCmd }} </span> 
@@ -301,6 +302,7 @@
                             <th class="text-nowrap p-2 border-right border-white h6">Date livraison</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Crée par</th>
                             <th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th>
+                            <th class="p-2 border-right text-center border-white h6">N° préchargement</th>
                             <th class="p-2 border-right text-center border-white h6">Priorité</th>
                             <th class="text-right p-2 border-right border-white h6">Actions</th>
                         </tr>
@@ -340,6 +342,7 @@
                             </template>
                            
                         </td>
+                        <td>{{ dry.idPre }}</td>
                         <td class="p-2 align-middle rateCenter position-relative">
 
                             <rate :length="3" :value="dry.priorite" :ratedesc="['Pas urgente', 'Normale', 'Urgente']" :readonly="true"  />
@@ -380,7 +383,7 @@
                     
                 </div>
                 <hr>
-                <div class="d-flex justify-content-center mb-3 sucesss"> 
+                <div class="d-flex justify-content-end mr-3 mb-3 sucesss"> 
                     <!--button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
                     <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
@@ -520,7 +523,8 @@
             'listContenaire',
             'currentClient',
             'currentEntite',
-            'listEntrepots'
+            'listEntrepots',
+            'cmdAPrecharger'
             
         ],  
         components: {
@@ -620,6 +624,14 @@
             }
         },
         methods: { 
+            getNbreCmd(id){
+                for(var i=0; i<this.cmdAPrecharger.length; i++){
+                    if(this.cmdAPrecharger[i].type_commandes_id == id){
+                        return this.cmdAPrecharger[i].total;
+                    }
+                }
+                return 0;
+            },
              disabledFutureDate(date) {
               const today = new Date();
               today.setHours(0, 0, 0, 0);
@@ -919,8 +931,6 @@
                 }).then((result) => {
                   if (result.isConfirmed) {
 
-
-
                         Vue.swal({
                             title: 'Validation',
                             html: '<b>En cours...</b>',
@@ -944,16 +954,27 @@
                         }).then(response => {
                           
                             if(response.data.code==0){
+                                
+                                setTimeout(function(){
+                                     Vue.swal.close();
+                                     Vue.swal.fire(
+                                      'succés!',
+                                      'validé avec succés!',
+                                      'success'
+                                    ).then((result) => {
+                                        // redirection   
+                                        location.reload();
+                                    });   
+                                  
+                                }, 5000);
+
+                              
 
                                 // Envoi notification avec le fichier PDF
 
                                 this.getCmdSelected(this.selected.id, this.selected.typeCommande, true);
                                 
-                                /*Vue.swal.fire(
-                                  'succés!',
-                                  'validé avec succés!',
-                                  'success'
-                                );*/
+
                                 this.selected.etat = 1;
                                 //this.getPrechargement();
                                 this.getReception();
@@ -1026,7 +1047,7 @@
                 entete.push([
                     {text:that.currentEntite['nom']+"\nTél: "+ that.currentEntite['telephone']+"/ Fax: "+that.currentEntite['fax']+"\nEmail: "+that.currentEntite['email']+"\nAdresse: "+that.currentEntite['adresse']},
 
-                    {text: 'N°Dossier '+that.selected.id, fontSize: 20, bold: true, alignment: 'center', color: '#3490dc'}, 
+                    {text: 'N°Dossier '+that.selected.id+'\n'+that.selected.typeCmd, fontSize: 20, bold: true, alignment: 'center', color: '#3490dc'}, 
 
                     {text: ['Entrepôt: ', {text: that.selected.entrepot, fontSize: 14}],  alignment: 'right'}]);
 
@@ -1186,29 +1207,9 @@
                             'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
                             'base64_file_pdf': url
 
-                        }).then(response => {
+                        });/*.then(response => {
 
-                            Vue.swal.close();
-
-                             if(response.data.code == 0){
-                                Vue.swal.fire(
-                                  'succés!',
-                                  'validé avec succés!',
-                                  'success'
-                                ).then((result) => {
-                                    // reload   
-                                    location.reload();
-                                });
-                             }else{
-                                Vue.swal.fire(
-                                  'Error!',
-                                  response.data.result,
-                                  'error'
-                                ).then((result) => {
-                                    // reload   
-                                    location.reload();
-                                });
-                             }
+                            
                                  
 
                         }).catch(err => {
@@ -1226,7 +1227,7 @@
                                 location.reload();
                             });
                             // console.log(err.stack);
-                        });;
+                        });*/
 
                    }); // download() or open() // getDataUrl
 

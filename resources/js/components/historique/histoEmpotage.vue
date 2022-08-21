@@ -53,7 +53,15 @@
 
         <template v-if="showResult">
 
-            <template v-if="!isDetail">      
+            <template v-if="!isDetail">     
+                <div class="row d-flex align-items-center justify-content-between mb-3">
+                    <ul class="legend mt-4 mb-2 pl-3 flex-1">
+                        <li v-for="type in typeCmd" class="d-flex align-items-center">
+                            <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
+                            <label class="m-0 mr-2">{{type.typcmd}}</label>
+                        </li>
+                    </ul>  
+                </div> 
                 <div class="row mt-3">
                     <div class="col-sm-12 ">
                         <div class="d-flex justify-content-between align-content-center mb-2">
@@ -79,17 +87,15 @@
                             <table class="table">
                                 <thead class="thead-blue" :class="[isloading ? '' : 'hasborder']">
                                      <tr>
-                                        <th class="p-2 border-right border-white h6">N° Dossier</th>
-                                        <!--th class="p-2 border-right border-white h6">Date Début</th>
-                                        <th class="p-2 border-right border-white h6">Date Fin</th-->
-
-                                        <th class="p-2 border-right border-white h6">Type commande</th>
+                                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[0])">
+                                            
+                                            N° Dossier <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                         <th class="p-2 border-right border-white h6">N°TC</th>
                                         <th class="p-2 border-right border-white h6">Type TC</th>
                                         <th class="p-2 border-right border-white h6">N°Plomb</th>
-                                        <th class="p-2 border-right border-white h6">Nbre colis total</th>
-                                        <th class="p-2 border-right border-white h6">Poids total</th>
-                                        <th class="p-2 border-right border-white h6">Volume total</th-->
+                                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[3])">Nbre colis total <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[1])">Poids total <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[2])">Volume total <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                         <th class="p-2 border-right border-white h6">Etat</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Date</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
@@ -103,13 +109,7 @@
                                     </template>
                                     <template v-else>
                                         <tr v-for="res in result.data" :key="res.id" class="bg-white position-relative">
-                                            <td>{{ res.reference }}</td>
-                                            <!--td>{{ res.dateDebut }}</td>
-                                            <td>{{ res.dateCloture }}</td-->
-                                          
-                                            <td class="p-2 align-middle">
-                                                {{ res.typeCommande }}
-                                            </td>
+                                            <td class="position-relative"> <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> {{ res.reference }}</td>
                                             <td class="p-2 align-middle">
                                                 {{ res.numContenaire }}
                                             </td>
@@ -119,14 +119,13 @@
                                             <td class="p-2 align-middle">
                                                {{ res.plomb }}
                                             </td>
-                                            <td>{{ parseInt(res.total_colis) + parseInt(res.total_pallette) }}</td>
+                                            <td>{{ res.colis_total }}</td>
                                             <td>{{ res.total_poids }}</td>
                                             <td>{{ res.total_volume }}</td>
                                            
                                             <td>
-                                                <span v-if="res.etat==1" class="badge badge-success">Validé</span>
-                                                <span v-if="res.is_close==1" class="badge badge-secondary">Cloturé</span>
-                                                <span v-if="res.etat==0" class="badge badge-warning">En cours</span>
+                                                <!--span v-if="res.etat==1" class="badge badge-success">Validé</span-->
+                                                <span v-if="res.is_close==1" class="badge badge-primary">Cloturé</span>
                                             </td>
                                              <!--td>
                                                 <div v-if="res.rapport_pdf!=null" class="d-flex align-items-center w-100 justify-content-center cursor-pointer"  @click="getpdf(res.rapport_pdf, res.id)">
@@ -244,9 +243,11 @@
                    
                 </div> 
                 <table class="table">
-                    <thead class="thead-blue borderorange">
+                    <thead class="thead-blue hasborder">
                          <tr>
-                            <th class="p-2 border-right border-white h6">N°CDE</th>
+                            <th class="p-2 border-right border-white h6" v-on:click="sortByColumn(columns[0])">N°CDE 
+                                <i class="fa fa-sort" aria-hidden="true" ></i>
+                            </th>
                             <th class="p-2 border-right border-white h6">N°FE</th>
                             <th class="p-2 border-right border-white h6">N°ECV</th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
@@ -319,7 +320,7 @@
             </template>
         </template>
         <!-- Modal Facture-->
-        <div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+        <div class="modal fade fullscreenModal" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
           aria-hidden="true" data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
              <div class="modal-content">
@@ -405,10 +406,21 @@ export default {
             pdfFileModal: null,
             pdfFile: null,
             searchRecep: '',
+            // Sort column
+            columnsSearch: ['reference', 'total_poids', 'total_volume', 'colis_total'],
+            sortedColumnSearch: '',
+            orderSearch: 'asc',
+            // Sort column Reception
+            columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu'],
+            sortedColumn: '',
+            order: 'asc'
         };
     },
     watch: {
         paginateHisto: function() {
+            this.search();
+        },
+        orderSearch: function(value) {
             this.search();
         },
         paginateRecep: function(){
@@ -417,8 +429,20 @@ export default {
         searchRecep: function(value) {
             this.getReception();
         },
+        order: function(value) {
+            this.getReception();
+       }
+        
     },
     methods: {
+        sortByColumn(column) {
+            this.sortedColumn = column;
+            this.order = (this.order === 'asc') ? 'desc' : 'asc';
+        },
+        sortByColumnSearch(column) {
+            this.sortedColumnSearch = column;
+            this.orderSearch = (this.orderSearch === 'asc') ? 'desc' : 'asc';
+        },
         disabledFutureDate(date) {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
@@ -429,7 +453,7 @@ export default {
             this.showResult = true;
             this.isloading = true;
             this.reinit();
-            axios.post('/search/histoEmpotage/'+this.clientCurrent.id,{
+            axios.post('/search/histoEmpotage/'+this.clientCurrent.id+"?column="+this.sortedColumnSearch+"&order="+this.orderSearch,{
                 page: page,
                 paginate: this.paginate,
                 filtre: this.filtre
@@ -477,7 +501,7 @@ export default {
         getReception(page = 1){
             // get commandes
           
-            axios.get('/histoEmpotage/reception/'+this.clientCurrent.id+"/"+this.selected.typeCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&filtre_four="+this.filtre.fournisseur+"&keysearch="+this.searchRecep).then(response => {
+            axios.get('/histoEmpotage/reception/'+this.clientCurrent.id+"/"+this.selected.typeCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&filtre_four="+this.filtre.fournisseur+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
                 this.reception = response.data;
                 console.log(this.reception, "reception");
             });

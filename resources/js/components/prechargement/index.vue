@@ -226,9 +226,9 @@
                 </table>
             </div>
             
-            <div class="mb-2 w-100 d-flex justify-content-end  align-items-end">
-                <div>
-                     <button class="btn btn-lg btn-primary" :disabled = "selected.etat == 1" v-on:click="valider()">Valider</button>
+            <div class="mb-2 w-100 d-flex justify-content-end align-items-end">
+                <div class="mr-3">
+                     <button class="btn btn-lg btn-primary" :disabled = "selected.etat == 1" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
             </div>
             
@@ -342,7 +342,7 @@
                                 <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
                             </a>
                             
-                            <label class="switch"  v-bind:style="[dry.dossier_id > 0 || selected.etat == 1 ? {'opacity': 0.5} : {'opacity': '1'}]">
+                            <label class="switch mr-0"  v-bind:style="[dry.dossier_id > 0 || selected.etat == 1 ? {'opacity': 0.5} : {'opacity': '1'}]">
                                 <input :disabled="dry.dossier_id > 0 || selected.etat == 1" class="switch-input inputCmd" :checked="selected.id == dry.idPre" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
                                 <span class="switch-label" data-on="OK" data-off="Choisir"></span> 
                                 <span class="switch-handle"></span> 
@@ -686,6 +686,20 @@
                           
                             if(response.data.code==0){
 
+                                setTimeout(function(){
+                                    Vue.swal.close();
+                                     Vue.swal.fire(
+                                      'succés!',
+                                      'validé avec succés!',
+                                      'success'
+                                    ).then((result) => {
+                                        // redirection   
+                                        location.reload();
+                                    });   
+                                  
+                                }, 5000);
+
+
                                 // Envoi notification avec le fichier PDF
 
                                 this.getCmdSelected(this.selected.id, true);
@@ -770,7 +784,7 @@
                 entete.push([
                     {text:that.currentEntite['nom']+"\nTél: "+ that.currentEntite['telephone']+"/ Fax: "+that.currentEntite['fax']+"\nEmail: "+that.currentEntite['email']+"\nAdresse: "+that.currentEntite['adresse']},
 
-                    {text: 'N°Préchargement '+that.selected.id, fontSize: 14, bold: true, alignment: 'center', color: '#3490dc'}, 
+                    {text: 'N°Préchargement '+that.selected.id+'\n'+that.selected.typeCmd, fontSize: 14, bold: true, alignment: 'center', color: '#3490dc'}, 
 
                     {text: ['Client: ', {text: that.currentClient['clnmcl']+"\n"+ that.currentClient['cltele']+"\n"+that.currentClient['clmail']+"\n"+that.currentClient['cladcl']+", "+that.currentClient['pays']+"\n\n", fontSize: 11}],  alignment: 'right'}]);
 
@@ -924,7 +938,7 @@
                             'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
                             'base64_file_pdf': url
 
-                        }).then(response => {
+                        });/*.then(response => {
 
                             Vue.swal.close();
 
@@ -944,7 +958,7 @@
                                   'error'
                                 )
                             } 
-                        }).catch(err => {
+                        });.catch(err => {
                             Vue.swal.close();
                             console.log(err.code);
                             console.log(err.message);
@@ -959,7 +973,7 @@
                                 location.reload();
                             });
                             // console.log(err.stack);
-                        });;
+                        });*/
 
                    }); // download() or open() // getDataUrl
                 }else{

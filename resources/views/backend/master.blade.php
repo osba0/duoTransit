@@ -17,7 +17,7 @@ $config = [
     <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/app/font-awesome.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/custom.css') }}">
 
-    <title>{{ $config['appName'] }}</title>
+    <title> @if(auth()->user()->unreadNotifications->count() > 0) ● @endif {{ $config['appName'] }}</title>
     @yield('styles')
 </head>
 
@@ -72,13 +72,15 @@ $config = [
                 <nav class="">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
+                        @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))  
                         <li class="nav-item">
                             <a href="{{route('home')}}" class="nav-link {{ (request()->is('/')) ? 'active' : '' }}">
                               <i class="fa fa-tachometer nav-icon"></i>
                               <p>Tableau de bord</p>
                             </a>
                         </li>
-                        @if (\Request::is('reception/*') or \Request::is('activity/*') or \Request::is('precharger/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is('gerer/*') or \Request::is('historique-empotage/*') or \Request::is('historique-prechargement/*'))  
+                        @endif
+                        @if (\Request::is('reception/*') or \Request::is('activity/*') or \Request::is('precharger/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is('gerer/*') or \Request::is('historique-empotage/*') or \Request::is('historique-prechargement/*') or \Request::is('notifications/*'))  
                             @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
                             <li class="nav-item">
                                 <a href="/reception/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('reception/*') ? 'active' : '' }}"><i class="nav-icon fa fa-sign-in"></i> <p>Réceptionner</p></a>
@@ -101,10 +103,16 @@ $config = [
                                   <p>Histo empotage</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('listNotif', ['client' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('notifications/*')) ? 'active' : '' }}">
+                                  <i class="fa fa-bell-o nav-icon"></i>
+                                  <p>Notifications</p>
+                                </a>
+                            </li>
                             @endif
 
 
-                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
+                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                                 @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ADMIN || auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT)))  
                                 <li class="nav-item {{ request()->is('gerer/prechargement/*') || request()->is('gerer/empotage/*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link">
@@ -130,7 +138,7 @@ $config = [
                                   </li>
                                   @endif
                               @endif
-                              @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT)) 
+                              @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER)) 
                                <li class="nav-item">
                                 <a href="{{ route('historique-empotage', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-empotage/*')) ? 'active' : '' }}">
                                   <i class="fa  fa-clock-o nav-icon"></i>
@@ -162,11 +170,12 @@ $config = [
                                   @endif
                                   @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT)) 
                                    <li class="nav-item">
-                                    <a href="/historique/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('historique/*')) ? 'active' : '' }}">
-                                      <i class="fa  fa-clock-o nav-icon"></i>
-                                      <p>Histo empotage</p>
-                                    </a>
-                                  </li>
+                                        <a href="/historique/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('historique/*')) ? 'active' : '' }}">
+                                          <i class="fa  fa-clock-o nav-icon"></i>
+                                          <p>Histo empotage</p>
+                                        </a>
+                                   </li>
+
                                   @endif
                                    
                                 </ul>  
@@ -174,7 +183,7 @@ $config = [
                             @endif
                         @endif
 
-                        @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
+                        @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                             @if (!\Request::is('configuration/*'))
                                 <!--li class="nav-item">
                                     <a href="/incidents/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('incidents/*')) ? 'active' : '' }}">
@@ -182,12 +191,13 @@ $config = [
                                       <p>Incidents</p>
                                     </a>
                                 </li-->
-                               <li class="nav-item">
-                                <a href="/activity/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('activity/*')) ? 'active' : '' }}">
-                                  <i class="fa fa-history nav-icon"></i>
-                                  <p>Journal</p>
-                                </a>
-                              </li>
+                                 <li class="nav-item">
+                                    <a href="{{ route('listNotif', ['client' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('notifications/*')) ? 'active' : '' }}">
+                                      <i class="fa fa-bell-o nav-icon"></i>
+                                      <p>Notifications</p>
+                                    </a>
+                                </li>
+                               
                              @endif  
                         
                         @endif
@@ -243,9 +253,20 @@ $config = [
                                     
                                 </a>
                             </li>
-                            
+                           
+                            @endUserCan
+                            @userCan(\App\Models\UserRole::ROLE_ROOT)
+                            <li class="nav-item">
+                                <a href="{{route('mouchard')}}" class="nav-link {{ request()->is('configuration/journal') ? 'active' : '' }}">
+                                    <i class="fa fa-history nav-icon"></i>
+                                    <p>Journal</p>
+                                    
+                                </a>
+                            </li>
                             @endUserCan
                         @endif
+
+                       
 
                     </ul>
                 </nav>
@@ -277,7 +298,7 @@ $config = [
                     class="brand-image" height="20"> <span>{{ $config['appName'] }} v1.5</span>
             </div>
             <!-- Default to the left -->
-            <strong>Copyright &copy; 2022 <a href="#">DuoTransit</a>.</strong> All rights
+            <strong>&copy; {{ now()->year }} <a href="#">{{ config('app.name', 'Laravel') }}</a>.</strong> All rights
             reserved.
         </footer>
     </div>

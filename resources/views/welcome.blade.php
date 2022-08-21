@@ -12,7 +12,7 @@ $config = [
   <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/app/font-awesome.min.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/custom.css') }}">
-  <title>{{ config('app.name') }}</title>
+  <title>@if(auth()->user()->unreadNotifications->count() > 0) ● @endif {{ config('app.name') }}</title>
   <style>
     .img-circle {
         border-radius: 50%;
@@ -317,25 +317,7 @@ $config = [
                         </div>
                     </div>
                 </div>
-                @endif
-                
-                @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
-                </div>
-                <div class="row mt-3">
-                @endif
-
-
-                  
-            @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ADMIN))
-            </div>
-           
-            @endif
-            
-    @endUserCan
-
-     @userCan(\App\Models\UserRole::ROLE_ROOT)
-            
-                 <div class="col-md-3 mt-3">
+                <div class="col-md-3 mt-3">
                     <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("contenaires") }}'">
                         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                           <dl class="mb-0">
@@ -354,6 +336,44 @@ $config = [
                         </div>
                     </div>
                 </div> 
+                <div class="col-md-3 mt-3">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("contenaires") }}'">
+                        <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
+                          <dl class="mb-0">
+                            <dt class="fs-3 fw-bold">{{ $totalJournal}}</dt>
+                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Journal</dd>
+                          </dl>
+                          <div class="item item-rounded-lg bg-primary">
+                            <i class="fa fa-history text-white h2 m-0" aria-hidden="true"></i>
+                          </div>
+                        </div>
+                        <div class="bg-body-light mt-3 rounded-bottom">
+                           <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ route('mouchard') }}">
+                            <span>Afficher</span>
+                            <i class="fa fa-arrow-circle-right h3 m-0 ms-1 opacity-25 fs-base"></i>
+                          </a>
+                        </div>
+                    </div>
+                </div> 
+                @endif
+                
+                @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
+                </div>
+                <div class="row mt-3">
+                @endif
+
+
+                  
+            @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ADMIN))
+            </div>
+           
+            @endif
+            
+    @endUserCan
+
+     @userCan(\App\Models\UserRole::ROLE_ROOT)
+            
+                 
                 
                 
                

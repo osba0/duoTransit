@@ -99,6 +99,12 @@ Route::group(['prefix' => 'configuration'], function () {
         $entrepots = Entrepot::get(); 
         return view('backend.configuration.entite', ['contenaires' => $contenaires, 'entrepots' => $entrepots]);
     })->name('entite')->middleware(['auth', 'role:' . UserRole::ROLE_ROOT]);
+
+    Route::get('/journal', function () {
+        $clients = Client::get(); 
+        return view('backend.configuration.journal', ['clients' => $clients]);
+    })->name('mouchard')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
+    
 });
 
 Route::get('/empotage/{id}/{numero}/{typeCmd}/{idSelected}', [ChargementController::class, 'empotageData'])->middleware(['auth']);
@@ -234,7 +240,17 @@ Route::get('/qrcode', function () {
 
 
 Route::get('/notifications/mark-as-read/{client}/{notification_id}', [NotificationController::class, 'show'])->middleware(['auth']);
+Route::get('/notifications/{client}', [NotificationController::class, 'index'])->middleware(['auth'])->name('listNotif');
+Route::get('/notif/list', [NotificationController::class, 'listeNotification'])->middleware(['auth']);
 
+Route::post('/notif/marquerLu/{id}', [NotificationController::class, 'marquerLu'])->middleware(['auth']); 
+
+Route::post('/notif/marquerToutLu', [NotificationController::class, 'marquerToutLu'])->middleware(['auth']); 
+
+Route::get('/checksession', [IndexController::class, 'checksession']); 
+
+
+Route::post('/sendNotificationReception', [ReceptionController::class, 'sendNotificationReception']); 
 
 
 require __DIR__.'/auth.php';

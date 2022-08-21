@@ -24,6 +24,7 @@ use App\Http\Resources\ClientResource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Contracts\Activity;
+use DB;
 
 
 
@@ -38,7 +39,11 @@ class ReceptionController extends Controller
 
         $user = Auth::user();
 
-        if(!($user->hasRole(UserRole::ROLE_ADMIN) || $user->hasRole(UserRole::ROLE_ROOT))){
+        if(is_null($user)){
+            return  redirect(route('login'));
+        }
+
+        if(!($user->hasRole(UserRole::ROLE_USER)) && !($user->hasRole(UserRole::ROLE_ADMIN))){
              abort(401);
         }
 
@@ -77,11 +82,9 @@ class ReceptionController extends Controller
         $paginate = request('paginate');
 
         $keyword = request('keysearch');
-
-
+        
         $dries = Reception::receptionsQuery();
         
-
         if($keyword!=''){
             $dries = $dries->search($keyword); 
         }
@@ -93,6 +96,13 @@ class ReceptionController extends Controller
             })->where(function($query){
                 $query->orWhere('dossier_prechargements_id', NULL)->orWhere('dossier_prechargements_id', 0);
             });
+
+        // Profil User lister que ses receptions
+
+        if($user->hasRole(UserRole::ROLE_USER)){
+             $dries->where("users_id", $user->id);
+        }
+        
 
         if(isset($paginate)) {
             $dries = $dries->paginate($paginate);
@@ -110,7 +120,6 @@ class ReceptionController extends Controller
 
         $keyword = request('keysearch');
 
-
         if($keyword!=''){
             $recep = $recep->search($keyword); 
         }
@@ -124,7 +133,7 @@ class ReceptionController extends Controller
             })->where('reetat', true)->get();
       
 
-         $client = Client::where('id', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+        $client = Client::where('id', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
         if(!$client){
             abort(404);
         }
@@ -224,7 +233,12 @@ class ReceptionController extends Controller
             ]);
         }
 
-        if($store){
+        return response([
+            "code" => 0,
+            "message" => $params
+        ]);
+
+        /*if($store){
             
             // Notifier
             $transitaire = Entite::where('id', $user->entites_id)->get()->first();
@@ -258,9 +272,37 @@ class ReceptionController extends Controller
                 "code" => 1,
                 "message" => "KO"
             ]);
-        }
+        }*/
 
         
+    }
+
+    public function sendNotificationReception(){
+        $user = Auth::user();
+
+        $params = request('data');
+        // Notifier
+        $transitaire = Entite::where('id', $user->entites_id)->get()->first();
+        $societe = Client::where('id', $params['clients_id'])->get()->first();
+
+        // add fournisseur
+        $params["fournisseur"] = Fournisseur::where('id', $params['fournisseurs_id'])->get()->first()['fonmfo'];
+        $params["entrepot"] = Entrepot::where('id', $params['entrepots_id'])->get()->first()['nomEntrepot'];
+        $params["typeCmd"] = TypeCommande::where('id', $params['type_commandes_id'])->get()->first()['typcmd'];
+
+
+        $getMailClient = User::where("entites_id", $transitaire['id'])->whereJsonContains('roles', UserRole::ROLE_CLIENT)->whereJsonContains('client_supervisor', intval($params['clients_id']))->get();
+
+        $emailSent=[];
+
+        foreach($getMailClient as $user){
+        
+            $emailSent[] = $user['email'];
+        }
+        
+        $pathFile = "assets/factures/". $params['refasc'];
+
+        Notification::send($getMailClient, new receptionCommandes($transitaire, $societe, $emailSent, $params, $pathFile));
     }
 
     public function modify(Request $request)

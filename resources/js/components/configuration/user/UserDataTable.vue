@@ -182,7 +182,7 @@
                                         
                                      </div>
                                       <div class="col-6 my-2 d-flex flex-column">
-                                    <div class="w-100 d-flex">
+                                    <div class="w-100 d-flex" v-if="isAdmin==0">
                                         <label class="typo__label pt-3 d-block m-0 text-right w-35  pr-2 nowrap">Société(s) Autorisée(s)</label>
                                         <div class="w-65 p-2">
                                             <multiselect v-model="value" :options="clients" :disabled = "noClientRole" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Choisir" label="clnmcl" track-by="id" :preselect-first="false">
@@ -221,7 +221,8 @@
     export default {
         props: [
           'listRoles',
-          'listClients' 
+          'listClients',
+          'isAdmin'
         ],
          components: {
             Multiselect   

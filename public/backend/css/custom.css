@@ -144,6 +144,10 @@ body{
   position: relative;
 }
 
+.dateLiv input{
+    width: 100% !important;
+}
+
 .disabled-div > div::before {
   content: "";
   background-color: rgba(255, 255, 255, 0.5);
@@ -193,6 +197,12 @@ body{
 }
 ion-icon {
     font-size: 20px;
+}
+.dateW65 .mx-datepicker {
+    flex:  1;
+}
+.w-49{
+    width: 49%;
 }
 .image{
     margin: 0;
@@ -815,16 +825,18 @@ body.sidebar-collapse .main-sidebar:hover .nav-item a p{
 }
 .notif .badge{
     display: inline-flex;
-    height: 20px;
+    height: 25px;
     min-width: 20px;
     border-radius: 100%;
-    font-size: 14px;
+    font-size: 12px;
     align-items: center;
     justify-content: center;
     border: 2px solid #f9f9f9;
     font-weight: bold !important;
     position: absolute;
-    top: 0;
+    top: -5px;
+    width: 25px;
+    right: -2px;
 }
 .legend { list-style: none; }
 .legend li { float: left; margin-right: 10px; }
@@ -851,6 +863,10 @@ body.sidebar-collapse .main-sidebar:hover .nav-item a p{
     max-width: 300px;
     min-width: 280px;
     padding: 0;
+}
+
+.notificationUL .dropdown-menu-lg {
+    min-width: 300px;
 }
 .userNotif{
     line-height: 12px;
@@ -1015,4 +1031,38 @@ table .bgStripe .rowActif{
 .rateCenter .Rate__star{
     padding:  0;
 }
+.fullscreenModal .modal-dialog {
+    width: calc(100% - 150px);
+    max-width: none;
+    height: 100% !important;
+    max-height: calc(100% - 37px);
+    margin: 0;
+    left: 150px;
+    
+}
+.fullscreenModal .close span {
+  font-size: 35px !important;
+  text-shadow: 0 1px 0 #000;
+  color:  red;
+}
+.sidebar-collapse .fullscreenModal .modal-dialog {
+    width: calc(100% - 74px);
+    left: 74px;
+}
+.fullscreenModal .modal-header{
+    padding-top: 0.6em;
+    padding-bottom: 0.6em
+}
 
+.fullscreenModal .modal-content {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.fullscreenModal embed{
+    height: 100%;
+}
+.table.borderDark td {
+  border-top: 1px solid #bbb;
+}

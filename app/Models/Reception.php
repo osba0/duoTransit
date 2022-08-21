@@ -48,13 +48,27 @@ class Reception extends Model
     {
 
         $typeCmd = request('typeCmd');
-        if(isset($typeCmd)){
-            $query->where('type_commandes_id', $typeCmd)->where('receptions.clients_id', request('id'))
-                ->orderBy('recrea', 'desc');
+
+        $order = request('order');
+
+        $sortedColumn = request('column');
+
+        if($typeCmd!=""){
+            $query->where('type_commandes_id', $typeCmd);
+        }
+
+        if($sortedColumn!=""){
+            $query = $query->orderBy($sortedColumn, $order);
         }else{
-             $query->where('receptions.clients_id', request('id'))
-                ->orderBy('recrea', 'desc');
-         
+             $query->orderBy('recrea', 'desc');
+           /* if(isset($typeCmd)){
+                $query->where('type_commandes_id', $typeCmd)->where('receptions.clients_id', request('id'))
+                    ->orderBy('recrea', 'desc');
+            }else{
+                 $query->where('receptions.clients_id', request('id'))
+                    ->orderBy('recrea', 'desc');
+             
+            }*/
         }
     }
 

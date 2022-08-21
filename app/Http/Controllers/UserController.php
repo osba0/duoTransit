@@ -28,10 +28,17 @@ class UserController extends Controller
     public function index()
     {
         $user = Auth::user();
+
+        if(!($user->hasRole(UserRole::ROLE_ADMIN) || $user->hasRole(UserRole::ROLE_ROOT))){
+             abort(401);
+        }
         
         $client = Client::get();
+
+        $isAdmin = 0;
         
         if($user->hasRole(UserRole::ROLE_ADMIN)){
+            $isAdmin = 1;
             $roles = UserRole::getRoleAdminList(); 
         }else{
             $roles = UserRole::getRoleList(); 
@@ -39,7 +46,7 @@ class UserController extends Controller
 
         activity(TypActivity::LISTER)->log('Affichage page utilisateur');
 
-        return  view('backend.user.index', ['clients' => $client, 'roles' => $roles]);
+        return  view('backend.user.index', ['clients' => $client, 'roles' => $roles, 'isAdmin' => $isAdmin]);
     }
 
     /**
