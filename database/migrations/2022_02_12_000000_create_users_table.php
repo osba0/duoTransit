@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->text('roles')->nullable();
             $table->text('client_supervisor')->nullable();
             $table->foreignId('entites_id')->constrained(); 
+            $table->integer('status')->default(1);
             $table->rememberToken();
             $table->timestamps();  
         });
