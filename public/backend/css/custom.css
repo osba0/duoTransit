@@ -171,7 +171,9 @@ body{
 	background: rgba(52,73,94,0.94);
 	color: #ECF0F1;
 }
-
+.thead-blue + tbody tr:hover{
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
 .hasborder th{
    border-bottom: 3px solid #3490dc !important;
 }
@@ -697,7 +699,7 @@ body.sidebar-collapse .main-sidebar:hover .nav-item a p{
 
 }
 .nav-sidebar .nav-link {
-     padding: 1rem 1rem;
+     padding: 1rem 0.1rem;
     border-bottom: 1px solid #dedede;
 }
 .filterUl {
@@ -1065,4 +1067,7 @@ table .bgStripe .rowActif{
 }
 .table.borderDark td {
   border-top: 1px solid #bbb;
+}
+.opacity-light{
+    opacity: .8;
 }
