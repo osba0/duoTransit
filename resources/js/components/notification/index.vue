@@ -20,9 +20,9 @@
                                 <th class="p-2 border-right border-white h6">Lue?</th>
                                 <th class="p-2 border-right border-white h6">Utilisateur</th>
                                 <th class="p-2 border-right border-white h6">Date</th>
-                                <th class="text-right p-2 border-right border-white h6">Action</th>
+                                <th class="text-right p-2 border-right border-white h6">Action </th>
                             </tr>
-                        </thead>
+                        </thead>  
                      <tbody>
                         <template v-if="!notifications.data || !notifications.data.length">
                                 <tr><td colspan="6" class="bg-white text-center">Aucun fournisseur défini!</td></tr>
