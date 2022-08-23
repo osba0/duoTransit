@@ -13,7 +13,7 @@ $config = [
     <link rel="icon" type="image/png" href="/images/logo-itransit-white.png">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/app/adminlte.min.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/app.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/app.css') }}"> 
     <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/app/font-awesome.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/custom.css') }}">
 
