@@ -302,7 +302,7 @@ class ReceptionController extends Controller
         
         $pathFile = "assets/factures/". $params['refasc'];
 
-        Notification::send($getMailClient, new receptionCommandes($transitaire, $societe, $emailSent, $params, $pathFile));
+        Notification::send($getMailClient, new receptionCommandes($transitaire, $societe, $emailSent, $params, $pathFile, $params['refasc']));
     }
 
     public function modify(Request $request)

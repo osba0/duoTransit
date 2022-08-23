@@ -539,7 +539,7 @@
                 prechargement:{},
                 prechargementDossier: {},
                 reception: {},
-                paginateRecep: 10,
+                paginateRecep: 200, // bug lors de la selection de la 2 page les stats sont renitialisé
                 choose:'',
                 selected: {
                     identifiant: '',

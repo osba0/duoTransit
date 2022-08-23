@@ -47,21 +47,16 @@ Vue.use(VueSweetalert2);
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('pageloader', require('./components/PageLoader.vue').default);    
 Vue.component('client-list', require('./components/principal/IndexComponent.vue').default);
-Vue.component('dry-index', require('./components/dry/DryIndex.vue').default);
+
 Vue.component('reception', require('./components/dry/Reception.vue').default);   
-Vue.component('chargement', require('./components/dry/Chargement.vue').default);
-Vue.component('chargement-view', require('./components/dry/ChargementView.vue').default);
-Vue.component('prechargement', require('./components/dry/Prechargement.vue').default);
-Vue.component('precharger', require('./components/dry/PreCharger.vue').default);  
+
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('client', require('./components/configuration/ClientComponent.vue').default);
 Vue.component('fournisseur', require('./components/configuration/FournisseurComponent.vue').default);
-Vue.component('empotage', require('./components/dry/Empotage.vue').default);  
-Vue.component('empotagedata', require('./components/dry/EmpotageData.vue').default);  
 Vue.component('userlist', require('./components/configuration/user/UserDataTable.vue').default); 
 Vue.component('changepassword', require('./components/configuration/user/UserChangePassword.vue').default); 
 Vue.component('incidents', require('./components/incidents/Incidents.vue').default);    
-Vue.component('historique', require('./components/dry/Historique.vue').default);  
+
 Vue.component('entite', require('./components/configuration/EntiteComponent.vue').default);  
 Vue.component('entrepot', require('./components/configuration/Entrepot.vue').default);
 Vue.component('contenaire', require('./components/configuration/Contenaire.vue').default);
@@ -126,11 +121,5 @@ window.axios.interceptors.response.use(
         }
     }
 );
-
-
-
-/* setInterval( function(){ 
-      axios.get('/checksession').then(resp => {});
-}.bind(this), 6500);*/
 
 

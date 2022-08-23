@@ -247,16 +247,16 @@
                 <table class="table">
                     <thead class="thead-blue hasborder">
                          <tr>
-                            <th class="p-2 border-right border-white h6" v-on:click="sortByColumn(columns[0])">N°CDE 
+                            <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[0])">N°CDE 
                                 <i class="fa fa-sort" aria-hidden="true" ></i>
                             </th>
-                            <th class="p-2 border-right border-white h6">N°FE</th>
-                            <th class="p-2 border-right border-white h6">N°ECV</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
-                            <th class="text-right p-2 border-right border-white h6">Poids</th>
-                            <th class="text-right p-2 border-right border-white h6">Volume</th>
-                            <th class="text-nowrap p-2 border-right border-white h6">Date livraison</th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[5])">Poids <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[6])">Volume <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-nowrap p-2 border-right border-white h6">Crée par?</th>
                             <th class="p-2 border-right border-white text-left h6">Validé par?</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Douane</th>

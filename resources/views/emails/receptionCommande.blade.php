@@ -7,7 +7,7 @@
    <div style="color:#0d3095; font-size: 18px;">
       Bonjour,
       <br/><br/>
-      Une nouvelle commande a été saisi n° commande<b>{{ $commande['rencmd'] }}</b>.
+      Une nouvelle commande a été réceptionnée n° commande <b>{{ $commande['rencmd'] }}</b> - <b>{{ $commande['typeCmd'] }}</b>.
       <br/><br/>
       Cordialement,<br/><br/>
       <h3 style="margin:0"><u>{{ $transitaire['nom'] }}</u></h3>
