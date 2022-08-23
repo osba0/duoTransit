@@ -53,7 +53,7 @@ class ReceptionController extends Controller
         }
         $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get(); 
 
-        $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
+        $fournis = Fournisseur::whereIn('id',$client->clfocl)->where("foetat", true)->get(); 
 
         $entrepots = Entrepot::get(); 
 
@@ -152,7 +152,7 @@ class ReceptionController extends Controller
             "poidsTotal"  => $recep->sum->repoid,
             "volumeTotal" => $recep->sum->revolu,
             "nbreColis"   => $recep->sum->renbcl + $recep->sum->renbpl,
-            "nbrJourMoyen" => ceil($diff_in_days/sizeof($recep)),
+            "nbrJourMoyen" => sizeof($recep)!=0? ceil($diff_in_days/sizeof($recep)):0,
             "commandesTotal" => $recep->count(),
             "typeCmd" => TypeCommandeResource::collection($typeCmd)
         ]);

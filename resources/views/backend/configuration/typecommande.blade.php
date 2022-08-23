@@ -16,7 +16,7 @@
                 <h2>Liste des Type de commande</h2>
               
                     @if($isRoot == true)
-                        <a href="#" class="text-white h2 btn btn-success" data-toggle="modal" data-target="#newTŷpeCommande">
+                        <a href="#" class="text-white h2 btn btn-primary" data-toggle="modal" data-target="#newTŷpeCommande">
                             <i class="fa fa-plus" aria-hidden="true"></i> Nouvel Type de Commande
                         </a>
                     @endif

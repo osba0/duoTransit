@@ -2,7 +2,7 @@
     <div>
         <div class="d-flex justify-content-between mb-3">
             <h2>Liste des sociétés</h2>
-            <a href="#" class="text-white h2 btn btn-success font-weight-bold" data-toggle="modal" data-target="#newClient" >
+            <a href="#" class="text-white h2 btn btn-primary font-weight-bold" data-toggle="modal" data-target="#newClient" >
                 <i class="fa fa-plus" aria-hidden="true"></i> Nouvelle société
             </a>
         </div>
@@ -17,7 +17,7 @@
                         <th class="p-2 border-right border-white h6">Telephone</th>
                         <th class="p-2 border-right border-white h6">Adresse</th>
                         <th class="p-2 border-right border-white h6">Pays</th>
-                        <th class="p-2 border-right border-white h6">Fournisseurs</th>
+                        <th class="p-2 border-right border-white h6" width="20%">Fournisseurs</th>
                         <th class="p-2 border-right border-white h6">Type Commmande</th>
                         <th class="p-2 border-right border-white h6 text-center">Logo</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>

@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
         <!-- Styles -->
-        <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}" >
+        <link defer rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}" >
 
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>

@@ -34,7 +34,8 @@ class User extends Authenticatable
         'roles',
         'client_supervisor',
         'password',
-        'entites_id'
+        'entites_id',
+        'status'
     ];
 
     //protected static $logName = 'user';

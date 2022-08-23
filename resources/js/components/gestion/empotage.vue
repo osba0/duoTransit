@@ -29,7 +29,7 @@
                                 <label class="m-0 mr-2">{{type.typcmd}}</label>
                             </li>
                         </ul>
-                        <a href="#" class="text-white h2 btn btn-success" data-toggle="modal" data-target="#newEmpotage">
+                        <a href="#" class="text-white h2 btn btn-primary font-weight-bold" data-toggle="modal" data-target="#newEmpotage">
                              <i class="fa fa-plus" aria-hidden="true"></i> Créer un nouveau rapport
                         </a>
                         
@@ -399,7 +399,7 @@
                     <div class="modal-header text-left">
                         <h4 class="modal-title w-100 font-weight-bold">
                             <template v-if="modeModify">Modifier</template>
-                        <template v-else>Nouveau Rapport Empotation</template>
+                        <template v-else>Nouveau rapport d'empotage</template>
                         
                         </h4>
                         <button type="button" class="close" data-dismiss="modal" v-on:click="closeModal()" aria-label="Close" ref="closePoup">

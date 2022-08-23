@@ -82,6 +82,8 @@ Route::group(['prefix' => 'configuration'], function () {
 
     Route::get('/utilisateurs', [UserController::class, 'index'])->name('utilisateurs')->middleware(['auth']);
 
+    Route::post('/statusCompte', [UserController::class, 'statusCompte'])->middleware(['auth']);;
+
      Route::get('/entrepots', function () {
         return view('backend.configuration.entrepots');
     })->name('entrepots')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
@@ -219,6 +221,7 @@ Route::delete('/configuration/deleteFournisseur/{id}', [ConfigurationController:
 Route::post('/configuration/createFournisseur', [ConfigurationController::class, 'createFournisseur']);
 Route::post('/configuration/modifyFournisseur', [ConfigurationController::class, 'modifyFournisseur']);
 Route::post('/configuration/modifPwd/{id}', [UserController::class, 'changePassword'])->middleware(['auth']);
+Route::post('/configuration/etatFournisseur', [ConfigurationController::class, 'etatFournisseur']);
 Route::get('/configuration/getUser', [UserController::class, 'list'])->middleware(['auth']);
 
 Route::delete('/deleteReception/{id}/{idClient}', [ReceptionController::class, 'delete'])->middleware(['auth']);

@@ -74,8 +74,8 @@
                 </li>
             </ul>
             <div class="mt-2 mr-3">
-                <a href="#" class="text-white btn btn-success font-weight-bold" data-toggle="modal" data-target="#newReception">
-                    <i class="fa fa-plus" aria-hidden="true"></i> Nouvelle reception
+                <a href="#" class="text-white btn btn-primary font-weight-bold" data-toggle="modal" data-target="#newReception">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Nouvelle Réception
                 </a> 
             </div>
       </div>
@@ -192,10 +192,10 @@
                                 <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="editDry(dry)" data-toggle="modal" data-target="#newReception">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                 </a>
-                                <a href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
+                                <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
 				                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
 				                    <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
-				                </a>
+				                </button>
                                  <a title="Incident" href="#" class="btn m-1 btn-circle position-relative  border btn-circle-sm m-1 bg-white" v-on:click="incident(dry)" data-toggle="modal" data-target="#newIncident">
                                     <i class="fa fa-bolt" aria-hidden="true"></i>
                                     <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
@@ -296,7 +296,7 @@
 
                   </div>
                    <div class="modal-footer d-flex justify-content-center">
-                    <button type="submit" class="btn btn-success">Suivant</button>
+                    <button type="submit" class="btn btn-info">Suivant</button>
                     <button type="button" v-on:click="closeModalInit()" class="btn btn-warning">Annuler</button>
                   </div>
                 </div>

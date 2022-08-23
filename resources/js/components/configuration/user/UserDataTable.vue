@@ -11,10 +11,11 @@
                         <th class="p-2 border-right border-white h6">Login</th>
                         <th class="p-2 border-right border-white h6">Profil</th>
                         <th class="p-2 border-right border-white h6">Société(s) autorisée(s)</th>
+                        <th class="p-2 border-right border-white h6">Etat</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
-             <tbody>
+             <tbody class="bgStripe">
                       <tr v-for="user in users.data" class="bg-white"> <!--:set="roles = convertJson(user.roles)"-->
                         <td class="p-2 align-middle">
                             {{ user.id }}
@@ -44,6 +45,13 @@
                                 </template>
                             </template>
                            
+                            </label>
+                        </td>
+                         <td class="p-2 align-middle">  
+                            <label class="switch">
+                                <input class="switch-input inputCmd" :checked="user.etat==1" type="checkbox" :value="user.id" v-on:change="etat($event,user)" /> 
+                                <span class="switch-label" data-on="Activé" data-off="Désactivé"></span> 
+                                <span class="switch-handle"></span> 
                             </label>
                         </td>
                          <td class="p-2 text-right">
@@ -273,6 +281,30 @@
            }
         },
          methods : { 
+            etat(event, four){
+
+                var ischecked=0;
+                if (event.target.checked) {
+                    ischecked=1;
+                }
+
+                const data = new FormData();
+                data.append('id', four.id);
+                data.append('etat', ischecked);
+
+                axios.post("/configuration/statusCompte", data).then(response => {
+                     let res = response.data.result;
+               
+                    Vue.swal.fire(
+                          'succés!',
+                           ischecked==0? 'Compte désactivé avec succés!': 'Compte activé avec succés!',
+                          'success'
+                        ).then((result) => {
+                           this.getUser();
+                        });
+               
+                });
+            },
             onProfil(){
                 if(this.userForm.profil=='Client'){
                     this.noClientRole = false;

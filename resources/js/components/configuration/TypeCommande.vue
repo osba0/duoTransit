@@ -11,7 +11,7 @@
                         <th class="text-right p-2 border-right border-white h6" v-if="isRoot">Action</th>
                     </tr>
                 </thead>
-             <tbody>
+             <tbody class="bgStripe">
                 <template v-if="!typecommandes.data || !typecommandes.data.length">
                         <tr><td colspan="6" class="bg-white text-center">Aucun type commande défini!</td></tr>
                     </template>

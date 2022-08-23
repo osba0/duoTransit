@@ -31,6 +31,7 @@ class NotificationResource extends JsonResource
             'data'      => $this->data,
             'read'      => $this->read_at != null ? true: false,
             'date'      => $time,
+            'user'      => $this->data['user']['username']
            
         ];
     }

@@ -67,10 +67,12 @@ class receptionCommandes extends Notification
     {
         return [
             'title' => 'Nouvelle commande n°'.$this->commande['rencmd'].', Type Commande:'.$this->commande['typeCmd'],
-            'description' => 'Fournisseur: '.$this->commande['fournisseur'].', Entrepôt: '.$this->commande['entrepot'].', N°Facture:'.$this->commande['renufa'].', N°FE: '.$this->commande['refere'].', N°ECV: '.$this->commande['reecvr'].', Nbre Palette: '.$this->commande['renbpl'].', Nbre Colis: '.$this->commande['renbcl'].', Poids(KG): '.$this->commande['repoid'].', Volume: '.$this->commande['revolu'].', Montant Facture(€): '.$this->commande['revafa'].', Commantaire: '.$this->commande['recomt'].', Date livraison: '.$this->commande['redali'],
+            'description' => 'N° Commande: '.$this->commande['rencmd'].', Fournisseur: '.$this->commande['fournisseur'].', Poids(KG): '.$this->commande['repoid'].', Volume(m3): '.$this->commande['revolu'], 
             'fichier' => '/' .$this->pathFile,
             'user' => Auth::user(),
             'slug' => $this->societe['slug']   
         ];
     }
 }
+
+/*.', Entrepôt: '.$this->commande['entrepot'].', N°Facture:'.$this->commande['renufa'].', N°FE: '.$this->commande['refere'].', N°ECV: '.$this->commande['reecvr'].', Nbre Palette: '.$this->commande['renbpl'].', Nbre Colis: '.$this->commande['renbcl'].', Poids(KG): '.$this->commande['repoid'].', Volume: '.$this->commande['revolu'].', Montant Facture(€): '.$this->commande['revafa'].', Commantaire: '.$this->commande['recomt'].', Date livraison: '.$this->commande['redali']*/

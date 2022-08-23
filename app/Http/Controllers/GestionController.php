@@ -70,7 +70,7 @@ class GestionController extends Controller
 
         $defaultContenaire = Contenaire::get()->where("isdefault", true)->first();
 
-        $nbrCmdACharger =  DB::table('receptions')
+        $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])
                  ->select('type_commandes_id', DB::raw('count(*) as total'))
                  ->groupBy('type_commandes_id')->whereNotNull('dossier_prechargements_id')->where(function($query){
                         $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);

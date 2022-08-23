@@ -33,8 +33,8 @@
                     </li>
                 </ul>
                 <div class="mt-2 mr-3">
-                    <a href="#" class="text-white btn btn-success font-weight-bold" data-toggle="modal" data-target="#newDossier">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Nouvel Dossier
+                    <a href="#" class="text-white btn btn-primary font-weight-bold" data-toggle="modal" data-target="#newDossier">
+                        <i class="fa fa-plus" aria-hidden="true"></i> Nouveau Dossier
                     </a> 
                 </div>
             </div>

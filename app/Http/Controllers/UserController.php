@@ -216,5 +216,17 @@ class UserController extends Controller
             "code" => 0,
             "message" => "OK" 
         ]);
+    }     
+
+    public function statusCompte(){
+        User::where('id', request('id'))
+              ->update([
+                "status" => request('etat')
+          ]);
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
     }
 }

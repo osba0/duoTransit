@@ -86,6 +86,7 @@ class IndexController extends Controller
             $typeCmdTotal = $req->leftJoin('type_commandes', 'receptions.type_commandes_id', '=', 'type_commandes.id')->distinct('type_commandes.id')->count();
 
         }else{
+
             $fournisseur = Fournisseur::get()->count();
             $entrepot = Entrepot::get()->count();
             $dry = Reception::get()->count();
@@ -94,17 +95,19 @@ class IndexController extends Controller
 
             $journal = LogActivity::get()->count();
 
-
-            $users = User::where("entites_id", $user->entites_id)->get()->count();
-          
+            if($user->hasRole(UserRole::ROLE_ADMIN)){
+                $users = User::where("entites_id", $user->entites_id)->whereJsonContains('roles', UserRole::ROLE_ADMIN)->get()->count();
+            }else{
+                $users = User::where("entites_id", $user->entites_id)->get()->count();
+            }
 
             $fournis = Fournisseur::get();
             
         }
 
-        $fournis = Fournisseur::get();
+        $fournis = Fournisseur::where("foetat",1)->get();
 
-        $typeCmd = TypeCommande::get();
+        $typeCmd = TypeCommande::where("etat",1)->get();
 
         if(sizeof($typeCmd) > 0){
             $typeCommande = TypeCommandeResource::collection($typeCmd);

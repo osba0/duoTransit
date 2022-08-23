@@ -17,7 +17,8 @@
                 :list-contenaire="{{ json_encode($listContenaire) }}"
                 :current-client="{{ json_encode($client) }}"
                 :current-entite="{{ json_encode($entite) }}"
-                :list-entrepots="{{ json_encode($entrepots) }}"></prechargement-client>
+                :list-entrepots="{{ json_encode($entrepots) }}"
+                :cmd-a-precharger="{{ json_encode($nbrCmdACharger) }}"></prechargement-client>
             @else
                 <div class="badge badge-warning p-3">Client non autorisé ou inexistant!</div>
             @endif

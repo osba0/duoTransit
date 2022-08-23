@@ -212,7 +212,7 @@ $config = [
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{route('clients')}}" class="nav-link {{ request()->is('configuration/clients') ? 'active' : '' }}"><i class="fa fa-male nav-icon"></i><p class="d-block">Sociétés</p>  
+                                <a href="{{route('clients')}}" class="nav-link {{ request()->is('configuration/clients') ? 'active' : '' }}"><i class="fa fa-briefcase nav-icon"></i><p class="d-block">Sociétés</p>  
                                 </a>
                             </li>
                             <li class="nav-item">

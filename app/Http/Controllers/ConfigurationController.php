@@ -11,6 +11,7 @@ use App\Models\Entite;
 use App\Models\Fournisseur;
 use App\Models\Entrepot;
 use App\Models\TypeCommande;
+use App\Models\Reception;
 use App\Models\Contenaire;
 use App\Http\Resources\FournisseurResource;
 use App\Http\Resources\TypeCommandeResource;
@@ -227,7 +228,7 @@ class ConfigurationController extends Controller
         $paginate = request('paginate');
 
         if (isset($paginate)) {
-            $fournisseurs = Fournisseur::orderBy('id', 'desc')->paginate($paginate);
+            $fournisseurs = Fournisseur::orderBy('created_at', 'desc')->paginate($paginate);
         }else{
             $fournisseurs = Fournisseur::get();
         }
@@ -237,13 +238,20 @@ class ConfigurationController extends Controller
 
     public function fournisseurDelete(Request $request)
     {
-        Fournisseur::where('id', request('id'))->delete();
+        $exist = Reception::where('fournisseurs_id', request('id'))->get();
+        if(count($exist) > 0){
+            return response([
+                "code" => 1,
+                "message" => "Exist" 
+            ]);
+        }else{
+            Fournisseur::where('id', request('id'))->delete();
 
-        if(!is_null(request('logo')) || !empty(request('logo'))) File::delete("images/logo/".request('logo'));
+            if(!is_null(request('logo')) || !empty(request('logo'))) File::delete("images/logo/".request('logo'));
 
-        $listClientAll = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
+            $listClientAll = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
 
-        foreach($listClientAll as $client){
+            /*foreach($listClientAll as $client){
 
                 $tabFour = $client['clfocl'];
 
@@ -254,13 +262,14 @@ class ConfigurationController extends Controller
                 Client::where('id', $client['id'])->update([
                     "clfocl" => array_unique($tabFour)
                 ]);
-            
+            }*/
         }
+       
 
-          return response([
-                "code" => 0,
-                "message" => "OK" 
-            ]);
+        return response([
+            "code" => 0,
+            "message" => "OK" 
+        ]);
     }
 
     public function createFournisseur(Request $request){
@@ -287,7 +296,7 @@ class ConfigurationController extends Controller
 
             // get last ID 
             
-            $lastIDFour = Fournisseur::latest('id')->first();
+            /*$lastIDFour = Fournisseur::latest('id')->first();
             
             $listClientSet = json_decode(request('listClientAjouter'));
 
@@ -306,7 +315,7 @@ class ConfigurationController extends Controller
                             "clfocl" => array_unique($tabFour)
                       ]);
                 }
-            }
+            }*/
            
 
             //var_dump(json_decode(request('listClientAjouter'))); die();
@@ -345,23 +354,21 @@ class ConfigurationController extends Controller
         if(!is_null(request('imageSet'))){
             $filename = request('imageSet');
         }
-            
+       
         Fournisseur::where('id', request('id'))
               ->update([
                 "fonmfo" => request('nom'),
                 "foadrs" => request('adresse'),
                 "fotele" => request('telephone'),
-                'fologo' => $filename,
-                "foetat" => 1
-
+                'fologo' => $filename
           ]);
 
 
 
-        $listClientSet = json_decode(request('listClientAjouter'));
+        /*$listClientSet = json_decode(request('listClientAjouter'));
 
         $listClientAll = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
-
+    
         foreach($listClientAll as $client){
 
             if (in_array($client['id'], $listClientSet)){
@@ -385,7 +392,7 @@ class ConfigurationController extends Controller
                     "clfocl" => array_unique($tabFour)
                 ]);
             }
-        }
+        }*/
 
         return response([
             "code" => 0,
@@ -752,6 +759,18 @@ class ConfigurationController extends Controller
         TypeCommande::where('id', request('id'))
               ->update([
                 "etat" => request('etat')
+          ]);
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+    }
+
+     public function etatFournisseur(){
+        Fournisseur::where('id', request('id'))
+              ->update([
+                "foetat" => request('etat')
           ]);
 
         return response([

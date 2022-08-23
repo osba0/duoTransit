@@ -10,12 +10,13 @@
                         <th class="p-2 border-right border-white h6">Adresse</th>
                         <th class="p-2 border-right border-white h6">Logo</th>
                         <th class="p-2 border-right border-white h6">Société</th>
+                        <th class="p-2 border-right border-white h6">Etat</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
              <tbody>
                 <template v-if="!fournisseurs.data || !fournisseurs.data.length">
-                        <tr><td colspan="6" class="bg-white text-center">Aucun fournisseur défini!</td></tr>
+                        <tr><td colspan="8" class="bg-white text-center">Aucun fournisseur défini!</td></tr>
                     </template>
                       <tr v-for="fournisseur in fournisseurs.data" class="bg-white">
                         <td class="p-2 align-middle">
@@ -39,7 +40,7 @@
                           </template>
                           
                         </td>
-                        <td>
+                        <td> 
                             <template v-for="client in listClient">
                                 <template v-if="client.clfocl.includes(fournisseur.id)">
                                     <span class="badge bg-success mr-2 p-2 mb-2">
@@ -48,6 +49,13 @@
                                 </template>
                             </template>
                                       
+                        </td>
+                         <td>  
+                            <label class="switch">
+                                <input class="switch-input inputCmd" :checked="fournisseur.etat==1" type="checkbox" :value="fournisseur.id" v-on:change="etat($event,fournisseur)" /> 
+                                <span class="switch-label" data-on="Actif" data-off="Inactif"></span> 
+                                <span class="switch-handle"></span> 
+                            </label>
                         </td>
                          <td class="p-2 text-right">
                              <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editFournisseur(fournisseur)" data-toggle="modal" data-target="#newFournisseur">
@@ -138,8 +146,8 @@
                                     
                                  </div>
                              </div>
-                              <hr>
-                            <div class="row">
+                            
+                            <div class="row d-none">
                                 <div class="col-12 my-2 d-flex flex-column">
                                     <div class="w-100 d-flex justify-content-between flex-column align-items-center">
                                         <label class="typo__label d-block m-0 w-100  pr-2 nowrap">Société</label>
@@ -217,6 +225,22 @@
            }
         },
          methods : { 
+             etat(event, four){
+
+                var ischecked=0;
+                if (event.target.checked) {
+                    ischecked=1;
+                }
+
+                const data = new FormData();
+                data.append('id', four.id);
+                data.append('etat', ischecked);
+
+                axios.post("/configuration/etatFournisseur", data).then(response => {
+                let res = response.data.result;
+                this.getFournisseur();
+                });
+            },
             removeImage(){
                 this.hasImage = false;
                 this.fournisseurForm.logo = "";
@@ -314,15 +338,26 @@
                 }).then((result) => {
                   if (result.isConfirmed) {
                         axios.delete('/configuration/deleteFournisseur/'+fournisseur.id+"?logo="+fournisseur.logo).then(response => {
-                            this.modeModify = false;
-                             this.getFournisseur();
-                             Vue.swal.fire(
-                              'Supprimé!',
-                              'Fournisseur supprimé avec succés.',
-                              'success'
-                            ).then((result) => {
-                                 window.location.reload();
-                            });
+                            if(response.data.code==0){
+                                this.modeModify = false;
+                                this.getFournisseur();
+                                Vue.swal.fire(
+                                  'Supprimé!',
+                                  'Fournisseur supprimé avec succés', 
+                                  'success'
+                                ).then((result) => {
+                                     window.location.reload();
+                                });
+                            }else{
+                                 Vue.swal.fire(
+                                  'Warning!',
+                                  'Impossible de supprimer! Supprimer les commandes associées.',
+                                  'warning'
+                                ).then((result) => {
+                                   
+                                });
+                            }
+                            
                              
                            
 

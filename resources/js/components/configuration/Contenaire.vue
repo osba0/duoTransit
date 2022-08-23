@@ -11,7 +11,7 @@
                         <th class="text-right p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
-             <tbody>
+             <tbody class="bgStripe">
                 <template v-if="!contenaires.data || !contenaires.data.length">
                         <tr><td colspan="6" class="bg-white text-center">Aucun contenaire défini!</td></tr>
                     </template>

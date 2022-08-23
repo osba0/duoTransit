@@ -1,6 +1,7 @@
  <template>
     <div>
         <template v-if="!isDetail"> 
+            <form v-on:submit.prevent="search">
             <div class="row justify-content-center histoform">
                 <div class="col-md-12">
                     <div class="d-inline-block">
@@ -39,7 +40,7 @@
                                     <input type="text" class="form-control"  v-model="filtre.commande">
                                 </div>
                                 <div>
-                                   <button @click="search()" class="btn btn-success ml-3"> <span v-if="isloading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Rechercher</button>
+                                   <button type="submit" class="btn btn-success ml-3"> <span v-if="isloading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Rechercher</button>
                                 </div>
                             </div>
                              
@@ -48,6 +49,7 @@
                 </div>
               
             </div>
+        </form>
         </template>
         
 
@@ -139,7 +141,7 @@
                                              <td class="p-2 align-middle">
                                                 <div class="d-flex justify-content-end align-items-center">
                                                     <div @click="detailsCommande(res)" class="d-flex cursor-pointer bg-primary position-relative rounded-circle boxAction justify-content-center align-items-center mr-2" title="Liste des commandes">
-                                                    <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre">{{ res.nbrCmd }}</span> <i class="fa fa-list-ul" aria-hidden="true"></i>
+                                                    <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre">{{ res.nbrCmd > 9 ? '+9' : res.nbrCmd }}</span> <i class="fa fa-list-ul" aria-hidden="true"></i>
                                                     </div>
                                                     <a v-if="res.etat==1" href="#" title="Rapport Empotage" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(res)" data-toggle="modal" data-target="#openFacture">
                                                         <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
@@ -299,10 +301,10 @@
                                 <i class="fa fa-eye" aria-hidden="true"></i>
                                  <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                             </a>
-                            <a href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
+                            <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
                                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                 <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
-                            </a>
+                            </button>
                         </td>
                     </tr>
                     </template>

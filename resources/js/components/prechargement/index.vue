@@ -24,6 +24,7 @@
                                 <li v-for="type in typeCmd" class="d-flex align-items-center">
                                     <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
                                     <label class="m-0 mr-2">{{type.typcmd}}</label>
+                                    <label class="m-0 mr-2">({{ getNbreCmd(type.id) }})</label>
                                 </li>
                             </ul>
                             <div>
@@ -34,8 +35,8 @@
                                   
                                     </select>
                                 
-                                    <button type="submit" class="btn btn-warning d-flex align-items-center">
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" :class="{'d-none': !submitted_add, 'd-inline-block': submitted_add && !$v.typeCommande.required}"></span> <i class="fa fa-plus px-2" aria-hidden="true" :class="{'d-none': submitted_add, 'd-inline-block': !submitted_add}"></i> Ajouter un dossier</button>
+                                    <button type="submit" class="btn btn-primary d-flex align-items-center">
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" :class="{'d-none': !submitted_add, 'd-inline-block': submitted_add && !$v.typeCommande.required}"></span>Créer</button>
                                 </form>
                             </div>
                         </div>
@@ -337,10 +338,10 @@
                                  <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                             </a>
 
-                            <a href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)">
+                            <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)">
                                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                 <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
-                            </a>
+                            </button>
                             
                             <label class="switch mr-0"  v-bind:style="[dry.dossier_id > 0 || selected.etat == 1 ? {'opacity': 0.5} : {'opacity': '1'}]">
                                 <input :disabled="dry.dossier_id > 0 || selected.etat == 1" class="switch-input inputCmd" :checked="selected.id == dry.idPre" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
@@ -420,7 +421,8 @@
             'listContenaire',
             'currentClient',
             'currentEntite',
-            'listEntrepots'
+            'listEntrepots',
+            'cmdAPrecharger'
         ],  
         components: {
             /*PageLoader*/
@@ -495,6 +497,14 @@
             }
         },
         methods: { 
+         getNbreCmd(id){
+            for(var i=0; i<this.cmdAPrecharger.length; i++){
+                if(this.cmdAPrecharger[i].type_commandes_id == id){
+                    return this.cmdAPrecharger[i].total;
+                }
+            }
+            return 0;
+        },
         switchContenaire(id, volume){
             this.capacite = volume;
             this.defaultContenaire.id = id;

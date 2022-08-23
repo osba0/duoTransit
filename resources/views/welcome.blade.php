@@ -268,7 +268,7 @@ $config = [
                             <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Sociétés</dd>
                           </dl>
                           <div class="item item-rounded-lg bg-primary">
-                            <i class="fa fa-male text-white h2 m-0" aria-hidden="true"></i>
+                            <i class="fa fa-briefcase text-white h2 m-0" aria-hidden="true"></i>
                           </div>
                         </div>
                         <div class="bg-body-light mt-3 rounded-bottom">

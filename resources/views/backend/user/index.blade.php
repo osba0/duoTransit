@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <div class="d-flex justify-content-between mb-3">
                 <h2>Utilisateurs</h2>
-                <a href="#" class="text-white h2 btn btn-success" data-toggle="modal" data-target="#newUser">
+                <a href="#" class="text-white h2 btn btn-primary" data-toggle="modal" data-target="#newUser">
                     <i class="fa fa-plus" aria-hidden="true"></i> Nouveau user
                 </a>
             </div>

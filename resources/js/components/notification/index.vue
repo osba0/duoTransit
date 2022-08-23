@@ -14,10 +14,11 @@
                     <table class="table borderDark">
                         <thead class="thead-blue hasborder">
                              <tr>
-                                <th class="p-2 border-right border-white h6" width="25%">Title</th>
+                                <th class="p-2 border-right border-white h6" width="25%">Titre</th>
                                 <th class="p-2 border-right border-white h6" width="30%">Description</th>
                                 <th class="p-2 border-right border-white h6">Fichier</th>
                                 <th class="p-2 border-right border-white h6">Lue?</th>
+                                <th class="p-2 border-right border-white h6">Utilisateur</th>
                                 <th class="p-2 border-right border-white h6">Date</th>
                                 <th class="text-right p-2 border-right border-white h6">Action</th>
                             </tr>
@@ -26,7 +27,7 @@
                         <template v-if="!notifications.data || !notifications.data.length">
                                 <tr><td colspan="6" class="bg-white text-center">Aucun fournisseur défini!</td></tr>
                             </template>
-                              <tr v-for="notif in notifications.data" :class="!notif.read? 'bg-white': 'bg-light'">
+                              <tr v-for="notif in notifications.data" :class="!notif.read? 'bg-white': 'bg-light opacity-light'">
                                 <td classborderDark="p-2 align-top">
                                    <h5 :class="[!notif.read? 'font-weight-bold':'']">{{ notif.data["title"] }}</h5> 
                                 </td>
@@ -34,14 +35,15 @@
                                     {{ notif.data["description"] }}
                                 </td>
                                 <td class="p-2 align-middle">
-                                    <a v-if="notif.data['fichier']!=''" href="#" title="Voir le fichier" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-primary"  @click="showFichier(notif.data['fichier'])" data-toggle="modal" data-target="#openFichier">
+                                    <button v-if="notif.data['fichier']!=''" :disabled="notif.data['fichier'].split('.').length == 1" title="Voir le fichier" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-primary"  @click="showFichier(notif.data['fichier'])" data-toggle="modal" data-target="#openFichier">
                                         <i class="fa fa-file text-white" aria-hidden="true"></i>
-                                    </a>
+                                    </button>
                                 </td>
                                 <td class="p-2 text-left align-middle">
                                     <span v-if="notif.read" class="badge badge-success">Oui</span>
                                     <span v-else class="badge badge-warning">Non</span>
                                 </td>
+                                <td class="p-2 text-left align-middle">{{ notif.user }}</td>
                                 <td class="p-2 align-middle"> Il y'a {{ notif.date }}</td>
                                 <td class="text-right align-middle">
                                     <div class="d-flex w-100 justify-content-end">

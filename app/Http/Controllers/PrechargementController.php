@@ -62,6 +62,17 @@ class PrechargementController extends Controller
 
         $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
 
+        $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])
+                 ->select('type_commandes_id', DB::raw('count(*) as total'))
+                 ->groupBy('type_commandes_id')->where(function($query){
+                        $query->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
+                        
+                        })->where(function($query){
+                        $query->orWhere('dossier_prechargements_id', 0)->orWhere('dossier_prechargements_id', NULL);
+                        
+                        })
+                 ->get();  
+
         
 
         $entrepots = Entrepot::get(); 
@@ -69,7 +80,7 @@ class PrechargementController extends Controller
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
         }else{
-            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client , 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires, "entite" => $entite, "entrepots" => $entrepots];
+            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client , 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires, "entite" => $entite, "entrepots" => $entrepots, 'nbrCmdACharger' => $nbrCmdACharger];
         }
         
         return  view('backend.prechargement.index', $data);

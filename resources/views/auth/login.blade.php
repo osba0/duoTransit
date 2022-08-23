@@ -16,7 +16,18 @@
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
         <!-- Validation Errors -->
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
+        <!--x-auth-validation-errors class="mb-4" :errors="$errors" /-->
+
+        @if (session('error'))
+             <div class="alert alert-danger">
+                 {{ session('error') }}
+             </div>
+          @endif
+        @if($errors->any())
+         <div class="alert alert-danger">
+            Login ou Mot de passe incorrect.
+        </div>
+        @endif
 
         <form method="POST" action="{{ route('login') }}" id="app_run">
             @csrf
