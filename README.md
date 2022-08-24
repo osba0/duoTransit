@@ -3,7 +3,7 @@
 **Installation**
 
 ```
-git clone git@github.com:YouWeApS/order_auto_print2.git
+git clone https://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@github.com:osba0/duoTransit.git
 
 cd duotransit/
 
@@ -19,4 +19,5 @@ php artisan key:generate
 **Configuration .env**
 ```
 php artisan migrate
+php artisan db:seed
 ```
