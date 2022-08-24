@@ -62,7 +62,9 @@ class UserController extends Controller
 
         if (isset($paginate)) {
             if($user->hasRole(UserRole::ROLE_ADMIN)){
-                  $users = User::whereJsonContains("roles", $user->roles[0])->orderBy('id', 'desc')->paginate($paginate);
+                  $users = User::where("entites_id", $user->entites_id)->where(function($query){
+                    $query->orWhereJsonContains("roles", UserRole::ROLE_ADMIN)->orWhereJsonContains('roles', UserRole::ROLE_USER);
+                })->orderBy('id', 'desc')->paginate($paginate);
             }else{
                  $users = User::orderBy('id', 'desc')->paginate($paginate);
             }
