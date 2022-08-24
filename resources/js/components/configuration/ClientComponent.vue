@@ -26,7 +26,7 @@
              <tbody class="bgStripe">
                     <template v-if="!clients.data || !clients.data.length">    
                          <tr>
-                           <td colspan="9" class="text-center">Aucune société trouvée!</td>
+                           <td colspan="10" class="text-center">Aucune société trouvée!</td>
                         </tr>
                     </template>
                       <tr v-for="client in clients.data">  
