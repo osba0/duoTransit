@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Entite;
 use App\Models\User;
+use App\Models\UserRole;
+use Hash;
 
 class UserSeeder extends Seeder
 {
