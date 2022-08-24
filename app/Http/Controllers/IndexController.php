@@ -96,7 +96,9 @@ class IndexController extends Controller
             $journal = LogActivity::get()->count();
 
             if($user->hasRole(UserRole::ROLE_ADMIN)){
-                $users = User::where("entites_id", $user->entites_id)->whereJsonContains('roles', UserRole::ROLE_ADMIN)->get()->count();
+                $users = User::where("entites_id", $user->entites_id)->where(function($query){
+                    $query->orWhereJsonContains('roles', UserRole::ROLE_ADMIN)->orWhereJsonContains('roles', UserRole::ROLE_USER);
+                })->get()->count();
             }else{
                 $users = User::where("entites_id", $user->entites_id)->get()->count();
             }

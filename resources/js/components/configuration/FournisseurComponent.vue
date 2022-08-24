@@ -297,7 +297,8 @@
                           'Fournisseur enregistré avec succés!',
                           'success'
                         ).then((result) => {
-                          window.location.reload();
+                            this.getFournisseur();
+                           //window.location.reload();
                         });
                         
                         
