@@ -16,7 +16,7 @@ class TypeCommandeSeeder extends Seeder
     {
         $typecmd = TypeCommande::create([
             'typcmd' => 'Médicament',
-            'tcolor' => '"4e9a06',
+            'tcolor' => '#4e9a06',
             'etat'   => true
         ]);
         
