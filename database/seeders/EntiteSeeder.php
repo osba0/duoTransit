@@ -22,7 +22,7 @@ class EntiteSeeder extends Seeder
         $entrepot[] = Entrepot::take(1)->first()['id'];
         $contenaire[] = Contenaire::where('isDefault', true)->first()['id'];
 
-        $entite = Entrepot::create([
+        $entite = Entite::create([
             'nom' => 'Marine Plus',
             'slug' => \Str::slug(request('Marine Plus')),
             'adresse' => '29 AVENUE DE GENEVE, France',
