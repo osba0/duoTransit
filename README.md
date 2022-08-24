@@ -1,4 +1,5 @@
-## About DuoTransit 
+## DuoTransit
+DuoTransit est une application WEB permettant de gérer et de superviser les commandes entre le transitaire et le client. 
 
 **Installation**
 
