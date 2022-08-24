@@ -30,8 +30,8 @@ class EntiteSeeder extends Seeder
             'fax' => '00 00 00 00',
             'email' => 'marineplus@yopmail.com',
             'etat' => 1,
-            'entrepots_id' => $entrepot,
-            'contenaires_id' => $contenaire
+            'entrepots_id' => json_decode($entrepot),
+            'contenaires_id' => json_decode($contenaire)
         ]);
         
         $entite->save();
