@@ -34,7 +34,7 @@
                             </label>
                         </td>
                          <td class="p-2 text-right" v-if="isRoot">
-                             <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="etatCommande(typecommande)" data-toggle="modal" data-target="#newTŷpeCommande">
+                             <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editTypeCommande(typecommande)" data-toggle="modal" data-target="#newTŷpeCommande">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                 </a>
                             <a title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1" v-on:click="deleteTypeCommande(typecommande)">
@@ -126,8 +126,8 @@
                 typecommandesForm :{
                     id: '',
                     type: '',
-                    color: ''
-
+                    color: '',
+                    etat: ''
                 },
                 hasImage: false,
                 submitted: false,
@@ -163,6 +163,7 @@
 
                 data.append('type', this.typecommandesForm.type);
                 data.append('color', this.typecommandesForm.color);
+                data.append('etat', this.typecommandesForm.etat);
 
                 let action = "createTypeCommande";
 
@@ -238,6 +239,7 @@
                 this.typecommandesForm.id = typecommande.id;
                 this.typecommandesForm.type = typecommande.type;
                 this.typecommandesForm.color = typecommande.color;
+                this.typecommandesForm.etat = typecommande.etat;
                
             
             },
