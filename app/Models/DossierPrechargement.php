@@ -12,7 +12,7 @@ class DossierPrechargement extends Model
 {
     use HasFactory; 
 
-    protected $fillable = ['contenaires_id', 'nbreContenaire', 'reetat', 'users_id', 'clients_id', 'type_commandes_id'];
+    protected $fillable = ['contenaires_id', 'entrepots_id', 'nbreContenaire', 'reetat', 'users_id', 'clients_id', 'type_commandes_id'];
 
     public static $idClient=0;
     public static $idEntite=0;

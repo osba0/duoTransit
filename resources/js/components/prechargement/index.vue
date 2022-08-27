@@ -24,7 +24,7 @@
                                 <li v-for="type in typeCmd" class="d-flex align-items-center">
                                     <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
                                     <label class="m-0 mr-2">{{type.typcmd}}</label>
-                                    <label class="m-0 mr-2">({{ getNbreCmd(type.id) }})</label>
+                                    <label class="m-0 mr-2 badge badge-primary">{{ getNbreCmd(type.id) }}</label>
                                 </li>
                             </ul>
                             <div>
