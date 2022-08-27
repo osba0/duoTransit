@@ -17,6 +17,7 @@ class CreateChargementInitsTable extends Migration
             $table->id();
             $table->string('numDossier');
             $table->integer('type_commandes_id')->constrained(); 
+            $table->integer('entrepots_id')->constrained(); 
             $table->date('dateDebut');
             $table->date('dateCloture')->nullable();
             $table->foreignId('clients_id')->constrained();
