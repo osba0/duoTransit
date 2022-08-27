@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- Modal Facture-->
-        <div class="modal fade" id="openFacturePop" tabindex="-1" role="dialog" aria-labelledby="myModalFacturePops"
+        <div class="modal fade fullscreenModal" id="openFacturePop" tabindex="-1" role="dialog" aria-labelledby="myModalFacturePops"
           aria-hidden="true" data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
           	 <div class="modal-content">

@@ -187,6 +187,8 @@ class EmpotageController extends Controller
 
         $keyword = request('keysearch');
 
+        $sort = request('column');
+
         if (isset($paginate)) {
 
             $dries = Reception::where('dossier_id', request('ref'))->where(function($query){
@@ -200,6 +202,14 @@ class EmpotageController extends Controller
 
             if($keyword!=''){
                 $dries = $dries->search($keyword);
+            }
+
+            if($sort!=''){
+                $order = request('order');
+              
+                $dries = $dries->orderBy(strval($sort), $order);
+            }else{
+                $dries = $dries->orderBy("receptions.redali", "DESC"); 
             }
 
             $dries = $dries->paginate($paginate);

@@ -1,7 +1,7 @@
 <template>
 <div>
   <template v-if="!viewReception.data || !viewReception.data.length">
-    <div class="modal fade" id="detailReception" tabindex="-1" role="dialog" ref="detailRep" aria-labelledby="detailReception"
+    <div class="modal fade fullscreenModal" id="detailReception" tabindex="-1" role="dialog" ref="detailRep" aria-labelledby="detailReception"
       aria-hidden="true" data-backdrop="static" data-keyboard="false">
       <div class="modal-dialog modal-xl" role="document">
          <div class="modal-content">
@@ -12,7 +12,7 @@
                       <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body mx-3">
+                <div class="modal-body pt-0 mx-3">
                     <template v-if="!ispreviewModal">
                      <div class="row">
                          <div class="col-6 my-2 d-flex flex-column align-items-center">

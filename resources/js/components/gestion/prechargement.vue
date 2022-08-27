@@ -6,14 +6,14 @@
                 <qr-code text='Text to encode'></qr-code>
             </div-->
             
-          <div class="col-sm-9 d-flex align-items-center">
-               <h2>Validation Préchargement  <template v-if="isDetail">:</template></h2>
+          <div class="col-sm-8 d-flex align-items-center">
+               <h3>Validation Préchargement  <template v-if="isDetail">:</template></h3>
                <template v-if="isDetail">
-                   <span class="pl-2 h3 text-primary font-weight-bold"> N° Dossier {{ selected.id }}&nbsp;</span>
-                   <span class="h3 text-primary font-weight-bold"> du {{ selected.dateDebut }} au {{ selected.dateCloture }}</span>
+                   <span class="pl-2 h4 text-primary font-weight-bold"> N° Dossier {{ selected.id }}&nbsp;</span>
+                   <span class="h4 text-primary font-weight-bold"> du {{ selected.dateDebut }} au {{ selected.dateCloture }}</span>
                 </template>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Acceuil</a></li>
               <li class="breadcrumb-item" :class="!isDetail ? 'active': ''"><a href="#">Préchargement</a></li>
@@ -29,7 +29,7 @@
                     <li v-for="type in typeCmd" class="d-flex align-items-center">
                         <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
                         <label class="m-0 mr-2">{{type.typcmd}}</label>
-                        <label class="m-0 mr-2">({{ getNbreCmd(type.id) }})</label>
+                        <label class="m-0 mr-2 badge badge-primary">{{ getNbreCmd(type.id) }}</label>
                     </li>
                 </ul>
                 <div class="mt-2 mr-3">
@@ -292,17 +292,17 @@
                 <table class="table">
                     <thead class="thead-blue">
                          <tr>
-                            <th class="p-2 border-right border-white h6">N°CDE</th>
-                            <th class="p-2 border-right border-white h6">N°FE</th>
-                            <th class="p-2 border-right border-white h6">N°ECV</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white cursor-pointer h6 white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
-                            <th class="text-right p-2 border-right border-white h6">Poids (KG)</th>
-                            <th class="text-right p-2 border-right border-white h6">Volume (m<sup>3</sup>)</th>
-                            <th class="text-nowrap p-2 border-right border-white h6">Date livraison</th>
-                            <th class="text-nowrap p-2 border-right border-white h6">Crée par</th>
-                            <th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th>
-                            <th class="p-2 border-right text-center border-white h6">N° préchargement</th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[5])">Poids(KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[6])">Volume(m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-nowrap p-2 border-right border-white h6 white-space-nowrap">Crée par</th>
+                            <th class="p-2 border-right border-white text-left h6 white-space-nowrap">Préchargé?</th>
+                            <th class="p-2 border-right text-center border-white h6 white-space-nowrap" title="N° Préchargement">N° Pré.</th>
                             <th class="p-2 border-right text-center border-white h6">Priorité</th>
                             <th class="text-right p-2 border-right border-white h6">Actions</th>
                         </tr>
@@ -317,7 +317,7 @@
                         <td class="p-2 align-middle">{{ dry.refere }}</td>
                         <td class="p-2 align-middle">{{ dry.reecvr }}</td>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
-                        <td class="p-2 align-middle">
+                        <td class="p-2 align-middle white-space-nowrap">
                                 <template v-if="dry.renbcl > 0">
                                         <label class="badge badge-secondary mr-1">{{dry.renbcl}} Colis</label>
                                   </template>
@@ -330,9 +330,9 @@
                         <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
                         
                         
-                        <td class="p-2 align-middle"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
-                        <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td>
-                        <td class="p-2 align-middle">
+                        <td class="p-2 align-middle white-space-nowrap">{{ dry.redali }}</td>
+                        <td class="p-2 align-middle text-nowrap"><span class="badge badge-info">{{ dry.user_created}}</span></td>
+                        <td class="p-2 align-middle white-space-nowrap">
                             
                             <template v-if="dry.idPre > 0">
                                  <span class="badge badge-success">oui</span> {{dry.prechargeur}}
@@ -348,14 +348,14 @@
                             <rate :length="3" :value="dry.priorite" :ratedesc="['Pas urgente', 'Normale', 'Urgente']" :readonly="true"  />
 
                         </td>
-                        <td class="p-2 text-right">
+                        <td class="p-2 text-right align-middle">
                             <div class="d-flex justify-content-end align-items-center">
-                                <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3 position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                                <a title="Voir les détails" href="#" class="btn mx-1 btn-circle border btn-circle-sm btnAction bg-white mr-1 position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                     <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                                 </a>
                                 <span v-if="dry.dossier_id > 0"><i class="fa fa-check-circle"></i></span>
-                                <label class="switch" :style= "[selected.etat==1 ? {opacity: 0.5} : {opacity: 1}]">
+                                <label class="switch mr-0" :style= "[selected.etat==1 ? {opacity: 0.5} : {opacity: 1}]">
                                     <template v-if="selected.etat==0">
                                         <input class="switch-input inputCmd" :disabled="selected.etat==1" :checked="(selected.id == dry.dossier_id || dry.idPre > 0)" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
                                         <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
@@ -584,7 +584,11 @@
                 checking: false,
                 pdfFileModal: null,
                 searchRecep: '',
-                filtreRate: ''
+                filtreRate: '',
+                // Sort column
+                columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis'],
+                sortedColumn: '',
+                order: 'asc'
             }
 
         },
@@ -621,9 +625,19 @@
             },
             filtreRate: function(value) {
                 this.getReception();
-            }
+            },
+            order: function(value) {
+                this.getReception();
+           }
         },
         methods: { 
+            /**
+             * Sort the data by column.
+             * */
+            sortByColumn(column) {
+              this.sortedColumn = column;
+              this.order = (this.order === 'asc') ? 'desc' : 'asc';
+            },
             getNbreCmd(id){
                 for(var i=0; i<this.cmdAPrecharger.length; i++){
                     if(this.cmdAPrecharger[i].type_commandes_id == id){
@@ -772,7 +786,7 @@
             },
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/gerer/dossier/pre/reception/'+this.idClient+"/"+this.selected.typeCommande+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&idPre="+this.selected.id+"&etat="+this.selected.etat+"&filtreRate="+this.filtreRate+"&keysearch="+this.searchRecep).then(response => {
+            axios.get('/gerer/dossier/pre/reception/'+this.idClient+"/"+this.selected.typeCommande+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&idPre="+this.selected.id+"&etat="+this.selected.etat+"&filtreRate="+this.filtreRate+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
                 this.reception = response.data;
 
                 console.log(this.reception, "reception");
