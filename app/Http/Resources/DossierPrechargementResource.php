@@ -32,6 +32,8 @@ class DossierPrechargementResource extends JsonResource
             "typecmdID"                 => $this->typecmdID, 
             "typeCmd_color"             => $this->typecmdColor, 
             "contenaire"                => $this->contenaire,
+            "entrepotID"                => $this->entrepots_id,
+            "entrepot"                  => $this->entrepots_name,
             "rapport_pdf"               => isset($this->rapport_pdf) ? Carbon::parse($this->updated_at_pre)->format('d/m/Y'):''
 
 
