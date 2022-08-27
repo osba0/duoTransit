@@ -277,15 +277,15 @@
                         <thead class="thead-blue">
                              <tr>
                                 <th class="p-2 border-right border-white h6">#</th>
-                                <th class="p-2 border-right border-white h6">N°CDE</th>
-                                <th class="p-2 border-right border-white h6">N°FE</th>
-                                <th class="p-2 border-right border-white h6">N°ECV</th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="p-2 border-right border-white h6">Fournisseur</th>
                                 <th class="p-2 border-right border-white h6">Emballage</th>
-                                <th class="text-right p-2 border-right border-white h6">Poids (KG)</th>
-                                <th class="text-right p-2 border-right border-white h6">Volume  (m<sup>3</sup>)</th>
-                                <th class="p-2 border-right border-white h6">Num Fact</th>
-                                <th class="text-nowrap p-2 border-right border-white h6">Date livraison</th>
+                                <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[6])">Volume  (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6  white-space-nowrap">Num Fact</th>
+                                <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
                                 <th class="p-2 border-right text-center border-white h6">Priorité</th>
                                 <th class="text-right p-2 border-right border-white h6">Actions</th>
@@ -305,11 +305,11 @@
                     <td class="p-2 align-middle">
                          <!--label class="badge badge-primary mr-1 numCmdLab w-100">{{ dry.rencmd }}</label-->
                          {{ dry.rencmd }}
-                    </td>
+                    </td> 
                     <td class="p-2 align-middle">{{ dry.refere }}</td>
                     <td class="p-2 align-middle">{{ dry.reecvr }}</td>
                     <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
-                    <td class="p-2 align-middle">
+                    <td class="p-2 align-middle white-space-nowrap">
                             <template v-if="dry.renbcl > 0">
                                     <label class="badge badge-secondary mr-1">{{dry.renbcl}} Colis</label>
                               </template>
@@ -464,7 +464,11 @@
                 search: '',
                 filtreRate: '',
                 etatFiltre: 0,
-                searchPre: ''
+                searchPre: '',
+                // Sort column
+                columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis'],
+                sortedColumn: '',
+                order: 'asc'
             }
 
         },
@@ -494,17 +498,27 @@
             },
             filtreRate: function(value) {
                 this.getReception();
-            }
+            },
+            order: function(value) {
+                this.getReception();
+           }
         },
         methods: { 
-         getNbreCmd(id){
-            for(var i=0; i<this.cmdAPrecharger.length; i++){
-                if(this.cmdAPrecharger[i].type_commandes_id == id){
-                    return this.cmdAPrecharger[i].total;
+            /**
+             * Sort the data by column.
+             * */
+            sortByColumn(column) {
+              this.sortedColumn = column;
+              this.order = (this.order === 'asc') ? 'desc' : 'asc';
+            },
+            getNbreCmd(id){
+                for(var i=0; i<this.cmdAPrecharger.length; i++){
+                    if(this.cmdAPrecharger[i].type_commandes_id == id){
+                        return this.cmdAPrecharger[i].total;
+                    }
                 }
-            }
-            return 0;
-        },
+                return 0;
+            },
         switchContenaire(id, volume){
             this.capacite = volume;
             this.defaultContenaire.id = id;
@@ -592,7 +606,7 @@
         },
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/prechargement/getreception/'+this.idClient+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID+"&keysearch="+this.search+"&rate="+this.filtreRate).then(response => {
+            axios.get('/prechargement/getreception/'+this.idClient+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID+"&keysearch="+this.search+"&rate="+this.filtreRate+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
                 this.reception = response.data;
                 this.isLoading = false;
             });

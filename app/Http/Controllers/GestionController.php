@@ -223,24 +223,22 @@ class GestionController extends Controller
 
         $paginate = request('paginate');
 
-
         $keyword = request('keysearch');
-
-
-
+        
+        $sort = request('column');
 
         $filtreRate = request('filtreRate');
 
         if (isset($paginate)) {
 
             $dries = Reception::where('receptions.clients_id', request('id'))->where(function($query){
-                        if(request('etat')==1){
-                            $query->where('dossier_id', request('idPre'));
-                        }else{
-                            $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
-                        }
-                        
-                        })
+                if(request('etat')==1){
+                    $query->where('dossier_id', request('idPre'));
+                }else{
+                    $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
+                }
+                
+                })
             ->leftJoin('dossier_prechargements', 'dossier_prechargements.id', '=', 'receptions.dossier_prechargements_id')
             ->leftJoin('users as a', 'dossier_prechargements.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
@@ -253,6 +251,14 @@ class GestionController extends Controller
             if($filtreRate!=''){
 
                 $dries = $dries->filtreRate($filtreRate); 
+            }
+
+            if($sort!=''){
+                $order = request('order');
+              
+                $dries = $dries->orderBy(strval($sort), $order);
+            }else{
+                $dries = $dries->orderBy("receptions.redali", "DESC"); 
             }
             
             $dries = $dries->paginate($paginate);

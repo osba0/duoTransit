@@ -215,7 +215,8 @@ class PrechargementController extends Controller
         $keyword = request('keysearch');
 
         $filtreRate = request('rate');
-
+        
+        $sort = request('column');
         
 
         if (isset($paginate)) {
@@ -234,6 +235,14 @@ class PrechargementController extends Controller
 
             if($filtreRate!=''){
                 $dries = $dries->filtreRate($filtreRate); 
+            }
+
+            if($sort!=''){
+                $order = request('order');
+              
+                $dries = $dries->orderBy(strval($sort), $order);
+            }else{
+                $dries = $dries->orderBy("receptions.redali", "DESC"); 
             }
             
             $dries = $dries->orderBy('redali', 'asc')->paginate($paginate);

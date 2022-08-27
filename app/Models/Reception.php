@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\Contracts\Activity;
 use App\Models\TypActivity;
+use DB;
 
 class Reception extends Model
 {
@@ -58,6 +59,8 @@ class Reception extends Model
         }
 
         if($sortedColumn!=""){
+            $query = $query->select("*", \DB::raw("SUM(renbcl + renbpl) as totalColis"))
+                    ->groupBy("reidre");
             $query = $query->orderBy($sortedColumn, $order);
         }else{
              $query->orderBy('recrea', 'desc');

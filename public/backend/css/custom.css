@@ -346,8 +346,10 @@ input.styled[type="checkbox"] {
     font-weight: 700;
     border-top-left-radius: .25rem;
     border-bottom-left-radius: .25rem;
-    background: #3490dc;
+    background: rgba(52,73,94,0.94);
     color: #fff;
+    border-bottom: 4px solid #3582c3;
+
 }
 .ribbon-box.orange {
     background: #d49c47;
@@ -994,6 +996,12 @@ table .bgStripe .rowActif{
     border-radius: 20px;
     z-index:  22;
 }
+.btnAction{
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  line-height: 30px;
+}
 
 @keyframes lineAnim {
     0% {
@@ -1011,6 +1019,7 @@ table .bgStripe .rowActif{
 .rateCenter .Rate{
     width: 100%;
     text-align: center;
+    display: flex;
 }
 
 .rateCenter button:focus{

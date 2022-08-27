@@ -296,15 +296,15 @@
                 <table class="table">
                     <thead class="thead-blue">
                          <tr>
-                            <th class="p-2 border-right border-white h6">N°CDE</th>
-                            <th class="p-2 border-right border-white h6">N°FE</th>
-                            <th class="p-2 border-right border-white h6">N°ECV</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
-                            <th class="text-right p-2 border-right border-white h6">Poids (KG)</th>
-                            <th class="text-right p-2 border-right border-white h6">Volume (m<sup>3</sup>)</th>
-                            <th class="text-nowrap p-2 border-right border-white h6">Date livraison</th>
-                            <th class="text-nowrap p-2 border-right border-white h6">Crée par</th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th>
                             <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->
                             <th class="text-nowrap p-2 border-right border-white h6">Douane</th>
                             <th class="text-right p-2 border-right border-white h6">Action</th>
@@ -320,7 +320,7 @@
                         <td class="p-2 align-middle">{{ dry.refere }}</td>
                         <td class="p-2 align-middle">{{ dry.reecvr }}</td>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
-                        <td class="p-2 align-middle">
+                        <td class="p-2 align-middle white-space-nowrap">
                                 <template v-if="dry.renbcl > 0">
                                         <label class="badge badge-secondary mr-1">{{dry.renbcl}} Colis</label>
                                   </template>
@@ -333,8 +333,8 @@
                         <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
                         
                         
-                        <td class="p-2 align-middle"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
-                        <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td>
+                        <td class="p-2 align-middle white-space-nowrape"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
+                        <td class="p-2 align-middle text-nowrap white-space-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td>
                         <!--td class="p-2 align-middle">
                             
                             <template v-if="dry.idPre > 0">
@@ -659,7 +659,11 @@
                 pdfFileModal: null,
                 numDossier: "",
                 searchRecep: '',
-                numDossierEdit: ''
+                numDossierEdit: '',
+                // Sort column
+                columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis'],
+                sortedColumn: '',
+                order: 'asc'
             }
 
         },
@@ -686,721 +690,58 @@
             },
             etatFiltre: function(value) {
                 this.getEmpotage();
-            }
+            },
+            order: function(value) {
+                this.getReception();
+           }
         },
         methods: { 
-        switchContenaire(id, volume){
-            this.capacite = volume; 
-            this.defaultContenaire.id = id;
-            this.setProgressCont(this.selected.volume);
-        },
-        getTypeCommande(id){
-            for(var i=0; i<this.typeCmd.length;i++){
-                if(this.typeCmd[i].id === id){
-                    return this.typeCmd[i].typcmd;
+            /**
+             * Sort the data by column.
+             * */
+            sortByColumn(column) {
+              this.sortedColumn = column;
+              this.order = (this.order === 'asc') ? 'desc' : 'asc';
+            },
+            switchContenaire(id, volume){
+                this.capacite = volume; 
+                this.defaultContenaire.id = id;
+                this.setProgressCont(this.selected.volume);
+            },
+            getTypeCommande(id){
+                for(var i=0; i<this.typeCmd.length;i++){
+                    if(this.typeCmd[i].id === id){
+                        return this.typeCmd[i].typcmd;
+                    }
                 }
-            }
-            return id;
-        },
-        getColorTypeCmd(id){
-             for(var i=0; i<this.typeCmd.length;i++){
-                if(this.typeCmd[i].id === id){
-                    return this.typeCmd[i].tcolor;
+                return id;
+            },
+            getColorTypeCmd(id){
+                 for(var i=0; i<this.typeCmd.length;i++){
+                    if(this.typeCmd[i].id === id){
+                        return this.typeCmd[i].tcolor;
+                    }
                 }
-            }
-            return "#aaa";
-        },
-        empoter(event, cmd){
-            var ischecked=0;
-           
-            if (event.target.checked) {
-                ischecked=1;
-            }
-
-            this.eventCmdSelected.ischecked=ischecked;
-            this.eventCmdSelected.idcmd = cmd.reidre;
-            
-            
-            const data = new FormData();
-            data.append('idEmpotage', this.selected.identifiant);
-            data.append('idreception', cmd.reidre);
-            data.append('ischecked', ischecked);
-
-
-            axios.post("/gerer/dossier/setEmpotage", data).then(response => {
-                let res = response.data.result;
-    
-                this.selected.nbrCmd   = res[0].total_cmd;
-                this.selected.nbrColis = parseInt(res[0].total_colis==null ? 0 : res[0].total_colis) + parseInt(res[0].total_palette==null ? 0 : res[0].total_palette);
-                this.selected.poids    = res[0].total_poids==null ? 0 : res[0].total_poids;
-                this.selected.volume   = res[0].total_volume==null ? 0 : res[0].total_volume;
-
-
-
-                this.setProgressCont(res[0].total_volume);
-                this.getEmpotage(); // refresh tableau prechargement
-                
-                this.getCmdSelected(this.selected.identifiant,this.selected.idCmd, false);
-                this.getReception();
-
-           
-              
-            });
-        },
-        setProgressCont(volume){
-            var percent = ((volume/this.capacite)*100).toFixed(0);
-                
-            if(percent > 100){
-                 var surplus =  Math.floor(percent/100);
-                 this.volumePercent = (percent%100);
-                 this.nbrContenaire = surplus+1;
-            }else{
+                return "#aaa";
+            },
+            empoter(event, cmd){
+                var ischecked=0;
                
-                if(this.selected.volume==0 || this.selected.volume==null || this.selected.volume==''){
-                    this.nbrContenaire = 0;
-                }else{
-                    this.nbrContenaire = 1;
-                }
-                
-                this.volumePercent = percent;
-            }
-        },
-        getEmpotage(page = 1){
-            this.isLoading=true;    
-            axios.get('/empotage/list/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate+ "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&etatFiltre="+this.etatFiltre).then(response => {
-                this.empotage = response.data;
-                var self = this;
-                setTimeout(function(){
-                    self.isLoading = false;
-                },500);
-                this.checking=true;
-            });
-        }, 
-        getReception(page = 1){
-            this.isLoading=true;
-            axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&keysearch="+this.searchRecep).then(response => {
-
-                this.reception = response.data;
-
-                if(this.selected.etat==0){
-                    this.selected.nbrCmd   = 0;
-                    this.selected.nbrColis  = 0;
-                    this.selected.poids    = 0;
-                    this.selected.volume   = 0;
-
-                    var nbColis=0;
-                    var nbCommande=0;
-                    for(var i=0; i<this.reception.data.length; i++){
-                        var obj = this.reception.data[i];
-
-
-                        if((obj.dossier_empotage_id > 0 && this.selected.identifiant == obj.dossier_empotage_id) ){
-
-
-                            if(this.eventCmdSelected.idcmd!=obj.reidre || (this.eventCmdSelected.ischecked > 0 && this.eventCmdSelected.idcmd==obj.reidre)){
-                                nbCommande++;
-                                nbColis +=  (obj.renbcl + obj.renbpl);
-                    
-                                this.selected.poids    += obj.repoid;
-                                this.selected.volume   += obj.revolu;
-                            }else if(this.eventCmdSelected.ischecked == 0 && this.eventCmdSelected.idcmd==obj.reidre){
-                                nbCommande--;
-                                nbColis -=  (obj.renbcl + obj.renbpl);
-                    
-                                this.selected.poids    -= obj.repoid;
-                                this.selected.volume   -= obj.revolu;
-
-                                if(nbCommande < 0){
-                                    nbCommande=0;
-                                    this.selected.poids    = 0;
-                                    this.selected.volume   = 0;
-                                    nbColis           = 0;
-                                }
-                            }
-
-
-                            
-                            
-                        }
-
-                    }
-                    this.selected.nbrColis = nbColis;
-                    this.selected.nbrCmd = nbCommande;
-                    this.setProgressCont(this.selected.volume);
-                }
-               
-                this.isLoading = false;
-            });
-        },
-        currentDateTime() {
-            const current = new Date();
-            const date = current.getDate()+'/'+(current.getMonth()+1)+'/'+current.getFullYear();
-            const time = current.getHours() + ":" + current.getMinutes() + ":" + current.getSeconds();
-            const dateTime = date;
-
-            return dateTime;
-        },
-        getCmdSelected(id, typeCommande, genererPDF){
-            axios.get('/gerer/getCmd/empoter/'+id+'/'+typeCommande).then(response => {
-                this.checkedCommandes = response.data.result;
-                 if(genererPDF){
-                    this.generatePdf(true);
-                }
-            });
-        },
-        valider(){
-            this.commandeSelected = [];
-            this.commandeNoSelected = [];
-            var self = this;
-            /*$(".inputCmd").each(function(){
-                if($(this).is(':checked')){
-                    self.commandeSelected.push($(this).val());
-                }else{
-                    self.commandeNoSelected.push($(this).val());
-                }
-                
-            });*/
-
-            $(".val-douane").each(function(){
-                if($(this).val()!=''){
-                    self.commandeSelected.push($(this).attr("data-id"));
-                }else{
-                    self.commandeNoSelected.push($(this).attr("data-id"));
-                }
-                
-            });
-
-
-            if(!this.commandeSelected.length>0){
-                Vue.swal.fire(
-                      'warning!',
-                      'Renseigner au moins un n° douane avant de valider!',
-                      'warning'
-                    );
-                return false;
-            }
-
-            Vue.swal.fire({
-                  title: 'Confirmez la validation',
-                  text: "Dossier n° "+this.selected.dossier,
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '',
-                  confirmButtonText: 'Oui, Valider!'
-                }).then((result) => {
-                  if (result.isConfirmed) {
-
-                         Vue.swal({
-                            title: 'Validation',
-                            html: '<b>En cours...</b>',
-                            timerProgressBar: true,
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Vue.swal.showLoading()
-                            },
-                            willClose: () => {
-
-                            }
-                        }).then((result) => {});
-
-                       axios.post("/gerer/validationEmpotage/valider/"+this.idClient, {
-                            'idsCmd': this.commandeSelected,
-                            'ignored': this.commandeNoSelected,
-                            'idEmpotage' : this.selected.identifiant,
-                            'typeCmd' : this.selected.idCmd,
-                            'id_dossier': this.selected.dossier
-
-                        }).then(response => {
-
-
-                            // Envoi notification avec le fichier PDF
-
-                            this.getCmdSelected(this.selected.identifiant,this.selected.idCmd, true);
-                          
-                            if(response.data.code==0){
-                                setTimeout(function(){
-                                    Vue.swal.close();
-                                     Vue.swal.fire(
-                                      'succés!',
-                                      'validé avec succés!',
-                                      'success'
-                                    ).then((result) => {
-                                        // redirection   
-                                        location.reload();
-                                    });   
-                                  
-                                }, 5000);
-
-                                this.selected.etat = 1;
-                                //this.getPrechargement();
-                                this.getReception();
-
-                                
-                            }else{
-                                this.submitted_add = false;
-                                 Vue.swal.fire(
-                                  'error!',
-                                  response.data.message,
-                                  'error'
-                                )
-                            }  
-                        });
-                    }
-                });
-
-
-
-            
-        },
-        convertImgToBase64(url, callback, outputFormat){
-            var canvas = document.createElement('CANVAS');
-            var ctx = canvas.getContext('2d');
-            var img = new Image;
-            img.crossOrigin = 'Anonymous';
-            img.onload = function(){
-                canvas.height = img.height;
-                canvas.width = img.width;
-                ctx.drawImage(img,0,0);
-                var dataURL = canvas.toDataURL(outputFormat || 'image/png');
-                callback.call(this, dataURL);
-                // Clean up
-                canvas = null; 
-            };
-            img.src = url;
-        },
-        generatePdf(isnotification=false){
-
-
-            
-            PdfMakeWrapper.setFonts(pdfFonts);
-
-            const pdf = new PdfMakeWrapper();
-            pdf.pageOrientation('landscape');
-            pdf.defaultStyle({
-                fontSize: 10
-            });
-            
-            var that  = this;
-
-            this.convertImgToBase64('/images/logo/'+that.currentEntite['logo'], function(base64Img){
-
-                var entete=[];
-                entete.push([{ image: base64Img, width: 100}, {text: ''}, {text: 'Date: '+ that.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}]); 
-                entete.push([
-                    {text:that.currentEntite['nom']+"\nTél: "+ that.currentEntite['telephone']+"/ Fax: "+that.currentEntite['fax']+"\nEmail: "+that.currentEntite['email']+"\nAdresse: "+that.currentEntite['adresse']},
-
-                    {text: 'N°Dossier '+that.selected.dossier+'\n'+that.selected.typeCmd, fontSize: 20, bold: true, alignment: 'center', color: '#3490dc'}, 
-
-                    {text: ['Entrepôt: ', {text: that.selected.entrepot, fontSize: 14}],  alignment: 'right'}]);
-                
-                //entete.push([{text: 'N°Dossier '+that.selected.dossier, fontSize: 15, alignment: 'center', lineHeight: 2, colSpan: 3}]);
-                entete.push([{text: "\n\nDestination: "+that.clientCurrent.pays, fontSize: 13, alignment: 'left', colSpan: 3}]);
-                entete.push([{text: "Rapport d'empotage pour le compte de: "+" "+that.clientCurrent.clnmcl+"\n", fontSize: 16, alignment: 'center', colSpan: 3}]);
-                
-              
-
-                var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
-
-                var infos_contenaire = [];
-                infos_contenaire.push([
-                {text:['N° TC: ', {text: that.selected.numtc, fontSize:12, bold: true}]},
-                {text:['TYPE TC: ', {text: that.selected.typetc+' DRY', fontSize:12, bold: true}]},{text:['PLOMB: ', {text: that.selected.plomb, fontSize:12, bold: true}]}]);
-
-                var contenaire = new Table(infos_contenaire).widths(['28%', '28%', '28%', '28%']).margin([0, 0, 0, 7]).end;
-
-                var totaux = [[{text: 'Nb de commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis empotés', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids(KG) empoté', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume m3 empoté', fontSize: 10, bold: true, alignment: 'center'} ]];
-                totaux.push([{text: that.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
-
-                var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
-                color(columnIndex){
-                return columnIndex=== 0 ? "#cccccc": '';  
-                },
-                fillColor (columnIndex){
-                    if(columnIndex===0){
-                        return columnIndex === 0 ? "#ccc": '';  
-                    }
-                    
-                }
-                }).margin([0, 15, 8, 7]).end;
-
-                const data = [];
-
-                const headerTab = ['Référence', 'Emballage', 'Designation', 'Poids(KG)', 'Volume(m3)', 'Factures', 'Douanes'];
-
-                data.push(headerTab); 
-
-                var legend1 = "";
-                var legend2 = "";
-
-                for(var i=0; i< that.checkedCommandes.length; i++){
-                    var obj = that.checkedCommandes[i];
-                    var nbr = [];
-                    var emballage = [];
-
-                    var cmdCell=[];
-                    var prio = "";
-
-
-                    if(obj.renbcl > 0){
-                        nbr.push(obj.renbcl);
-                        emballage.push((obj.renbcl).toString() + ' Colis');
-                    }
-
-                    if(obj.renbpl > 0){
-                        nbr.push(obj.renbpl);
-                        emballage.push((obj.renbpl).toString() + ' Pal.');
-                    }
-                    
-
-                    if(obj.priorite==1){
-                        prio = '*';
-                        legend1 = '(*) Pas urgente';
-
-                    }
-
-                    if(obj.priorite==3){
-                        prio = '***';
-                        legend2 = '(***) Urgente';
-                    }
-
-                    cmdCell.push(obj.refere+" "+prio);
-
-                    const item = [cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa, obj.douane];
-                    data.push(item);
+                if (event.target.checked) {
+                    ischecked=1;
                 }
 
-                var table = new Table(data).widths([70,70,'*',60,60,80,80]).layout({
-                color(columnIndex){
-                return columnIndex=== 0 ? "#cccccc": '';  
-                },
-                fillColor (columnIndex){
-                    if(columnIndex===0){
-                        return columnIndex === 0 ? "#bbb": '';  
-                    }else{
-                        return columnIndex%2 === 0 ? "white": '#eee';  
-                    }
-                    
-                }
-                }).end;
-
-                pdf.header = {
-                 exampleLayout: {
-                    hLineWidth: function (i, node) {
-                      if (i === 0 || i === node.table.body.length) {
-                        return 0;
-                      }
-                      return (i === node.table.headerRows) ? 2 : 1;
-                    },
-                    vLineWidth: function (i) {
-                      return 0;
-                    },
-                    hLineColor: function (i) {
-                      return i === 1 ? 'black' : '#aaa';
-                    },
-                    paddingLeft: function (i) {
-                      return i === 0 ? 0 : 8;
-                    },
-                    paddingRight: function (i, node) {
-                      return (i === node.table.widths.length - 1) ? 0 : 8;
-                    }
-                  }
-                }
-
-                pdf.footer(function(currentPage, pageCount) { return  { margin: [20, 0, 20, 0], height: 30, columns: [{alignment: "left",
-                text: 'DuoTransit'}, {text: currentPage.toString() + ' / ' + pageCount, alignment: "right"}]}; });
-
-                pdf.add(header);
-
-                pdf.add(contenaire);
-
-                pdf.add(table);
-
-                
-                pdf.add(
-                    pdf.ln(2)
-                );
-
-
-                // formater le nom du fichier
-
-                var labelCmd1 =  that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
-            
-                var nameFile = 'dossier-'+that.selected.dossier+'_'+labelCmd1+"_numtc-"+that.selected.numtc+"_plomb-"+that.selected.plomb+".pdf";
-
-
-                var qrTotaux = [];
-
-                var legendTotaux = [];
-
-                legendTotaux.push([tabtotaux, {text: legend1+' '+legend2, fontSize: 10, bold: true, alignment: 'left'}]);
-
-                qrTotaux.push([legendTotaux, new QR(location.origin+"/pdf/empotage/"+nameFile).fit(80).alignment('right').end]); 
-
-                var tableQR = new Table(qrTotaux).widths(['*', 80]).layout('noBorders').end;
-
-                pdf.add(tableQR);
-
-                
-                if(isnotification){
-
-                var self = that; 
-                pdf.create().getDataUrl(function(url) { 
-
-                    console.log(url, "File PDF"); 
-
-
-                    axios.post("/gerer/empotage/notification/"+self.clientCurrent['id'], {
-                        'idsCmd': self.commandeSelected,
-                        'id_dossier' : self.selected.dossier,
-                        'numtc': self.selected.numtc,
-                        'typetc': self.selected.typetc,
-                        'plomb':  self.selected.plomb,
-                        'typeCommande': self.selected.typeCmd,
-                        'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
-                        'base64_file_pdf': url,
-                        'IDclient': self.idClient
-
-                    }); /*.then(response => {
-                        Vue.swal.close();
-                            Vue.swal.fire(
-                          'succés!',
-                          'validé avec succés!',
-                          'success'
-                        ).then((result) => {
-                            // redirection   
-                            location.reload();
-                        });
-                    }).catch(err => {
-                        Vue.swal.close();
-                        console.log(err.code);
-                        console.log(err.message);
-
-                        Vue.swal.close();
-                            Vue.swal.fire(
-                          'Warning!',
-                          'Echec envoi de mail!',
-                          'warning'
-                        ).then((result) => {
-                            // redirection   
-                            location.reload();
-                        });
-                        // console.log(err.stack);
-                    });*/
-
-                }); // download() or open() // getDataUrl
-
-                }else{
-                    pdf.create().download(); 
-                }
-
-            });
-           
-
-            /* pdf.create().open(); // download() or open()
-
-
-           
-
-
-            pdf.create().getBase64((data) => {
-                axios.post("/gerer/empotage/savepdf", {
-                'dataPdf': data,
-                'id_rapport': this.selected.identifiant
-
-                 }).then(response => {
-              
-                });
-            });
-
-            */
-    
-           },
-           showDossier(dossier){
-                console.log("EDED: ", dossier.total_poids);
-                this.commandeSelected = [];
-                this.commandeNoSelected = [];
-                this.isDetail = true;
-                this.selected.identifiant = dossier.id;
-                this.selected.dossier         = dossier.reference;
-                this.selected.nbrCmd     = dossier.nbrCmd;
-                this.selected.nbrColis   = parseInt(dossier.total_colis)+parseInt(dossier.total_pallette);
-                this.selected.poids      = dossier.total_poids;
-                this.selected.volume     = dossier.total_volume;
-                this.selected.typeCmd    = dossier.typeCommande;
-                this.selected.dateDebut  = dossier.dateDebut;
-                this.selected.dateCloture  = dossier.dateCloture;
-                this.selected.isSelected = true;
-                this.selected.idCmd      = dossier.typeCommandeID;
-                this.selected.etat       = dossier.etat;
-                this.selected.numtc      = dossier.numContenaire;
-                this.selected.typetc     = dossier.typeContenaire;
-                this.selected.plomb      = dossier.plomb;
-                this.selected.capacite   = dossier.capaciteContenaire;
-                this.selected.isClosed   = dossier.is_close;
-                this.capacite = dossier.capaciteContenaire;
-                this.selected.entrepot   = dossier.entrepot;
-                this.selected.idEntrepot = dossier.entrepotID;
-
-                this.setProgressCont(dossier.total_volume);
-                this.getReception();
-                this.getCmdSelected(this.selected.identifiant, this.selected.idCmd, false);
-
-           },
-           back(){
-            this.getEmpotage(this.selected.currentPage);
-            this.isDetail = false;
-            this.commandeSelected = [];
-            this.commandeNoSelected = [];
-            this.eventCmdSelected.ischecked = -1;
-            this.eventCmdSelected.idcmd = '';
-
-           },
-            getResults() {
-                axios.get('/gerer/livesearch', { params: { keyword: this.keyword } })
-                    .then(res => this.dossiers = res.data)
-                    .catch(error => {});
-            },
-            say: function (message, typecmd, entrepot) { 
-                this.keyword = message;
-                this.showDropDown=false;
-                this.empotageForm.typeCmd = typecmd;
-                this.empotageForm.idEntrepot = entrepot;
-            },
-            isFocus(){
-               this.showDropDown=true;
-            },
-            handleBlur(){
-                var thiss=this;
-                setTimeout(function(){
-                    thiss.showDropDown=false;
-                },500);
-                
-            },
-             closeModal(){
-                this.$refs.closePoup.click();
-                this.flushData();
-                this.submitted = false;
-                this.modeModify = false;
-
-            },
-            saveEmpotage(){
-                this.submitted = true;
-                
-                var date1 = new Date(this.empotageForm.dateDepart);
-                var date2 = new Date(this.empotageForm.dateArrivee);
-
-                 if(date1.getTime() > date2.getTime()){
-                    Vue.swal.fire(
-                          'warning!',
-                          'Date départ incorrecte!',
-                          'warning'
-                        );
-                    this.submitted_circle=false;
-
-                    return false;
-                }
-            
-
+                this.eventCmdSelected.ischecked=ischecked;
+                this.eventCmdSelected.idcmd = cmd.reidre;
                 
                 
-                const data = new FormData();
-                data.append('reference', this.empotageForm.reference);
-                data.append('typeCmd', this.empotageForm.typeCmd);
-                data.append('tc', this.empotageForm.tc);
-                data.append('typetc', this.empotageForm.typetc);
-                data.append('plomb', this.empotageForm.plomb);
-                data.append('idClient', this.idClient);
-                data.append('idEntrepot', this.empotageForm.idEntrepot);
-                data.append('date_depart', this.empotageForm.dateDepart);
-                data.append('date_arrivee', this.empotageForm.dateArrivee);
-
-                let action = "createEmpotage";
-
-                if(this.modeModify){
-                    data.append('id', this.empotageForm.id);    
-                    action = "modifyEmpotage";
-                }
-
-                axios.post("/gerer/empotage/"+action, data).then(response => {
-                  
-                    if(response.data.code==0){
-                        this.$refs.closePoup.click();
-                        this.flushData();
-                        Vue.swal.fire(
-                          'succés!',
-                          'Empotage enregistré avec succés!',
-                          'success'
-                        );
-                        this.getEmpotage();
-                        
-                    }else{
-                         Vue.swal.fire(
-                          'error!',
-                          response.data.message,
-                          'error'
-                        )
-                    }
-                    this.submitted = false;
-                    this.modeModify = false;
-                   
-                });
-            },
-            flushData(){
-                this.keyword = "";
-                this.empotageForm.tc = "";
-                this.empotageForm.typetc= "";
-                this.empotageForm.plomb= "";
-                this.empotageForm.typeCmd = "";
-                this.empotageForm.idEntrepot = "";
-            },
-            setData(event) { 
-                for(var i=0; i< this.listeDossier.length; i++){
-                    if(this.listeDossier[i].idpre==event.target.value){
-                        this.empotageForm.reference = this.listeDossier[i].numDossier;
-                        this.empotageForm.typeCmd = this.listeDossier[i].type_commandes;
-                        this.empotageForm.idEntrepot = this.listeDossier[i].entrepots;
-                    }
-                }
-               
-              
-            },
-            saveDouane(cmd){ 
-                $(".loader_"+cmd.reidre).show();
-                /*const data = new FormData();
-                data.append('id', id);
-                data.append('douane', this.douane[id]);
-                axios.post("/gerer/updateDouane", data).then(response => {
-                    $(".loader_"+id).hide(); 
-                });*/
-
-                var douane = this.douane[cmd.reidre];
-
-                var placeholder = $(".val-douane[data-id='"+cmd.reidre+"']").attr("placeholder");
-
-
-                if(!(typeof(douane) !== 'undefined') || !(douane !== null)){
-                    douane='';                    
-                }    
-
-                if(douane==''){
-                    if(!(typeof(placeholder) !== 'undefined') || !(placeholder !== null)){
-                        
-                    }else{
-                        douane = placeholder;
-                        this.douane[cmd.reidre] = douane;
-                    }
-                }          
-
-               
                 const data = new FormData();
                 data.append('idEmpotage', this.selected.identifiant);
                 data.append('idreception', cmd.reidre);
-                data.append('douane', douane);
+                data.append('ischecked', ischecked);
 
 
-
-                axios.post("/gerer/updateDouane", data).then(response => {
+                axios.post("/gerer/dossier/setEmpotage", data).then(response => {
                     let res = response.data.result;
         
                     this.selected.nbrCmd   = res[0].total_cmd;
@@ -1415,105 +756,778 @@
                     
                     this.getCmdSelected(this.selected.identifiant,this.selected.idCmd, false);
                     this.getReception();
-                    $(".loader_"+cmd.reidre).hide(); 
 
                
                   
                 });
-
             },
-            focusDoune(id){},
-            cloturer(){
-                 Vue.swal.fire({
-                  title: 'Confirmez la cloture',
-                  text:   'N°TC:'+this.selected.numtc+' - TYPE TC: '+ this.selected.typetc+' DRY - PLOMB: '+this.selected.plomb,
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#d33',
-                  cancelButtonColor: '#3085d6',
-                  confirmButtonText: 'Oui, cloturer!'
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                        axios.post('/gerer/empotage/cloturer/'+this.selected.identifiant).then(response => {
-                            console.log(response);
-                             Vue.swal.fire(
-                              'Cloturé!',
-                              'Dossier cloturé.',
-                              'success'
-                            );
-
-
-                        });
-                  
-                  }
-                })
-           },
-           editEmpotage(empotage){
-                this.modeModify=true;
-                this.empotageForm.id = empotage.id;
-                //this.keyword=empotage.reference;
-                this.empotageForm.reference =empotage.reference;
-                this.empotageForm.tc       =empotage.numContenaire;
-                this.empotageForm.typetc   =empotage.IDContenaire;
-                this.empotageForm.plomb    =empotage.plomb;
-                this.empotageForm.typeCmd  =empotage.typeCommandeID;
-                this.empotageForm.idEntrepot = empotage.entrepotID;
-                this.empotageForm.dateDepart= empotage.dateDepartEng;
-                this.empotageForm.dateArrivee= empotage.dateArriveeEng;
-                this.numDossierEdit = empotage.reference;
-           },
-           deleteEmpotage(empotage){
-                Vue.swal.fire({
-                  title: 'Confirmez la suppression',
-                  text: "Dossier n° "+empotage.reference,
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#d33',
-                  cancelButtonColor: '#3085d6',
-                  confirmButtonText: 'Oui, supprimer!'
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                        axios.delete('/gerer/deleteEmpotage/'+empotage.id+"?idClient="+this.idClient).then(response => {
-                             Vue.swal.fire(
-                              'Supprimé!',
-                              'Dossier supprimé avec succés.',
-                              'success'
-                            );
-                            /* this.modeModify = false;
-                             this.getEmpotage();*/
-
-                              location.reload();
-                        });
-                  
-                  }
-                })
+            setProgressCont(volume){
+                var percent = ((volume/this.capacite)*100).toFixed(0);
+                    
+                if(percent > 100){
+                     var surplus =  Math.floor(percent/100);
+                     this.volumePercent = (percent%100);
+                     this.nbrContenaire = surplus+1;
+                }else{
+                   
+                    if(this.selected.volume==0 || this.selected.volume==null || this.selected.volume==''){
+                        this.nbrContenaire = 0;
+                    }else{
+                        this.nbrContenaire = 1;
+                    }
+                    
+                    this.volumePercent = percent;
+                }
             },
-           showModal(dry){
-                 EventBus.$emit('VIEW_CMD', {
-                    openView: true,
-                    dry: dry,
-                    fournisseur: this.listFournisseurs,
-                    typeCommande: this.typeCmd,
-                    entrepot: this.listEntrepots,
-                    idClient: this.idClient,
-                    canDeleteIncident: false
+            getEmpotage(page = 1){
+                this.isLoading=true;    
+                axios.get('/empotage/list/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate+ "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&etatFiltre="+this.etatFiltre).then(response => {
+                    this.empotage = response.data;
+                    var self = this;
+                    setTimeout(function(){
+                        self.isLoading = false;
+                    },500);
+                    this.checking=true;
+                });
+            }, 
+            getReception(page = 1){
+                this.isLoading=true;
+                axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
+
+                    this.reception = response.data;
+
+                    if(this.selected.etat==0){
+                        this.selected.nbrCmd   = 0;
+                        this.selected.nbrColis  = 0;
+                        this.selected.poids    = 0;
+                        this.selected.volume   = 0;
+
+                        var nbColis=0;
+                        var nbCommande=0;
+                        for(var i=0; i<this.reception.data.length; i++){
+                            var obj = this.reception.data[i];
+
+
+                            if((obj.dossier_empotage_id > 0 && this.selected.identifiant == obj.dossier_empotage_id) ){
+
+
+                                if(this.eventCmdSelected.idcmd!=obj.reidre || (this.eventCmdSelected.ischecked > 0 && this.eventCmdSelected.idcmd==obj.reidre)){
+                                    nbCommande++;
+                                    nbColis +=  (obj.renbcl + obj.renbpl);
+                        
+                                    this.selected.poids    += obj.repoid;
+                                    this.selected.volume   += obj.revolu;
+                                }else if(this.eventCmdSelected.ischecked == 0 && this.eventCmdSelected.idcmd==obj.reidre){
+                                    nbCommande--;
+                                    nbColis -=  (obj.renbcl + obj.renbpl);
+                        
+                                    this.selected.poids    -= obj.repoid;
+                                    this.selected.volume   -= obj.revolu;
+
+                                    if(nbCommande < 0){
+                                        nbCommande=0;
+                                        this.selected.poids    = 0;
+                                        this.selected.volume   = 0;
+                                        nbColis           = 0;
+                                    }
+                                }
+
+
+                                
+                                
+                            }
+
+                        }
+                        this.selected.nbrColis = nbColis;
+                        this.selected.nbrCmd = nbCommande;
+                        this.setProgressCont(this.selected.volume);
+                    }
+                   
+                    this.isLoading = false;
+                });
+            },
+            currentDateTime() {
+                const current = new Date();
+                const date = current.getDate()+'/'+(current.getMonth()+1)+'/'+current.getFullYear();
+                const time = current.getHours() + ":" + current.getMinutes() + ":" + current.getSeconds();
+                const dateTime = date;
+
+                return dateTime;
+            },
+            getCmdSelected(id, typeCommande, genererPDF){
+                axios.get('/gerer/getCmd/empoter/'+id+'/'+typeCommande).then(response => {
+                    this.checkedCommandes = response.data.result;
+                     if(genererPDF){
+                        this.generatePdf(true);
+                    }
+                });
+            },
+            valider(){
+                this.commandeSelected = [];
+                this.commandeNoSelected = [];
+                var self = this;
+                /*$(".inputCmd").each(function(){
+                    if($(this).is(':checked')){
+                        self.commandeSelected.push($(this).val());
+                    }else{
+                        self.commandeNoSelected.push($(this).val());
+                    }
+                    
+                });*/
+
+                $(".val-douane").each(function(){
+                    if($(this).val()!=''){
+                        self.commandeSelected.push($(this).attr("data-id"));
+                    }else{
+                        self.commandeNoSelected.push($(this).attr("data-id"));
+                    }
+                    
                 });
 
-            },
-            format_nbr(mnt){
-                if(mnt != '' && mnt != null){
-                    return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+                if(!this.commandeSelected.length>0){
+                    Vue.swal.fire(
+                          'warning!',
+                          'Renseigner au moins un n° douane avant de valider!',
+                          'warning'
+                        );
+                    return false;
                 }
-                return mnt;
+
+                Vue.swal.fire({
+                      title: 'Confirmez la validation',
+                      text: "Dossier n° "+this.selected.dossier,
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '',
+                      confirmButtonText: 'Oui, Valider!'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+
+                             Vue.swal({
+                                title: 'Validation',
+                                html: '<b>En cours...</b>',
+                                timerProgressBar: true,
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Vue.swal.showLoading()
+                                },
+                                willClose: () => {
+
+                                }
+                            }).then((result) => {});
+
+                           axios.post("/gerer/validationEmpotage/valider/"+this.idClient, {
+                                'idsCmd': this.commandeSelected,
+                                'ignored': this.commandeNoSelected,
+                                'idEmpotage' : this.selected.identifiant,
+                                'typeCmd' : this.selected.idCmd,
+                                'id_dossier': this.selected.dossier
+
+                            }).then(response => {
+
+
+                                // Envoi notification avec le fichier PDF
+
+                                this.getCmdSelected(this.selected.identifiant,this.selected.idCmd, true);
+                              
+                                if(response.data.code==0){
+                                    setTimeout(function(){
+                                        Vue.swal.close();
+                                         Vue.swal.fire(
+                                          'succés!',
+                                          'validé avec succés!',
+                                          'success'
+                                        ).then((result) => {
+                                            // redirection   
+                                            location.reload();
+                                        });   
+                                      
+                                    }, 5000);
+
+                                    this.selected.etat = 1;
+                                    //this.getPrechargement();
+                                    this.getReception();
+
+                                    
+                                }else{
+                                    this.submitted_add = false;
+                                     Vue.swal.fire(
+                                      'error!',
+                                      response.data.message,
+                                      'error'
+                                    )
+                                }  
+                            });
+                        }
+                    });
+
+
+
+                
             },
-            showRapport(empo){
-                var labelCmd = empo.typeCommande.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+            convertImgToBase64(url, callback, outputFormat){
+                var canvas = document.createElement('CANVAS');
+                var ctx = canvas.getContext('2d');
+                var img = new Image;
+                img.crossOrigin = 'Anonymous';
+                img.onload = function(){
+                    canvas.height = img.height;
+                    canvas.width = img.width;
+                    ctx.drawImage(img,0,0);
+                    var dataURL = canvas.toDataURL(outputFormat || 'image/png');
+                    callback.call(this, dataURL);
+                    // Clean up
+                    canvas = null; 
+                };
+                img.src = url;
+            },
+            generatePdf(isnotification=false){
+
+
+                
+                PdfMakeWrapper.setFonts(pdfFonts);
+
+                const pdf = new PdfMakeWrapper();
+                pdf.pageOrientation('landscape');
+                pdf.defaultStyle({
+                    fontSize: 10
+                });
+                
+                var that  = this;
+
+                this.convertImgToBase64('/images/logo/'+that.currentEntite['logo'], function(base64Img){
+
+                    var entete=[];
+                    entete.push([{ image: base64Img, width: 100}, {text: ''}, {text: 'Date: '+ that.currentDateTime(), fontSize: 8, alignment: 'right', lineHeight: 1}]); 
+                    entete.push([
+                        {text:that.currentEntite['nom']+"\nTél: "+ that.currentEntite['telephone']+"/ Fax: "+that.currentEntite['fax']+"\nEmail: "+that.currentEntite['email']+"\nAdresse: "+that.currentEntite['adresse']},
+
+                        {text: 'N°Dossier '+that.selected.dossier+'\n'+that.selected.typeCmd, fontSize: 20, bold: true, alignment: 'center', color: '#3490dc'}, 
+
+                        {text: ['Entrepôt: ', {text: that.selected.entrepot, fontSize: 14}],  alignment: 'right'}]);
+                    
+                    //entete.push([{text: 'N°Dossier '+that.selected.dossier, fontSize: 15, alignment: 'center', lineHeight: 2, colSpan: 3}]);
+                    entete.push([{text: "\n\nDestination: "+that.clientCurrent.pays, fontSize: 13, alignment: 'left', colSpan: 3}]);
+                    entete.push([{text: "Rapport d'empotage pour le compte de: "+" "+that.clientCurrent.clnmcl+"\n", fontSize: 16, alignment: 'center', colSpan: 3}]);
+                    
+                  
+
+                    var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
+
+                    var infos_contenaire = [];
+                    infos_contenaire.push([
+                    {text:['N° TC: ', {text: that.selected.numtc, fontSize:12, bold: true}]},
+                    {text:['TYPE TC: ', {text: that.selected.typetc+' DRY', fontSize:12, bold: true}]},{text:['PLOMB: ', {text: that.selected.plomb, fontSize:12, bold: true}]}]);
+
+                    var contenaire = new Table(infos_contenaire).widths(['28%', '28%', '28%', '28%']).margin([0, 0, 0, 7]).end;
+
+                    var totaux = [[{text: 'Nb de commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis empotés', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids(KG) empoté', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume m3 empoté', fontSize: 10, bold: true, alignment: 'center'} ]];
+                    totaux.push([{text: that.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
+
+                    var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
+                    color(columnIndex){
+                    return columnIndex=== 0 ? "#cccccc": '';  
+                    },
+                    fillColor (columnIndex){
+                        if(columnIndex===0){
+                            return columnIndex === 0 ? "#ccc": '';  
+                        }
+                        
+                    }
+                    }).margin([0, 15, 8, 7]).end;
+
+                    const data = [];
+
+                    const headerTab = ['Référence', 'Emballage', 'Designation', 'Poids(KG)', 'Volume(m3)', 'Factures', 'Douanes'];
+
+                    data.push(headerTab); 
+
+                    var legend1 = "";
+                    var legend2 = "";
+
+                    for(var i=0; i< that.checkedCommandes.length; i++){
+                        var obj = that.checkedCommandes[i];
+                        var nbr = [];
+                        var emballage = [];
+
+                        var cmdCell=[];
+                        var prio = "";
+
+
+                        if(obj.renbcl > 0){
+                            nbr.push(obj.renbcl);
+                            emballage.push((obj.renbcl).toString() + ' Colis');
+                        }
+
+                        if(obj.renbpl > 0){
+                            nbr.push(obj.renbpl);
+                            emballage.push((obj.renbpl).toString() + ' Pal.');
+                        }
+                        
+
+                        if(obj.priorite==1){
+                            prio = '*';
+                            legend1 = '(*) Pas urgente';
+
+                        }
+
+                        if(obj.priorite==3){
+                            prio = '***';
+                            legend2 = '(***) Urgente';
+                        }
+
+                        cmdCell.push(obj.refere+" "+prio);
+
+                        const item = [cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa, obj.douane];
+                        data.push(item);
+                    }
+
+                    var table = new Table(data).widths([70,70,'*',60,60,80,80]).layout({
+                    color(columnIndex){
+                    return columnIndex=== 0 ? "#cccccc": '';  
+                    },
+                    fillColor (columnIndex){
+                        if(columnIndex===0){
+                            return columnIndex === 0 ? "#bbb": '';  
+                        }else{
+                            return columnIndex%2 === 0 ? "white": '#eee';  
+                        }
+                        
+                    }
+                    }).end;
+
+                    pdf.header = {
+                     exampleLayout: {
+                        hLineWidth: function (i, node) {
+                          if (i === 0 || i === node.table.body.length) {
+                            return 0;
+                          }
+                          return (i === node.table.headerRows) ? 2 : 1;
+                        },
+                        vLineWidth: function (i) {
+                          return 0;
+                        },
+                        hLineColor: function (i) {
+                          return i === 1 ? 'black' : '#aaa';
+                        },
+                        paddingLeft: function (i) {
+                          return i === 0 ? 0 : 8;
+                        },
+                        paddingRight: function (i, node) {
+                          return (i === node.table.widths.length - 1) ? 0 : 8;
+                        }
+                      }
+                    }
+
+                    pdf.footer(function(currentPage, pageCount) { return  { margin: [20, 0, 20, 0], height: 30, columns: [{alignment: "left",
+                    text: 'DuoTransit'}, {text: currentPage.toString() + ' / ' + pageCount, alignment: "right"}]}; });
+
+                    pdf.add(header);
+
+                    pdf.add(contenaire);
+
+                    pdf.add(table);
+
+                    
+                    pdf.add(
+                        pdf.ln(2)
+                    );
+
+
+                    // formater le nom du fichier
+
+                    var labelCmd1 =  that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+                
+                    var nameFile = 'dossier-'+that.selected.dossier+'_'+labelCmd1+"_numtc-"+that.selected.numtc+"_plomb-"+that.selected.plomb+".pdf";
+
+
+                    var qrTotaux = [];
+
+                    var legendTotaux = [];
+
+                    legendTotaux.push([tabtotaux, {text: legend1+' '+legend2, fontSize: 10, bold: true, alignment: 'left'}]);
+
+                    qrTotaux.push([legendTotaux, new QR(location.origin+"/pdf/empotage/"+nameFile).fit(80).alignment('right').end]); 
+
+                    var tableQR = new Table(qrTotaux).widths(['*', 80]).layout('noBorders').end;
+
+                    pdf.add(tableQR);
+
+                    
+                    if(isnotification){
+
+                    var self = that; 
+                    pdf.create().getDataUrl(function(url) { 
+
+                        console.log(url, "File PDF"); 
+
+
+                        axios.post("/gerer/empotage/notification/"+self.clientCurrent['id'], {
+                            'idsCmd': self.commandeSelected,
+                            'id_dossier' : self.selected.dossier,
+                            'numtc': self.selected.numtc,
+                            'typetc': self.selected.typetc,
+                            'plomb':  self.selected.plomb,
+                            'typeCommande': self.selected.typeCmd,
+                            'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
+                            'base64_file_pdf': url,
+                            'IDclient': self.idClient
+
+                        }); /*.then(response => {
+                            Vue.swal.close();
+                                Vue.swal.fire(
+                              'succés!',
+                              'validé avec succés!',
+                              'success'
+                            ).then((result) => {
+                                // redirection   
+                                location.reload();
+                            });
+                        }).catch(err => {
+                            Vue.swal.close();
+                            console.log(err.code);
+                            console.log(err.message);
+
+                            Vue.swal.close();
+                                Vue.swal.fire(
+                              'Warning!',
+                              'Echec envoi de mail!',
+                              'warning'
+                            ).then((result) => {
+                                // redirection   
+                                location.reload();
+                            });
+                            // console.log(err.stack);
+                        });*/
+
+                    }); // download() or open() // getDataUrl
+
+                    }else{
+                        pdf.create().download(); 
+                    }
+
+                });
+               
+
+                /* pdf.create().open(); // download() or open()
+
+
+               
+
+
+                pdf.create().getBase64((data) => {
+                    axios.post("/gerer/empotage/savepdf", {
+                    'dataPdf': data,
+                    'id_rapport': this.selected.identifiant
+
+                     }).then(response => {
+                  
+                    });
+                });
+
+                */
+        
+               },
+               showDossier(dossier){
+                    console.log("EDED: ", dossier.total_poids);
+                    this.commandeSelected = [];
+                    this.commandeNoSelected = [];
+                    this.isDetail = true;
+                    this.selected.identifiant = dossier.id;
+                    this.selected.dossier         = dossier.reference;
+                    this.selected.nbrCmd     = dossier.nbrCmd;
+                    this.selected.nbrColis   = parseInt(dossier.total_colis)+parseInt(dossier.total_pallette);
+                    this.selected.poids      = dossier.total_poids;
+                    this.selected.volume     = dossier.total_volume;
+                    this.selected.typeCmd    = dossier.typeCommande;
+                    this.selected.dateDebut  = dossier.dateDebut;
+                    this.selected.dateCloture  = dossier.dateCloture;
+                    this.selected.isSelected = true;
+                    this.selected.idCmd      = dossier.typeCommandeID;
+                    this.selected.etat       = dossier.etat;
+                    this.selected.numtc      = dossier.numContenaire;
+                    this.selected.typetc     = dossier.typeContenaire;
+                    this.selected.plomb      = dossier.plomb;
+                    this.selected.capacite   = dossier.capaciteContenaire;
+                    this.selected.isClosed   = dossier.is_close;
+                    this.capacite = dossier.capaciteContenaire;
+                    this.selected.entrepot   = dossier.entrepot;
+                    this.selected.idEntrepot = dossier.entrepotID;
+
+                    this.setProgressCont(dossier.total_volume);
+                    this.getReception();
+                    this.getCmdSelected(this.selected.identifiant, this.selected.idCmd, false);
+
+               },
+               back(){
+                this.getEmpotage(this.selected.currentPage);
+                this.isDetail = false;
+                this.commandeSelected = [];
+                this.commandeNoSelected = [];
+                this.eventCmdSelected.ischecked = -1;
+                this.eventCmdSelected.idcmd = '';
+
+               },
+                getResults() {
+                    axios.get('/gerer/livesearch', { params: { keyword: this.keyword } })
+                        .then(res => this.dossiers = res.data)
+                        .catch(error => {});
+                },
+                say: function (message, typecmd, entrepot) { 
+                    this.keyword = message;
+                    this.showDropDown=false;
+                    this.empotageForm.typeCmd = typecmd;
+                    this.empotageForm.idEntrepot = entrepot;
+                },
+                isFocus(){
+                   this.showDropDown=true;
+                },
+                handleBlur(){
+                    var thiss=this;
+                    setTimeout(function(){
+                        thiss.showDropDown=false;
+                    },500);
+                    
+                },
+                 closeModal(){
+                    this.$refs.closePoup.click();
+                    this.flushData();
+                    this.submitted = false;
+                    this.modeModify = false;
+
+                },
+                saveEmpotage(){
+                    this.submitted = true;
+                    
+                    var date1 = new Date(this.empotageForm.dateDepart);
+                    var date2 = new Date(this.empotageForm.dateArrivee);
+
+                     if(date1.getTime() > date2.getTime()){
+                        Vue.swal.fire(
+                              'warning!',
+                              'Date départ incorrecte!',
+                              'warning'
+                            );
+                        this.submitted_circle=false;
+
+                        return false;
+                    }
+                
+
+                    
+                    
+                    const data = new FormData();
+                    data.append('reference', this.empotageForm.reference);
+                    data.append('typeCmd', this.empotageForm.typeCmd);
+                    data.append('tc', this.empotageForm.tc);
+                    data.append('typetc', this.empotageForm.typetc);
+                    data.append('plomb', this.empotageForm.plomb);
+                    data.append('idClient', this.idClient);
+                    data.append('idEntrepot', this.empotageForm.idEntrepot);
+                    data.append('date_depart', this.empotageForm.dateDepart);
+                    data.append('date_arrivee', this.empotageForm.dateArrivee);
+
+                    let action = "createEmpotage";
+
+                    if(this.modeModify){
+                        data.append('id', this.empotageForm.id);    
+                        action = "modifyEmpotage";
+                    }
+
+                    axios.post("/gerer/empotage/"+action, data).then(response => {
+                      
+                        if(response.data.code==0){
+                            this.$refs.closePoup.click();
+                            this.flushData();
+                            Vue.swal.fire(
+                              'succés!',
+                              'Empotage enregistré avec succés!',
+                              'success'
+                            );
+                            this.getEmpotage();
+                            
+                        }else{
+                             Vue.swal.fire(
+                              'error!',
+                              response.data.message,
+                              'error'
+                            )
+                        }
+                        this.submitted = false;
+                        this.modeModify = false;
+                       
+                    });
+                },
+                flushData(){
+                    this.keyword = "";
+                    this.empotageForm.tc = "";
+                    this.empotageForm.typetc= "";
+                    this.empotageForm.plomb= "";
+                    this.empotageForm.typeCmd = "";
+                    this.empotageForm.idEntrepot = "";
+                },
+                setData(event) { 
+                    for(var i=0; i< this.listeDossier.length; i++){
+                        if(this.listeDossier[i].idpre==event.target.value){
+                            this.empotageForm.reference = this.listeDossier[i].numDossier;
+                            this.empotageForm.typeCmd = this.listeDossier[i].type_commandes;
+                            this.empotageForm.idEntrepot = this.listeDossier[i].entrepots;
+                        }
+                    }
+                   
+                  
+                },
+                saveDouane(cmd){ 
+                    $(".loader_"+cmd.reidre).show();
+                    /*const data = new FormData();
+                    data.append('id', id);
+                    data.append('douane', this.douane[id]);
+                    axios.post("/gerer/updateDouane", data).then(response => {
+                        $(".loader_"+id).hide(); 
+                    });*/
+
+                    var douane = this.douane[cmd.reidre];
+
+                    var placeholder = $(".val-douane[data-id='"+cmd.reidre+"']").attr("placeholder");
+
+
+                    if(!(typeof(douane) !== 'undefined') || !(douane !== null)){
+                        douane='';                    
+                    }    
+
+                    if(douane==''){
+                        if(!(typeof(placeholder) !== 'undefined') || !(placeholder !== null)){
+                            
+                        }else{
+                            douane = placeholder;
+                            this.douane[cmd.reidre] = douane;
+                        }
+                    }          
+
+                   
+                    const data = new FormData();
+                    data.append('idEmpotage', this.selected.identifiant);
+                    data.append('idreception', cmd.reidre);
+                    data.append('douane', douane);
+
+
+
+                    axios.post("/gerer/updateDouane", data).then(response => {
+                        let res = response.data.result;
             
-                this.pdfFileModal = 'dossier-'+empo.reference+'_'+labelCmd+"_numtc-"+empo.numContenaire+"_plomb-"+empo.plomb+".pdf";
-           },
-             closeModalPdf(){
-                 this.$refs.closePoupPdf.click();
-            },
+                        this.selected.nbrCmd   = res[0].total_cmd;
+                        this.selected.nbrColis = parseInt(res[0].total_colis==null ? 0 : res[0].total_colis) + parseInt(res[0].total_palette==null ? 0 : res[0].total_palette);
+                        this.selected.poids    = res[0].total_poids==null ? 0 : res[0].total_poids;
+                        this.selected.volume   = res[0].total_volume==null ? 0 : res[0].total_volume;
+
+
+
+                        this.setProgressCont(res[0].total_volume);
+                        this.getEmpotage(); // refresh tableau prechargement
+                        
+                        this.getCmdSelected(this.selected.identifiant,this.selected.idCmd, false);
+                        this.getReception();
+                        $(".loader_"+cmd.reidre).hide(); 
+
+                   
+                      
+                    });
+
+                },
+                focusDoune(id){},
+                cloturer(){
+                     Vue.swal.fire({
+                      title: 'Confirmez la cloture',
+                      text:   'N°TC:'+this.selected.numtc+' - TYPE TC: '+ this.selected.typetc+' DRY - PLOMB: '+this.selected.plomb,
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#d33',
+                      cancelButtonColor: '#3085d6',
+                      confirmButtonText: 'Oui, cloturer!'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                            axios.post('/gerer/empotage/cloturer/'+this.selected.identifiant).then(response => {
+                                console.log(response);
+                                 Vue.swal.fire(
+                                  'Cloturé!',
+                                  'Dossier cloturé.',
+                                  'success'
+                                );
+
+
+                            });
+                      
+                      }
+                    })
+               },
+               editEmpotage(empotage){
+                    this.modeModify=true;
+                    this.empotageForm.id = empotage.id;
+                    //this.keyword=empotage.reference;
+                    this.empotageForm.reference =empotage.reference;
+                    this.empotageForm.tc       =empotage.numContenaire;
+                    this.empotageForm.typetc   =empotage.IDContenaire;
+                    this.empotageForm.plomb    =empotage.plomb;
+                    this.empotageForm.typeCmd  =empotage.typeCommandeID;
+                    this.empotageForm.idEntrepot = empotage.entrepotID;
+                    this.empotageForm.dateDepart= empotage.dateDepartEng;
+                    this.empotageForm.dateArrivee= empotage.dateArriveeEng;
+                    this.numDossierEdit = empotage.reference;
+               },
+               deleteEmpotage(empotage){
+                    Vue.swal.fire({
+                      title: 'Confirmez la suppression',
+                      text: "Dossier n° "+empotage.reference,
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#d33',
+                      cancelButtonColor: '#3085d6',
+                      confirmButtonText: 'Oui, supprimer!'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                            axios.delete('/gerer/deleteEmpotage/'+empotage.id+"?idClient="+this.idClient).then(response => {
+                                 Vue.swal.fire(
+                                  'Supprimé!',
+                                  'Dossier supprimé avec succés.',
+                                  'success'
+                                );
+                                /* this.modeModify = false;
+                                 this.getEmpotage();*/
+
+                                  location.reload();
+                            });
+                      
+                      }
+                    })
+                },
+               showModal(dry){
+                     EventBus.$emit('VIEW_CMD', {
+                        openView: true,
+                        dry: dry,
+                        fournisseur: this.listFournisseurs,
+                        typeCommande: this.typeCmd,
+                        entrepot: this.listEntrepots,
+                        idClient: this.idClient,
+                        canDeleteIncident: false
+                    });
+
+                },
+                format_nbr(mnt){
+                    if(mnt != '' && mnt != null){
+                        return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                    }
+                    return mnt;
+                },
+                showRapport(empo){
+                    var labelCmd = empo.typeCommande.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+                
+                    this.pdfFileModal = 'dossier-'+empo.reference+'_'+labelCmd+"_numtc-"+empo.numContenaire+"_plomb-"+empo.plomb+".pdf";
+               },
+                 closeModalPdf(){
+                     this.$refs.closePoupPdf.click();
+                },
         },
         mounted() {
           this.getEmpotage();
