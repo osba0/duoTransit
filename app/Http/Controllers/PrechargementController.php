@@ -104,7 +104,8 @@ class PrechargementController extends Controller
                     "reetat"            => 0,
                     "users_id"          => Auth::user()->id,
                     "clients_id"        => request('clientID'),
-                    "type_commandes_id" => request('typeCmd')
+                    "type_commandes_id" => request('typeCmd'),
+                    "entrepots_id"      => request('entrepot')
                 ]); 
                 return response([
                     "code" => 0,
@@ -151,6 +152,7 @@ class PrechargementController extends Controller
             ->leftJoin('users', 'dossier_prechargements.users_id', '=', 'users.id')
             ->leftJoin('type_commandes', 'dossier_prechargements.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('contenaires', 'dossier_prechargements.contenaires_id', '=', 'contenaires.id')
+            ->leftJoin('entrepots', 'dossier_prechargements.entrepots_id', '=', 'entrepots.id')
             ->groupBy('dossier_prechargements.id')
             ->select('receptions.dossier_prechargements_id', 
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
@@ -168,6 +170,8 @@ class PrechargementController extends Controller
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.id as typecmdID',
                 'type_commandes.tcolor as typecmdColor',
+                'entrepots.id as entrepots_id',
+                'entrepots.nomEntrepot as entrepots_name',
                 'contenaires.nom as contenaire')->where('dossier_prechargements.clients_id', request('id'));
 
             if($keyword!=''){
@@ -227,7 +231,7 @@ class PrechargementController extends Controller
                 })->where(function($query2){
 
                     $query2->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL)->orWhere('dossier_prechargements_id', request('idPre'));
-                })->where('type_commandes_id', request('typecmd'));
+                })->where('type_commandes_id', request('typecmd'))->where('entrepots_id', request('entrepotID'));
 
             if($keyword!=''){
                 $dries = $dries->search($keyword); 

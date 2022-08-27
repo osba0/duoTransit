@@ -30,8 +30,13 @@
                             <div>
                                 <form @submit.prevent="save" enctype="multipart/form-data"  key=1 class="d-flex">
                                     <select class="form-control mr-2" v-model="typeCommande" :class="{ 'border-danger': submitted_add && !$v.typeCommande.required }">
-                                    <option value="">Choisir le type commande</option>
-                                    <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
+                                        <option value="">Type commande</option>
+                                        <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
+                                  
+                                    </select>
+                                    <select class="form-control mr-2" v-model="entrepot" :class="{ 'border-danger': submitted_add && !$v.entrepot.required }">
+                                        <option value="">Choisir l'entrepôt</option>
+                                        <option v-for="entrepot in listEntrepots"  :value="entrepot.id">{{entrepot.nomEntrepot}}</option>
                                   
                                     </select>
                                 
@@ -109,6 +114,7 @@
                                         <th class="p-2 border-right border-white h6">Nbre colis total</th>
                                         <th class="p-2 border-right border-white h6">Poids total</th>
                                         <th class="p-2 border-right border-white h6">Volume total</th>
+                                        <th class="p-2 border-right border-white h6">Entrepôt</th>
                                         <th class="p-2 border-right border-white h6">Etat</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Date</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
@@ -129,6 +135,7 @@
                                             <td class="p-2 align-middle">{{ pre.total_colis }} {{pre.total_palette}}</td>
                                             <td class="p-2 align-middle">{{ pre.total_poids }}</td>
                                             <td class="p-2 align-middle">{{ pre.total_volume }}</td>
+                                            <td class="p-2 align-middle">{{ pre.entrepot }}</td>
                                             <!--td>{{ pre.typecmd }}</td-->
                                             <td class="p-2 align-middle">
                                                 <template v-if="pre.etat==1">
@@ -440,6 +447,7 @@
                 reception: {},
                 paginateRecep: 200,  // bug lors de la selection de la 2 page les stats sont renitialisé
                 typeCommande: "",
+                entrepot:'',
                 choose:'',
                 selected: {
                     typeCmd: '',
@@ -450,7 +458,8 @@
                     volume: '',
                     isSelected: false,
                     etat: '',
-                    mntFact: 0
+                    mntFact: 0,
+                    entrepotID: ''
                 },
                 capacite: this.defaultContenaire.volume,
                 nbrContenaire: 0,
@@ -474,6 +483,7 @@
         },
         validations: {
             typeCommande: { required },
+            entrepot: { required },
             keyword: { required },
              
         },
@@ -545,8 +555,9 @@
             this.selected.mntFact    = pre.total_mnt;
             this.selected.typeCmd    = pre.typecmd;
             this.selected.isSelected = true;
-            this.selected.etat     = pre.etat;
+            this.selected.etat           = pre.etat;
             this.selected.typeCommandeID = pre.typecmdID; 
+            this.selected.entrepotID     = pre.entrepotID;
             this.setProgressCont(pre.total_volume);
             this.getReception();
            },
@@ -606,7 +617,7 @@
         },
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/prechargement/getreception/'+this.idClient+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID+"&keysearch="+this.search+"&rate="+this.filtreRate+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
+            axios.get('/prechargement/getreception/'+this.idClient+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID+"&entrepotID="+this.selected.entrepotID+"&keysearch="+this.search+"&rate="+this.filtreRate+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
                 this.reception = response.data;
                 this.isLoading = false;
             });
@@ -615,12 +626,13 @@
             this.submitted_add = true;
              // stop here if form is invalid
             this.$v.typeCommande.$touch();
-            if (this.$v.typeCommande.$invalid) {  
+            if (this.$v.typeCommande.$invalid || this.$v.entrepot.$invalid) {  
                 return;
             }
 
             const data = new FormData();
             data.append('typeCmd', this.typeCommande);
+            data.append('entrepot', this.entrepot);
             data.append('clientID', this.idClient);
 
             axios.post("/createDossierPre", data).then(response => {
