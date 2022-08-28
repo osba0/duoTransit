@@ -139,7 +139,8 @@ class EmpotageController extends Controller
             "date_arrivee" => request('date_arrivee'), 
             "users_id" => Auth::user()->id,
             "reetat" => 0,
-            "is_close" => false
+            "is_close" => false,
+            "rapport_pdf" => ""
         ]);
 
         return response([
