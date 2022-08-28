@@ -118,6 +118,7 @@ class GestionController extends Controller
                 "users_id"             => $user->id,
                 "type_commandes_id"    => request('typeCmd'),
                 "entrepots_id"         => request('entrepot'),
+                "is_empote"               => false,
                 "reetat"               => false
             ]); 
 
