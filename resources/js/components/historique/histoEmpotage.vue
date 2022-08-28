@@ -256,10 +256,12 @@
                             <th class="p-2 border-right border-white h6">Emballage</th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[5])">Poids <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[6])">Volume <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-nowrap p-2 border-right border-white h6">Factures</th>
+                            <th class="text-nowrap p-2 border-right border-white h6">Douanes</th>
                             <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-nowrap p-2 border-right border-white h6">Crée par?</th>
                             <th class="p-2 border-right border-white text-left h6">Validé par?</th>
-                            <th class="text-nowrap p-2 border-right border-white h6">Douane</th>
+                            
                             <th class="text-right p-2 border-right border-white h6">Action</th>
                         </tr>
                     </thead>
@@ -284,8 +286,12 @@
                         </td>
                         <td class="p-2 align-middle text-right">{{ dry.repoid }}</td>
                         <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
-                        
-                        
+                        <td class="p-2 align-middle">
+                             {{dry.renufa}}
+                        </td>
+                        <td class="p-2 align-middle">
+                             {{dry.douane}}
+                        </td>
                         <td class="p-2 align-middle"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
                         <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td>
                         <td class="p-2 align-middle">
@@ -293,9 +299,6 @@
                             {{dry.prechargeur}}
                            
                         </td>
-                         <td class="p-2 align-middle">
-                             {{dry.douane}}
-                         </td>
                         <td class="p-2 text-right">
                              <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
                                 <i class="fa fa-eye" aria-hidden="true"></i>

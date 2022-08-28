@@ -2,7 +2,7 @@
     <div>
         <div class="card-body table-responsive p-0">
             <table class="table">
-                <thead class="thead-blue">
+                <thead class="thead-blue" :class="[isLoading ? '' : 'hasborder']">
                      <tr>
                         <th class="p-2 border-right border-white h6">#</th>
                         <th class="p-2 border-right border-white h6">Nom</th>
@@ -14,9 +14,9 @@
                         <th class="text-right p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
-             <tbody>
+             <tbody  class="bgStripe" :class="[isLoading ? 'loader-line' : '']">
                 <template v-if="!fournisseurs.data || !fournisseurs.data.length">
-                        <tr><td colspan="8" class="bg-white text-center">Aucun fournisseur défini!</td></tr>
+                        <tr><td colspan="8" class="bg-white text-center" v-if="checking">Aucun fournisseur défini!</td></tr>
                     </template>
                       <tr v-for="fournisseur in fournisseurs.data" class="bg-white">
                         <td class="p-2 align-middle">
@@ -43,9 +43,17 @@
                         <td> 
                             <template v-for="client in listClient">
                                 <template v-if="client.clfocl.includes(fournisseur.id)">
-                                    <span class="badge bg-success mr-2 p-2 mb-2">
+                                    <a title="Retirer la société" v-on:click="retirerSocieteFour(client, fournisseur)" class="badge badge-success text-white position-relative mr-2 p-2 mb-2 cursor-pointer">
                                     {{client.clnmcl}}
-                                    </span>  
+                                    <span class="badge badge-danger position-icone position-absolute"><i class="fa fa-minus"></i></span>
+                                   
+                                    </a>  
+                                </template>
+                                <template v-else>
+                                    <a title="Ajouter la société" class="badge badge-secondary text-white position-relative mr-2 p-2 mb-2 cursor-pointer" v-on:click="addSocieteFour(client, fournisseur)">
+                                    {{client.clnmcl}}
+                                     <span class="badge badge-success position-icone position-absolute"><i class="fa fa-plus"></i></span>
+                                    </a>
                                 </template>
                             </template>
                                       
@@ -209,7 +217,9 @@
                 submitted: false,
                 fournisseurs: {},
                 paginate: 10,
-                modeModify: false
+                modeModify: false,
+                isLoading: true,
+                checking: false,
             }
 
         },
@@ -323,8 +333,87 @@
                 this.fournisseurForm.idClients= "";
             },
             getFournisseur(page = 1){
+                 this.isLoading=true;
                 axios.get('/configuration/getFournisseur?page=' + page + "&paginate=" + this.paginate).then(response => {
                     this.fournisseurs = response.data;
+                     if(this.fournisseurs.length > 0){
+                           
+                        }else{
+                             this.checking=true;
+                        }
+                     this.isLoading=false;
+                });
+            },
+            addSocieteFour(client, fournisseur){
+                Vue.swal.fire({
+                  title: fournisseur.nom,
+                  text: "Confirmer l'ajout de "+client.clnmcl,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#38c172',
+                  cancelButtonColor: '#545b62',
+                  confirmButtonText: 'Oui, ajouter!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                        axios.post('/configuration/clientFournisseur/'+fournisseur.id+"/"+client.id).then(response => {
+                            if(response.data.code==0){
+                                this.modeModify = false;
+                                Vue.swal.fire(
+                                  'Ajouté!',
+                                  'Société ajouté avec succés', 
+                                  'success'
+                                ).then((result) => {
+                                    window.location.reload();
+                                });
+                            }else{
+                                 Vue.swal.fire(
+                                  'Warning!',
+                                  'Erreur',
+                                  'warning'
+                                ).then((result) => {
+                                   
+                                });
+                            }
+                            
+                        });
+                  
+                  }
+                });
+            },
+            retirerSocieteFour(client, fournisseur){
+                Vue.swal.fire({
+                  title: fournisseur.nom,
+                  text: "Confirmer le retrait de "+client.clnmcl,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#38c172',
+                  cancelButtonColor: '#545b62',
+                  confirmButtonText: 'Oui, ajouter!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                        axios.post('/configuration/retirerclientFournisseur/'+fournisseur.id+"/"+client.id).then(response => {
+                            if(response.data.code==0){
+                                this.modeModify = false;
+                                Vue.swal.fire(
+                                  'Retiré!',
+                                  'Société retiré avec succés', 
+                                  'success'
+                                ).then((result) => {
+                                    window.location.reload();
+                                });
+                            }else{
+                                 Vue.swal.fire(
+                                  'Warning!',
+                                  'Erreur',
+                                  'warning'
+                                ).then((result) => {
+                                   
+                                });
+                            }
+                            
+                        });
+                  
+                  }
                 });
             },
             deleteFournisseur(fournisseur){
@@ -352,7 +441,7 @@
                             }else{
                                  Vue.swal.fire(
                                   'Warning!',
-                                  'Impossible de supprimer! Supprimer les commandes associées.',
+                                  'Impossible de supprimer. Ce fournisseur a des commandes enregistrées.',
                                   'warning'
                                 ).then((result) => {
                                    
@@ -377,6 +466,7 @@
                 this.fournisseurForm.adresse = fournisseur.adresse;
                 this.fournisseurForm.telephone= fournisseur.telephone;
                 this.fournisseurForm.logo= fournisseur.logo;
+
                 if(fournisseur.logo){
                     this.hasImage = true;
                 }else{

@@ -200,6 +200,11 @@ Route::delete('/configuration/deleteEntite/{id}', [ConfigurationController::clas
 Route::post('/configuration/createEntite', [ConfigurationController::class, 'createEntite']);
 Route::post('/configuration/modifyEntite', [ConfigurationController::class, 'modifyEntite']);
 
+Route::post('/configuration/clientFournisseur/{fournisseur}/{client}', [ConfigurationController::class, 'ajoutClientFour']);
+
+Route::post('/configuration/retirerclientFournisseur/{fournisseur}/{client}', [ConfigurationController::class, 'retirerClientFour']);
+
+
 Route::get('/configuration/getTypeCommande', [ConfigurationController::class, 'getTypeCommande']);
 Route::delete('/configuration/deleteTypeCommande/{id}', [ConfigurationController::class, 'typeCommandeDelete']);
 Route::post('/configuration/createTypeCommande', [ConfigurationController::class, 'createTypeCommande']);
