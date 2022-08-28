@@ -7,23 +7,23 @@
                     <div class="d-inline-block">
                         <div class="border p-3 bg-white justify-content-center rounded">
                             <div class="d-inline-flex filtreTireur align-items-end">
-                                <div class="mr-3 text-left" style="width: 230px">
+                                <div class="mr-3 text-left" style="width: 180px">
 
                                    <label class="mr-3  text-left w-100 mb-0">Date Début</label>
                                     <date-picker v-model="filtre.dateDebut" required valueType="YYYY-MM-DD"  :disabled-date="disabledFutureDate" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
                                 </div>
-                                <div class="mr-3 text-left" style="width: 230px">
+                                <div class="mr-3 text-left" style="width: 180px">
                                       <label class="text-left w-100 mb-0">Date Fin</label>
                                       <date-picker v-model="filtre.dateFin" required valueType="YYYY-MM-DD" input-class="form-control w-100" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
                                 </div>
-                                <div class="mr-3 text-left" style="width: 230px">
+                                <div class="mr-3 text-left" style="width: 180px">
                                     <label class="text-left w-100 mb-0">Type Commande</label>
                                     <select class="form-control" v-model="filtre.typeCmd">
                                         <option value="">Tout</option>
                                         <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
                                     </select>
                                 </div>
-                                <div class="mr-3 text-left" style="width: 230px">
+                                <div class="mr-3 text-left" style="width: 180px">
                                     <label class="text-left w-100 mb-0">Fournisseur</label>
                                     <select class="form-control" v-model="filtre.fournisseur">
                                         <option value="">Tout</option>
@@ -31,11 +31,11 @@
                                         
                                     </select>
                                 </div>
-                                <div class="mr-3 text-left" style="width: 230px">
+                                <div class="mr-3 text-left" style="width: 180px">
                                     <label class="text-left w-100 mb-0">N°Dossier</label>
                                     <input type="text" class="form-control"  v-model="filtre.dossier">
                                 </div>
-                                 <div class="mr-3 text-left" style="width: 230px">
+                                 <div class="mr-3 text-left" style="width: 180px">
                                     <label class="text-left w-100 mb-0">N°Commande</label>
                                     <input type="text" class="form-control"  v-model="filtre.commande">
                                 </div>
