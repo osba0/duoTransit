@@ -2,6 +2,7 @@
     <div>
         <div class="row">
           <div class="col-sm-6">
+
                <h2 class="d-inline-block">Préchargement <template v-if="isDetail">:</template></h2>
                <template v-if="isDetail">
                    <span class="pl-2 h3 text-primary font-weight-bold"> N° Dossier {{ selected.id }}&nbsp;</span>
@@ -17,6 +18,7 @@
         <template v-if="!isDetail">
         <div class="row">
             <div class="col-sm-12">
+
                     <div class="table-responsive p-0">
                         <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -28,21 +30,24 @@
                                 </li>
                             </ul>
                             <div>
-                                <form @submit.prevent="save" enctype="multipart/form-data"  key=1 class="d-flex">
-                                    <select class="form-control mr-2" v-model="typeCommande" :class="{ 'border-danger': submitted_add && !$v.typeCommande.required }">
-                                        <option value="">Type commande</option>
-                                        <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
-                                  
-                                    </select>
-                                    <select class="form-control mr-2" v-model="entrepot" :class="{ 'border-danger': submitted_add && !$v.entrepot.required }">
-                                        <option value="">Choisir l'entrepôt</option>
-                                        <option v-for="entrepot in listEntrepots"  :value="entrepot.id">{{entrepot.nomEntrepot}}</option>
-                                  
-                                    </select>
-                                
-                                    <button type="submit" class="btn btn-primary d-flex align-items-center">
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" :class="{'d-none': !submitted_add, 'd-inline-block': submitted_add && !$v.typeCommande.required}"></span>Créer</button>
-                                </form>
+                                <fieldset class="border rounded-lg border-success bg-white p-3">
+                                    <legend class="bg-success font-weight-bold rounded-lg text-center">Nouveau dossier de préchargement</legend>
+                                    <form @submit.prevent="save" enctype="multipart/form-data"  key=1 class="d-flex">
+                                        <select class="form-control mr-2" v-model="typeCommande" :class="{ 'border-danger': submitted_add && !$v.typeCommande.required }">
+                                            <option value="">Type commande</option>
+                                            <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
+                                      
+                                        </select>
+                                        <select class="form-control mr-2" v-model="entrepot" :class="{ 'border-danger': submitted_add && !$v.entrepot.required }">
+                                            <option value="">Choisir l'entrepôt</option>
+                                            <option v-for="entrepot in listEntrepots"  :value="entrepot.id">{{entrepot.nomEntrepot}}</option>
+                                      
+                                        </select>
+                                    
+                                        <button type="submit" class="btn btn-primary d-flex align-items-center">
+                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" :class="{'d-none': !submitted_add, 'd-inline-block': submitted_add && !$v.typeCommande.required}"></span>Créer</button>
+                                    </form>
+                                </fieldset>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between align-content-center mb-2">
@@ -182,6 +187,7 @@
             </div>
             
             <div class="mb-3 mb-4">
+                <VueScrollFixedNavbar>
                 <table class="table table-bordered bg-white"> 
                     <tr>
                         <th class="text-uppercase thead-blue py-1 w-60">Dossier selectionné</th>
@@ -232,6 +238,7 @@
                         </td>
                     </tr>
                 </table>
+                </VueScrollFixedNavbar>
             </div>
             
             <div class="mb-2 w-100 d-flex justify-content-end align-items-end">
@@ -241,7 +248,7 @@
             </div>
             
           
-            <div class="d-flex justify-content-between align-content-center mb-2">
+            <!--div class="d-flex justify-content-between align-content-center mb-2">
                 <div class="d-flex align-items-end">
                     <div>
                         <div class="d-flex align-items-center">
@@ -278,10 +285,10 @@
                     />
                 </div>
                
-            </div>        
+            </div-->        
                 <div class="card-body table-responsive p-0">
                     <table class="table">
-                        <thead class="thead-blue">
+                        <thead class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
                              <tr>
                                 <th class="p-2 border-right border-white h6">#</th>
                                 <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
@@ -361,6 +368,23 @@
                 </template>
 
                 </tbody>
+                 <tfoot class="thead-blue position-relative" :class="[run? 'disabled-row':'']"  v-bind:style="[reception.data.length > 5 ? {'display': none} : '']">
+                             <tr>
+                                <th class="p-2 border-right border-white h6">#</th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6">Fournisseur</th>
+                                <th class="p-2 border-right border-white h6">Emballage</th>
+                                <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[6])">Volume  (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6  white-space-nowrap">Num Fact</th>
+                                <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
+                                <th class="p-2 border-right text-center border-white h6">Priorité</th>
+                                <th class="text-right p-2 border-right border-white h6">Actions</th>
+                            </tr>
+                        </tfoot>
                 </table>
                 </div>
             <div class="d-flex mt-4 justify-content-center">
@@ -370,6 +394,7 @@
                 ></pagination>
                 
             </div>
+
               
        </template>
 
@@ -404,6 +429,7 @@
     </div>
 </template>
 <script type="text/ecmascript-6">
+    import {VueScrollFixedNavbar} from "vue-scroll-fixed-navbar";
     import { EventBus } from '../../event-bus';
 
     import modalFacture from '../../components/modal/facture.vue';
@@ -434,7 +460,8 @@
         components: {
             /*PageLoader*/
             modalDetailsCommande,
-            modalFacture
+            modalFacture,
+            VueScrollFixedNavbar
           },
         data() { 
             return {
@@ -477,7 +504,8 @@
                 // Sort column
                 columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis'],
                 sortedColumn: '',
-                order: 'asc'
+                order: 'asc',
+                run: false
             }
 
         },
@@ -562,7 +590,7 @@
             this.getReception();
            },
         preselectionner(event, cmd){
-
+            this.run = true;
             var ischecked=0;
             if (event.target.checked) {
                 ischecked=1;
@@ -659,6 +687,7 @@
         back(){
             this.getPrechargement(this.selected.currentPage);
             this.isDetail = false;
+            this.run = false;
            },
         valider(){
         
@@ -1102,3 +1131,4 @@
         }
     }
 </script>
+

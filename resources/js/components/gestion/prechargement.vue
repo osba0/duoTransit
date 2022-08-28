@@ -188,8 +188,8 @@
                 </button>
             </div>
            
-            <div class="mb-3 mb-3">
-                
+            <div class="mb-3">
+                <VueScrollFixedNavbar>
                 <table class="table table-bordered bg-white"> 
                 <tr>
                     <th class="text-uppercase thead-blue py-1 w-60">Dossier selectionné  
@@ -238,6 +238,7 @@
                     </td>
                 </tr>
             </table>
+        </VueScrollFixedNavbar>
             </div>
             <div class="d-flex justify-content-end align-items-center mr-3 mb-3 sucesss"> 
                 <!--button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
@@ -250,7 +251,7 @@
                 <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
             </div>
             <hr>
-            <div class="d-flex justify-content-between align-content-center mb-2">
+            <!--div class="d-flex justify-content-between align-content-center mb-2">
                 <div class="d-flex align-items-end">
                     <div>
                         <div class="d-flex align-items-center">
@@ -287,10 +288,10 @@
                     />
                 </div>
                
-            </div>  
+            </div-->  
                 
                 <table class="table">
-                    <thead class="thead-blue">
+                    <thead class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
                          <tr>
                             <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
@@ -303,7 +304,7 @@
                             <th class="text-nowrap p-2 border-right border-white h6 white-space-nowrap">Crée par</th>
                             <th class="p-2 border-right border-white text-left h6 white-space-nowrap">Préchargé?</th>
                             <th class="p-2 border-right text-center border-white h6 white-space-nowrap" title="N° Préchargement">N° Pré.</th>
-                            <th class="p-2 border-right text-center border-white h6">Priorité</th>
+                            <th class="p-2 border-right text-center border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[8])">Priorité  <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-right p-2 border-right border-white h6">Actions</th>
                         </tr>
                     </thead>
@@ -374,6 +375,23 @@
                     </template>
 
                     </tbody>
+                    <tfoot class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
+                         <tr>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white cursor-pointer h6 white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6">Fournisseur</th>
+                            <th class="p-2 border-right border-white h6">Emballage</th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[5])">Poids(KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[6])">Volume(m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-nowrap p-2 border-right border-white h6 white-space-nowrap">Crée par</th>
+                            <th class="p-2 border-right border-white text-left h6 white-space-nowrap">Préchargé?</th>
+                            <th class="p-2 border-right text-center border-white h6 white-space-nowrap" title="N° Préchargement">N° Pré.</th>
+                            <th class="p-2 border-right text-center border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[8])">Priorité  <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-right p-2 border-right border-white h6">Actions</th>
+                        </tr>
+                    </tfoot>
                 </table>
                 <div class="d-flex mt-4 justify-content-center">
                     <pagination
@@ -383,7 +401,7 @@
                     
                 </div>
                 <hr>
-                <div class="d-flex justify-content-end mr-3 mb-3 sucesss"> 
+                <div class="d-flex justify-content-end mr-3 mb-5 sucesss"> 
                     <!--button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
                     <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
@@ -500,7 +518,7 @@
 <script>
     import { EventBus } from '../../event-bus';
 
-
+    import {VueScrollFixedNavbar} from "vue-scroll-fixed-navbar";
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
     import { PdfMakeWrapper, Table, Img, QR } from 'pdfmake-wrapper';
 
@@ -528,7 +546,8 @@
             
         ],  
         components: {
-            PageLoader
+            PageLoader,
+            VueScrollFixedNavbar
           },
         data() { 
             return {
@@ -586,9 +605,10 @@
                 searchRecep: '',
                 filtreRate: '',
                 // Sort column
-                columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis'],
+                columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis', 'priorite'],
                 sortedColumn: '',
-                order: 'asc'
+                order: 'asc',
+                run: false
             }
 
         },
@@ -666,6 +686,7 @@
                 return "#aaa";
             },
             preselectionner(event, cmd){
+                this.run = true;
                 var ischecked=0;
                
                 if (event.target.checked) {
@@ -1287,6 +1308,7 @@
             this.commandeNoSelected = [];
             this.eventCmdSelected.ischecked = -1;
             this.eventCmdSelected.idcmd = '';
+            this.run = false;
 
            },
            reactiver(pre){

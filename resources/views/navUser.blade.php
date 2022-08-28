@@ -1,4 +1,5 @@
 <div class="image d-flex align-items-center">
+    @if (!auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
     <ul class="notificationUL nav pull-right navTop d-none1">
         <li class="nav-item dropdown">
         <a class="notif p-2 d-flex align-items-center text-primary" data-toggle="dropdown" href="#" aria-expanded="false">
@@ -41,6 +42,7 @@
         </div>
       </li>
     </ul>
+    @endif
     <div class="pull-right mr-3">
         <span class="badge badge-default text-uppercase">Profil:</span> 
         <span class="badge text-uppercase {{Auth::user()->roles[0]=='root'?'badge-danger ':''}} {{Auth::user()->roles[0]=='client'?'badge-warning ':''}} {{Auth::user()->roles[0]=='user'?'badge-secondary ':''}} {{Auth::user()->roles[0]=='admin'?'badge-info ':''}}">{{Auth::user()->roles[0]}}</span>

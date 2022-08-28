@@ -356,12 +356,12 @@ class ConfigurationController extends Controller
         }
        
         Fournisseur::where('id', request('id'))
-              ->update([
-                "fonmfo" => request('nom'),
-                "foadrs" => request('adresse'),
-                "fotele" => request('telephone'),
-                'fologo' => $filename
-          ]);
+          ->update([
+            "fonmfo" => request('nom'),
+            "foadrs" => request('adresse'),
+            "fotele" => request('telephone'),
+            'fologo' => $filename
+        ]);
 
 
 
@@ -398,6 +398,65 @@ class ConfigurationController extends Controller
             "code" => 0,
             "message" => "OK"
         ]);
+    }
+
+
+    public function ajoutClientFour()
+    {
+       $client = Client::where('id',request('client'))->first(); 
+
+       $listfournisseur = $client['clfocl'];
+
+       if(!is_array($listfournisseur)){
+            $listfournisseur=[];    
+       }
+
+       array_push($listfournisseur, intval(request('fournisseur')));
+
+       // update
+
+       Client::where('id', request('client'))
+          ->update([
+            "clfocl" => array_unique($listfournisseur)
+        ]);
+
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+      
+    }
+
+
+     public function retirerClientFour()
+    {
+       $client = Client::where('id',request('client'))->first(); 
+
+       $listfournisseur = $client['clfocl'];
+
+       $newlist = [];
+
+
+       for($i=0; $i<sizeof($listfournisseur); $i++){
+            if($listfournisseur[$i] != request('fournisseur')){
+                $newlist[] = $listfournisseur[$i];
+            }
+       }
+
+       // update
+
+       Client::where('id', request('client'))
+          ->update([
+            "clfocl" => array_unique($newlist)
+        ]);
+
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+      
     }
 
 

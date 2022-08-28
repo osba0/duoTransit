@@ -70,18 +70,13 @@ class GestionController extends Controller
 
         $defaultContenaire = Contenaire::get()->where("isdefault", true)->first();
 
-        $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])
-                 ->select('type_commandes_id', DB::raw('count(*) as total'))
-                 ->groupBy('type_commandes_id')->whereNotNull('dossier_prechargements_id')->where(function($query){
+        $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])->leftJoin('dossier_prechargements', 'receptions.dossier_prechargements_id', '=', 'dossier_prechargements.id')
+                 ->select('receptions.type_commandes_id', DB::raw('count(*) as total'))
+                 ->groupBy('receptions.type_commandes_id')->whereNotNull('dossier_prechargements_id')->where(function($query){
                         $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
                         
-                        })
+                        })->where("dossier_prechargements.reetat", true)
                  ->get();  
-
-
-       
-
-       // var_dump($nbrCmdACharger[0]->type_commandes_id); die();
 
         $entrepots = Entrepot::get(); 
 

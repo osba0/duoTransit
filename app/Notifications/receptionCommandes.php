@@ -74,7 +74,7 @@ class receptionCommandes extends Notification
     {
         return [
             'title' => 'Nouvelle commande n° '.$this->commande['rencmd'].', Type Commande:'.$this->commande['typeCmd'],
-            'description' => 'N° Commande: '.$this->commande['rencmd'].', Fournisseur: '.$this->commande['fournisseur'].', Poids(KG): '.$this->commande['repoid'].', Volume(m3): '.$this->commande['revolu'], 
+            'description' => 'N° Commande:'.$this->commande['rencmd'].', Fournisseur: '.$this->commande['fournisseur'].', Poids(KG): '.$this->commande['repoid'].', Volume(m3): '.$this->commande['revolu'], 
             'fichier' => '/' .$this->pathFile,
             'user' => Auth::user(),
             'slug' => $this->societe['slug']   
