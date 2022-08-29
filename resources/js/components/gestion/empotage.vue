@@ -2,13 +2,13 @@
     <div>
         <!--PageLoader :is-loading = isLoading ></PageLoader--> 
         <div class="row">
-          <div class="col-sm-9 d-flex align-items-center">
-               <h2>Empotage<template v-if="isDetail">:</template></h2>
+          <div class="col-sm-8 d-flex align-items-center">
+               <h3>Empotage<template v-if="isDetail">:</template></h3>
                <template v-if="isDetail">
-                   <span class="pl-2 h3 text-primary font-weight-bold"> N° Dossier {{ selected.dossier }}&nbsp;</span>
+                   <span class="pl-2 h4 text-primary font-weight-bold"> N° Dossier {{ selected.dossier }}&nbsp;</span>
                 </template>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Acceuil</a></li>
               <li class="breadcrumb-item" :class="!isDetail ? 'active': ''"><a href="#">Empotage</a></li>
