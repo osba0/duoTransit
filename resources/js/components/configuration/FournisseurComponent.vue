@@ -65,7 +65,7 @@
                                 <span class="switch-handle"></span> 
                             </label>
                         </td>
-                         <td class="p-2 text-right">
+                         <td class="p-2 text-right white-space-nowrap">
                              <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editFournisseur(fournisseur)" data-toggle="modal" data-target="#newFournisseur">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                 </a>

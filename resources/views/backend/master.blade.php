@@ -111,7 +111,6 @@ $config = [
                             </li>
                             @endif
 
-
                             @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                                 @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ADMIN || auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT)))  
                                 <li class="nav-item {{ request()->is('gerer/prechargement/*') || request()->is('gerer/empotage/*') ? 'menu-open' : '' }}">
@@ -124,12 +123,16 @@ $config = [
                                     </a>
                                     <ul class="nav nav-treeview {{ request()->is('gerer/prechargement/*') ||  request()->is('gerer/empotage/*')  ? 'd-block' : '' }}" style="display: none">
                                       <li class="nav-item">
+
+
                                         <a href="/gerer/prechargement/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('gerer/prechargement/*')   ? 'active' : '' }}">
+                                            <i class="fa fa-circle-o" aria-hidden="true"></i>
                                           <p>Préchargement</p>
                                         </a>
                                       </li>
                                       <li class="nav-item">
                                         <a href="{{ route('gerer_empotage', ['id' => $client['slug']?? '']) }}" class="nav-link {{ request()->is('gerer/empotage/*')   ? 'active' : '' }}">
+                                            <i class="fa fa-circle-o" aria-hidden="true"></i>
                                           <p>Empotage</p>
                                         </a>
                                       </li>
@@ -185,12 +188,6 @@ $config = [
 
                         @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                             @if (!\Request::is('configuration/*'))
-                                <!--li class="nav-item">
-                                    <a href="/incidents/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('incidents/*')) ? 'active' : '' }}">
-                                      <i class="fa fa-exclamation-triangle nav-icon"></i>
-                                      <p>Incidents</p>
-                                    </a>
-                                </li-->
                                  <li class="nav-item">
                                     <a href="{{ route('listNotif', ['client' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('notifications/*')) ? 'active' : '' }}">
                                       <i class="fa fa-bell-o nav-icon"></i>

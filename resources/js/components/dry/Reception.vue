@@ -161,7 +161,8 @@
                         <!--td class="p-2 align-middle">
                         	{{ dry.type_commandes }}
                         </td--> 
-                        <td class="p-2 align-middle">
+                        <td class="p-2 align-middle position-relative ">
+                             <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>
                         	 <!--label class="badge badge-primary mr-1 numCmdLab w-100">{{ dry.rencmd }}</label-->
                              {{ dry.rencmd }}
                         </td>
