@@ -18,6 +18,8 @@ php artisan key:generate
 ```
 
 **Configuration .env**
+
+**Migration Database**
 ```
 php artisan migrate
 php artisan db:seed
