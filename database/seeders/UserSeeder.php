@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
                 'firstname' => 'root',
                 'lastname' => 'root',
                 'username' => 'root',
-                'email' => 'root@yomail.com',
+                'email' => 'root@yopmail.com',
                 'password' => Hash::make('passer@123456'),
                 'status' => 1,
                 'entites_id' => Entite::take(1)->first()['id']

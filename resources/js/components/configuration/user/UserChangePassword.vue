@@ -115,7 +115,7 @@ export default {
                 data.append('passwordactual', this.userForm.passwordactual);
                 data.append('password', this.userForm.password);
 
-                axios.post("/api/configuration/modifPwd/"+this.idClient, data).then(response => {
+                axios.post("/configuration/modifPwd/"+this.idClient, data).then(response => {
                   
                     if(response.data.code==0){
                         this.$refs.closePoup.click();
@@ -124,7 +124,9 @@ export default {
                           'succés!',
                           'Mot de passe modifié crée avec succés!',
                           'success'
-                        )
+                        ).then((result) => {
+                                   
+                                });
                         
 
                     }else{

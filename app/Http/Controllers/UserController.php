@@ -134,6 +134,7 @@ class UserController extends Controller
      */
     public function changePassword($id)
     {
+
         //$check = User::where('password', Hash::make(request('passwordactual')))->get();
          $hashedPassword = Auth::user()->password;
  
