@@ -49,7 +49,7 @@
     </div>
     <ul class="nav pull-right navTop">
         <li class="dropdown">
-            <a href="#" class="dropdown-toggle text-uppercase" data-toggle="dropdown"><span class="initial elevation-1">{{ Str::upper(substr(Auth::user()->firstname,0,1)) }}{{ Str::upper(substr(Auth::user()->lastname,0,1)) }}</span> {{ Auth::user()->username }} <b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle text-uppercase" data-toggle="dropdown"><span class="initial elevation-1">{{ Str::upper(substr(Auth::user()->username,0,1)) }}</span> {{ Auth::user()->username }} <b class="caret"></b></a>
             <ul class="dropdown-menu p-0">
                 <li class="text-center py-2 profilLi">
                     <span class="initial elevation-1 xls {{Auth::user()->roles[0]=='root'?'badge-danger ':''}} {{Auth::user()->roles[0]=='client'?'badge-warning ':''}} {{Auth::user()->roles[0]=='user'?'badge-secondary ':''}} {{Auth::user()->roles[0]=='admin'?'badge-info ':''}}">{{ Str::upper(substr(Auth::user()->lastname,0,1)) }}{{ Str::upper(substr(Auth::user()->firstname,0,1)) }}</span> </span>
