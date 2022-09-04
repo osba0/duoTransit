@@ -923,6 +923,7 @@
                           msgSuc,
                           'success'
                         );
+                        this.sortedColumn = "";
 	                    this.getDries();
 	                    this.flushData();
 	                    this.show = true;
@@ -961,7 +962,7 @@
                 if(this.search==''){
                     this.isLoading=true;
                 }
-
+                
                 const requestOne = 
 	        	axios.get('/dries/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&column="+this.sortedColumn+"&order="+this.order);
 
