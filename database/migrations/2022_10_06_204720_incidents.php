@@ -18,7 +18,7 @@ class Incidents extends Migration
             $table->string('commandes');
             
             $table->string('objet')->nullable();
-            $table->string('commentaire')->nullable();
+            $table->text('commentaire')->nullable();
             $table->foreignId('users_id')->constrained();
             $table->foreignId('clients_id')->constrained();
             $table->foreignId('entites_id')->constrained();  

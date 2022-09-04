@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\Contracts\Activity;
 use App\Models\TypActivity;
+use Illuminate\Support\Facades\Auth;
 use DB;
 
 class Reception extends Model
@@ -63,7 +64,14 @@ class Reception extends Model
                     ->groupBy("reidre");
             $query = $query->orderBy($sortedColumn, $order);
         }else{
-             $query->orderBy('recrea', 'desc');
+            $user = Auth::user();
+
+            if($user->hasRole(UserRole::ROLE_CLIENT)){
+                $query->orderBy('redali', 'desc');
+            }else{
+                $query->orderBy('recrea', 'desc');
+            }
+             
            /* if(isset($typeCmd)){
                 $query->where('type_commandes_id', $typeCmd)->where('receptions.clients_id', request('id'))
                     ->orderBy('recrea', 'desc');
