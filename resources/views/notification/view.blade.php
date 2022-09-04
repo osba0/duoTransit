@@ -7,6 +7,11 @@
 @section('content')
 <div id="app">
     <div class="row mt-4">
+        <div class="mb-3 col-md-12">
+                <button class="btn btn-primary mb-3" onclick="history.back()">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
+                </button>
+            </div>
         <div class="col-md-12">
           <div class="card p-3">
           		<h4>{{ $notification->data['title']}}</h4>
