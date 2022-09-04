@@ -47,7 +47,7 @@
                          :class="typeAction == 'insertion' ? 'main-type-action-press-filter' : ''"
                          @click="filterActions('insertion')">
                         <div class="h1 text-primary font-weight-bold">{{ insertion }}</div>
-                        <span class="text-primary d-block text-uppercase font-weight-bold h6 m-0">Création</span>
+                        <span class="text-primary d-block text-uppercase font-weight-bold h6 m-0">Création(s)</span>
                     </div>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                          :class="typeAction == 'modification' ? 'main-type-action-press-filter' : ''"
                          @click="filterActions('modification')">
                         <div class="h1 text-primary font-weight-bold">{{ modification }}</div>
-                        <span class="text-primary d-block text-uppercase font-weight-bold h6 m-0">Modification</span>
+                        <span class="text-primary d-block text-uppercase font-weight-bold h6 m-0">Modification(s)</span>
                     </div>
                 </div>
             </div>
@@ -69,7 +69,7 @@
                          :class="typeAction == 'suppression' ? 'main-type-action-press-filter' : ''"
                          @click="filterActions('suppression')">
                         <div class="h1 text-primary font-weight-bold">{{ suppression }}</div>
-                        <span class="text-primary d-block text-uppercase font-weight-bold h6 m-0">Suppréssion</span>
+                        <span class="text-primary d-block text-uppercase font-weight-bold h6 m-0">Suppréssion(5)</span>
                     </div>
                 </div>
             </div>
