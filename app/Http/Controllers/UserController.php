@@ -132,18 +132,20 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function changePassword($id)
+    public function changePassword()
     {
-
         //$check = User::where('password', Hash::make(request('passwordactual')))->get();
          $hashedPassword = Auth::user()->password;
  
        if (\Hash::check(request('passwordactual') , $hashedPassword )) {
-            User::where('id', request('id'))
+            /*User::where('id', request('id'))
               ->update([
-              "password"  => Hash::make(request('password')),  
+              "password"  => Hash::make(request('password'))
+              ]);*/
 
-              ]);
+               $user = Auth::user();
+                $user->password = Hash::make(request('password'));
+                $user->save();
         }else{
             return response([
                 "code" => 1,

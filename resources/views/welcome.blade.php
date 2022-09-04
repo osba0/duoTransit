@@ -83,7 +83,6 @@ $config = [
 </head>
 <body>
    
-   
     <header class="border-bottom mb-3 bg-white">
         <div class="container">
             <div class="row">

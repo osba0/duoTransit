@@ -115,20 +115,16 @@ export default {
                 data.append('passwordactual', this.userForm.passwordactual);
                 data.append('password', this.userForm.password);
 
-                axios.post("/configuration/modifPwd/"+this.idClient, data).then(response => {
+                axios.post("/configuration/modifPwd/", data).then(response => {
                   
                     if(response.data.code==0){
                         this.$refs.closePoup.click();
                         this.flushData();
                         Vue.swal.fire(
-                          'succés!',
+                          'Succés!',
                           'Mot de passe modifié crée avec succés!',
                           'success'
-                        ).then((result) => {
-                                   
-                                });
-                        
-
+                        );
                     }else{
                          Vue.swal.fire(
                           '',
