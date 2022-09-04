@@ -212,7 +212,7 @@
                         <td class="p-2 align-middle h6 text-center border-right thead-blue">{{ format_nbr(nbrColis) }}</td>
                         <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ format_nbr(totalPoids) }}</td>
                         <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ format_nbr(totalVolume) }}</td>
-                        <td colspan="4" class="p-2 h5 align-middle text-center  border-right" :class="[nbrJoursMoy<=8?'bg-success':'', (nbrJoursMoy>8 && nbrJoursMoy<=15)?'bg-warning':'', nbrJoursMoy>15?'bg-danger':'']">Nbr Jours Moyen: {{nbrJoursMoy}}</td>
+                        <td colspan="4" class="p-2 h5 align-middle text-center  border-right" :class="[nbrJoursMoy<=7?'bg-success':'', (nbrJoursMoy>8 && nbrJoursMoy<=15)?'bg-warning':'', nbrJoursMoy>15?'bg-danger':'']">Nbr Jours Moyen: {{nbrJoursMoy}}</td>
                         
                     </tr>
                     </template>
