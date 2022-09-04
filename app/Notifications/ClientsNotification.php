@@ -63,7 +63,8 @@ class ClientsNotification extends Notification
         return [
             'title' => "Ajout d'un nouveau client",
             'key1' => $this->client["clnmcl"],
-            'user' => Auth::user()
+            'user' => Auth::user(),
+            'slug' => ''  
         ];
     }
 

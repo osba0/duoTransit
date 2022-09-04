@@ -33,8 +33,10 @@ class NotificationController extends Controller
         $user = Auth::user();
 
         $paginate = request('paginate');
+
+        $slug = request('slug');
         
-        $notification = $user->notifications()->paginate($paginate);
+        $notification = $user->notifications()->where('data', 'LIKE', '%"slug":"'.$slug.'"%')->paginate($paginate);
         
        return NotificationResource::collection($notification);
     }

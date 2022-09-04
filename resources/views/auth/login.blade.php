@@ -6,12 +6,9 @@
                     <!--x-application-logo class="w-20 h-20 fill-current text-gray-500" /-->
                     <img src="{{ asset('images/itransit-logo.png') }}" class="text-center" style="display:inline-block;">
                 </a>
-                <h1 class="text-center" style="font-size: 40px">{{ env('APP_NAME') }}</h1>
+                <h1 class="text-center" style="font-size: 40px; color: #3498db; font-weight:bold;">{{ env('APP_NAME') }}</h1>
             </div>
         </x-slot>
-
-          
-
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -31,7 +28,8 @@
 
         <form method="POST" action="{{ route('login') }}" id="app_run">
             @csrf
-
+            <div class="pb-1 mt-2 mb-0 h3 font-weight-bold" style="color: #3e5267 !important;">Connexion</div>
+            <hr class="mb-3">
             <!-- Email Address -->
             <div>
                 <x-label for="username" :value="__('Login')" />
@@ -73,6 +71,19 @@
                     {{ __('Se connecter') }}
                 </x-button>
             </div>
-        </form>
     </x-auth-card>
+    </form>
 </x-guest-layout>
+<style type="text/css">
+    body{
+        background: url(../../images/bgApp.png) !important;
+        background-position-x: 0%;
+        background-position-y: 0%;
+        background-repeat: repeat;
+        background-repeat: no-repeat !important;
+        background-position: center 50% !important;
+    }
+    .bg-gray-100{
+        background: none !important;
+    }
+</style>
