@@ -159,9 +159,9 @@ class ConfigurationController extends Controller
             $store = Client::create($new_client);
 
            // $user->notify(new ClientsNotification($new_client)); 
-            $users = User::where("entites_id", $user->entites_id)->get();
+           /* $users = User::where("entites_id", $user->entites_id)->get();
 
-            Notification::send($users, new ClientsNotification($new_client));
+            Notification::send($users, new ClientsNotification($new_client));*/
 
         }catch(\Exceptions $e){
               return response([

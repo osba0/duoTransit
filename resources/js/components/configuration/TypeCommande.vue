@@ -4,7 +4,7 @@
             <table class="table">
                 <thead class="thead-blue">
                      <tr>
-                        <th class="p-2 border-right border-white h6">#</th>
+                        <th class="p-2 border-right border-white h6">ID</th>
                         <th class="p-2 border-right border-white h6">Type commande</th>
                         <th class="p-2 border-right border-white h6">Couleur</th>
                         <th class="p-2 border-right border-white h6">Etat</th>
@@ -23,7 +23,7 @@
                             {{ typecommande.type }}
                         </td>
                         <td class="p-2 align-middle">
-                            <span class="badge badge-default px-5 border" :style="{background: typecommande.color}">-</span>
+                            <span class="badge badge-default px-2" :style="{background: typecommande.color}">&nbsp;</span>
                             
                         </td>
                         <td>  

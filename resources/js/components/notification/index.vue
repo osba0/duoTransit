@@ -25,7 +25,7 @@
                         </thead>  
                      <tbody>
                         <template v-if="!notifications.data || !notifications.data.length">
-                                <tr><td colspan="6" class="bg-white text-center">Aucun fournisseur défini!</td></tr>
+                                <tr><td colspan="7" class="bg-white text-center">Aucune notification disponible!</td></tr>
                             </template>
                               <tr v-for="notif in notifications.data" :class="!notif.read? 'bg-white': 'bg-light opacity-light'">
                                 <td classborderDark="p-2 align-top">
@@ -99,7 +99,8 @@
     import Multiselect from 'vue-multiselect';
     export default {
          props: [
-            'totalUnread'
+            'totalUnread',
+            'clientCurrent'
         ],
          components: {
             Multiselect
@@ -122,7 +123,7 @@
         },
         methods : { 
             getNotification(page = 1){
-                axios.get('/notif/list?page=' + page + "&paginate=" + this.paginate).then(response => {
+                axios.get('/notif/list?page=' + page + "&paginate=" + this.paginate+"&slug="+this.clientCurrent['slug']).then(response => {
                     this.notifications = response.data;
                 });
             },
