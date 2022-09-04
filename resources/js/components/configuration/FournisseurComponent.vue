@@ -388,7 +388,7 @@
                   showCancelButton: true,
                   confirmButtonColor: '#38c172',
                   cancelButtonColor: '#545b62',
-                  confirmButtonText: 'Oui, ajouter!'
+                  confirmButtonText: 'Oui, retirer!'
                 }).then((result) => {
                   if (result.isConfirmed) {
                         axios.post('/configuration/retirerclientFournisseur/'+fournisseur.id+"/"+client.id).then(response => {
