@@ -167,7 +167,7 @@
                 </template>
             <template v-else> 
                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <button class="btn btn-warning mb-3" @click="reinit()">
+                    <button class="btn btn-primary mb-3" @click="reinit()">
                         <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                     </button>
                     <div class="d-flex">

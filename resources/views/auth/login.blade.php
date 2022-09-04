@@ -9,9 +9,11 @@
                 <h1 class="text-center" style="font-size: 40px; color: #3498db; font-weight:bold;">{{ env('APP_NAME') }}</h1>
             </div>
         </x-slot>
+        <div class="pb-1 mt-2 mb-0 h3 font-weight-bold" style="color: #3e5267 !important;">Connexion</div>
+            <hr class="mb-3">
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
-
+     
         <!-- Validation Errors -->
         <!--x-auth-validation-errors class="mb-4" :errors="$errors" /-->
 
@@ -28,8 +30,7 @@
 
         <form method="POST" action="{{ route('login') }}" id="app_run">
             @csrf
-            <div class="pb-1 mt-2 mb-0 h3 font-weight-bold" style="color: #3e5267 !important;">Connexion</div>
-            <hr class="mb-3">
+            
             <!-- Email Address -->
             <div>
                 <x-label for="username" :value="__('Login')" />

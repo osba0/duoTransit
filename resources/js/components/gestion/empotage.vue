@@ -103,8 +103,8 @@
                                     <th class="p-2 border-right border-white h6">Type TC</th>
                                     <th class="p-2 border-right border-white h6">N°Plomb</th>
                                     <th class="p-2 border-right border-white h6">Entrepôt</th>
-                                    <th class="p-2 border-right border-white h6">Date Départ</th>
-                                    <th class="p-2 border-right border-white h6">Date Arrivée</th>
+                                    <th class="p-2 border-right border-white h6" title="Date départ du bâteau">Date Départ</th>
+                                    <th class="p-2 border-right border-white h6"  title="Date arrivée du bâteau">Date Arrivée</th>
                                     <th class="p-2 border-right border-white h6">Etat</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Date de création</th>
                                     <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
@@ -188,7 +188,7 @@
         </template>
         <template v-else>
             <div class="mb-3 d-flex justify-content-between align-items-center">
-                <button class="btn btn-warning mb-3" @click="back()">
+                <button class="btn btn-primary mb-3" @click="back()">
                     <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                 </button>
                 <div class="d-flex">
@@ -512,13 +512,13 @@
                              <div class="row">
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2 dateW65">
-                                        <label class="d-block m-0 text-right  w-35 pr-2">Date Départ</label>
+                                        <label class="d-block m-0 text-right  w-35 pr-2" title="Date départ du bâteau">Date Départ</label>
                                         <date-picker v-model="empotageForm.dateDepart" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
                                     </div>
                                  </div>
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2 dateW65">
-                                        <label class="d-block m-0 text-left pr-2">Date Arrivée</label>
+                                        <label class="d-block m-0 text-left pr-2" title="Date arrivée du bâteau">Date Arrivée</label>
                                         <date-picker v-model="empotageForm.dateArrivee" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
                                     </div>
                                  </div>
