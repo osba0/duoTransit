@@ -36,7 +36,7 @@
                          :class="typeAction == 'affichage' ? 'main-type-action-press-filter' : ''"
                          @click="filterActions('affichage')">
                         <div class="h1 text-primary font-weight-bold">{{ affichage }}</div>
-                        <span class="text-primary d-block text-uppercase font-weight-bold h6 m-0">Affichage</span>
+                        <span class="text-primary d-block text-uppercase font-weight-bold h6 m-0">Affichage(s)</span>
                     </div>
                 </div>
             </div>
