@@ -58,9 +58,17 @@
                              <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editUser(user)" data-toggle="modal" data-target="#newUser">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                 </a>
-                            <a title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1" v-on:click="deleteUser(user)">
+                            <template v-if="user.login == 'root'">
+                                <a title=""  class="btn m-1 border-danger btn-circle border btn-circle-sm m-1">
+                                    <i class="fa fa-circle-o text-danger" aria-hidden="true"></i>
+                                </a>
+                            </template>
+                            <template v-else>
+                                <a title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1" v-on:click="deleteUser(user)">
                                     <i class="fa fa-close text-danger" aria-hidden="true"></i>
                                 </a>
+                            </template>
+                            
                         </td>
                        
                     </tr>
