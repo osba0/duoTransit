@@ -133,7 +133,7 @@ $config = [
                     </div>
                 </div>
                 <div class="col-md-3 mt-3">
-                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4 cursor-pointer">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4">
                         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                           <dl class="mb-0">
                             <dt class="fs-3 fw-bold">{{$four}}</dt>
@@ -146,7 +146,7 @@ $config = [
                     </div>
                 </div>
                 <div class="col-md-3 mt-3">
-                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4 cursor-pointer">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4">
                         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                           <dl class="mb-0">
                             <dt class="fs-3 fw-bold">{{$typeCmdTotal}}</dt>
@@ -159,7 +159,7 @@ $config = [
                     </div>
                 </div>
                 <div class="col-md-3 mt-3">
-                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4 cursor-pointer {{ $recap['nbrJourMoyen']<=8?'bg-success':'' }} {{ ($recap['nbrJourMoyen']>8 && $recap['nbrJourMoyen']<=15)?'bg-warning':'' }} {{ $recap['nbrJourMoyen']>15?'bg-danger':'' }}">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 pb-4 {{ $recap['nbrJourMoyen']<=8?'bg-success':'' }} {{ ($recap['nbrJourMoyen']>8 && $recap['nbrJourMoyen']<=15)?'bg-warning':'' }} {{ $recap['nbrJourMoyen']>15?'bg-danger':'' }}">
                         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                           <dl class="mb-0">
                             <dt class="fs-3 fw-bold {{ ($recap['nbrJourMoyen']>8 && $recap['nbrJourMoyen']<=15)?'text-dark':'text-white' }}" >{{$recap['nbrJourMoyen']}} Jour(s)</dt>
