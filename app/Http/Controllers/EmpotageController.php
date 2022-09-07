@@ -20,6 +20,7 @@ use App\Models\Entite;
 use App\Models\User; 
 use App\Models\UserRole;
 use DB;
+use File;
 
 class EmpotageController extends Controller
 {
@@ -505,5 +506,93 @@ class EmpotageController extends Controller
 
 
         Notification::send($getMailClient, new empotageCommandesTransitaire($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_dossier'), request('numtc'), request('typetc'), request('plomb'), request('typeCommande')));
+    }
+
+    public function saveDoc(Request $request){
+        try{   
+                $filename = '';
+                $allFileName=[];
+                $docs = explode(",", $request->Document[0]);
+         
+
+               for ($x = 0; $x < $request->TotalFiles; $x++) 
+               {
+     
+                   if ($request->hasFile('files'.$x)) 
+                    {
+                        $current_date_time = Carbon::now()->toDateTimeString();
+                        $paseDate = explode(' ', $current_date_time);
+                        $file     = $request->file('files'.$x); 
+                        $filename = 'doc'.'_'.request('idEmpotage').'_'.($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
+
+                        $file->move("assets/documents/", $filename);
+                        array_push($allFileName, $filename);
+                      
+                    }
+               } 
+        
+               for($i=0; $i<sizeof($docs); $i++){
+                    if($docs[$i]!=''){
+                        array_push($allFileName, $docs[$i]); 
+                    } 
+               }
+        
+                Empotage::where('id', request('idEmpotage'))
+                  ->update([
+                    "complements_document" => json_encode($allFileName)
+                ]);
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        // get Files
+        //$files = Empotage::where('id', request('idEmpotage'))->pluck('complements_document')->first();
+
+         return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
+    }
+
+
+     public function removeDoc(Request $request){
+        try{   
+
+                $allFileName=[];
+                $docs = explode(",", $request->Document[0]);
+         
+                for($i=0; $i<sizeof($docs); $i++){
+                    if($docs[$i]!='' && $docs[$i]!=$request->nameFile){
+                        array_push($allFileName, $docs[$i]); 
+                    } 
+                }
+        
+                Empotage::where('id', request('idEmpotage'))
+                  ->update([
+                    "complements_document" => json_encode($allFileName)
+                ]);
+
+                // delete file
+
+                File::delete("assets/documents/".$request->nameFile);
+                
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
     }
 }

@@ -32,6 +32,7 @@ class CreateEmpotagesTable extends Migration
             $table->text('rapport_pdf');  
             $table->date('date_depart')->nullable();  
             $table->date('date_arrivee')->nullable();  
+            $table->text('complements_document')->nullable(); 
             $table->timestamps();
         });
     }

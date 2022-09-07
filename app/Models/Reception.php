@@ -62,7 +62,8 @@ class Reception extends Model
         if($sortedColumn!=""){
             $query = $query->select("*", \DB::raw("SUM(renbcl + renbpl) as totalColis"))
                     ->groupBy("reidre");
-            $query = $query->orderBy($sortedColumn, $order);
+
+            $query = $query->orderByRaw('CONVERT('.$sortedColumn.', SIGNED) '.$order);
         }else{
             $user = Auth::user();
 

@@ -141,6 +141,7 @@
                         <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true"></i></th>
                         <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[3])">Num Fact <i class="fa fa-sort" aria-hidden="true" ></i></th>
                         <!--th class="text-right p-2 border-right border-white h6">Montant Facture</th-->
+                        <th class="text-nowrap cursor-pointer p-2 border-right border-white h6" v-on:click="sortByColumn(columns[4])">Nbre Jour <i class="fa fa-sort" aria-hidden="true" ></i></th>
                         <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true"></i></th>
                         <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
@@ -183,6 +184,7 @@
                         
                         <td class="p-2 align-middle text-right">{{ dry.renufa }}</td>
                         <!--td class="p-2 align-middle text-right">{{ dry.revafa }}</td-->
+                        <td class="p-2 align-middle white-space-nowrap">{{ dry.nbreJour }}</td>
                         <td class="p-2 align-middle white-space-nowrap"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
                         <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.reuser}}</td>
                         <td class="p-2 text-right align-middle">
@@ -654,7 +656,6 @@
         watch: {
 
 	       paginate: function(){
-
 	            this.getDries();
 	       },
 	       selectedTypeCmd: function(value) {
@@ -695,10 +696,10 @@
                 this.incidentForm.commande=item.rencmd;
             },
              handleFileUploadIncident(){
+                this.attachments = [];
                 for(var i=0; i<this.$refs.fileIncident.files.length;i++){
                     this.attachments.push(this.$refs.fileIncident.files[i])
                 }
-                console.log("DED", this.attachments);
             },
             saveIncident(){
 
@@ -1159,7 +1160,6 @@
         mounted() {
 	        this.getDries();
             this.totalFourniseur = this.listFournisseurs.length;
-            this.sortedColumn = this.columns[0];
 
 	    }
 
