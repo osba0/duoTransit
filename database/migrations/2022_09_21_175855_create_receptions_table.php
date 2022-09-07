@@ -48,7 +48,7 @@ class CreateReceptionsTable extends Migration
             $table->boolean('reinci')->default(0);
             $table->integer('priorite')->default(2);
             $table->timestamp('recrea');  
-            $table->timestamp('reupda');
+            $table->timestamp('reupda')->default(\DB::raw('CURRENT_TIMESTAMP'));
 
 
 

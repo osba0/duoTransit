@@ -89,13 +89,14 @@ class HistoActionController extends Controller
                 'empotages.reetat as etat',
                 'empotages.rapport_pdf as rapport_pdf',
                 'empotages.created_at as created_at',
+                'empotages.complements_document as docs',
                 'users.username as user',
                 'entrepots.nomEntrepot as nomEntrepot', 
                 'entrepots.id as idEntrepot',
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.tcolor as tcolor',
                 'type_commandes.id as typecmdID',
-                'contenaires.nom as contenaire')->where('empotages.reetat', true)->where('receptions.clients_id', request('id'))->whereBetween('empotages.updated_at', [request('filtre.dateDebut').' 00:00:00', request('filtre.dateFin').' 23:59:59']);
+                'contenaires.nom as contenaire')->where('empotages.reetat', true)->where('receptions.clients_id', request('id'))->whereBetween('empotages.created_at', [request('filtre.dateDebut').' 00:00:00', request('filtre.dateFin').' 23:59:59']);
 
 
 

@@ -167,6 +167,11 @@ Route::middleware(['web','auth'])->group(function () {
 
 });
 
+Route::post('/saveDocs/{idEmpotage}', [EmpotageController::class, 'saveDoc'])->middleware(['auth']);
+
+Route::post('/removeDocs/{idEmpotage}', [EmpotageController::class, 'removeDoc'])->middleware(['auth']);
+
+
 Route::post('/chargement/save', [ChargementController::class, 'create'])->middleware(['auth']);
 
 Route::get('/precharger/{id}', [PrechargementController::class, 'index'])->name('precharger')->middleware(['auth']);

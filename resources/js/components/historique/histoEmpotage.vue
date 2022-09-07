@@ -98,6 +98,7 @@
                                         <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[3])">Nbre colis total <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                         <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[1])">Poids total <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                         <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[2])">Volume total <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                        <th class="p-2 border-right border-white h6 bg-primary">N° Docin</th>
                                         <th class="p-2 border-right border-white h6">Etat</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Date</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
@@ -124,7 +125,9 @@
                                             <td>{{ res.colis_total }}</td>
                                             <td>{{ res.total_poids }}</td>
                                             <td>{{ res.total_volume }}</td>
-                                           
+                                            <td>
+                                                <button class="badge border-0 badge-info" v-on:click="addNumDocin(res)">Ajouter</button>
+                                            </td>
                                             <td>
                                                 <!--span v-if="res.etat==1" class="badge badge-success">Validé</span-->
                                                 <span v-if="res.is_close==1" class="badge badge-primary">Cloturé</span>
@@ -145,6 +148,11 @@
                                                     </div>
                                                     <a v-if="res.etat==1" href="#" title="Rapport Empotage" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(res)" data-toggle="modal" data-target="#openFacture">
                                                         <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a v-if="res.etat==1" href="#" title="Complément de document" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-warning"  @click="showDocument(res)" data-toggle="modal" data-target="#openDocument">
+                                                        <i class="fa fa-files-o" aria-hidden="true"></i>
+                                                        <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDoc(res.document) > 9 ? '+9' : getCountDoc(res.document) }}</span>
+                                                     
                                                     </a>
                                                 </div>
                                                 
@@ -352,6 +360,54 @@
             
           </div>
         </div>
+        <!-- Modal Document-->
+        <div class="modal fade fullscreenModal" id="openDocument" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+          aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="document">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left align-items-center">
+                        <h4 class="modal-title font-weight-bold">Documents</h4>
+                        <div class="flex-1 text-center">
+                            <label class="mb-0">Ajout un fichier</label>
+                            <input type="file" id="file" name="file" multiple ref="fileDoc" v-on:change="handleFileUploadDoc()"/>
+                            <button class="btn btn-success" v-on:click="saveDocs()">Enregister</button>
+                        </div>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupDoc" v-on:click="search(currentPage)">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3 overflow-hidden">
+                        <div class="d-flex justify-content-between h-100">
+                            <div>
+                                <div class="d-flex flex-column">
+                                    <template v-for="doc, index in tabDoc">
+                                        <div class="position-relative">
+                                            <button v-on:click="getDoc(index)" class="btn rounded-circle  btn-default mb-2" :class="index==currentIndex ? 'bg-light':''">
+                                                <span class="h1"><i class="fa fa-file"></i></span>
+                                            </button>
+                                            <button style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="removeDoc(doc)"><i class="fa fa-times"></i></button>
+                                        </div>
+                                    </template>
+                                   
+                                </div>
+                            </div>
+                             <template v-if="tabDoc.length > 0">
+                                <embed :src="'/assets/documents/'+tabDoc[currentIndex]" frameborder="0" width="95%" height="450px">
+                              </template>
+                             <template v-else>
+                                <div class="w-100 text-center">Aucun document </div> 
+                              </template>
+                            
+                         </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" v-on:click="closeModalDoc()" class="btn btn-warning">Fermer</button>
+                  </div>
+             </div>
+            
+          </div>
+        </div>
         <modalDetailsCommande></modalDetailsCommande>
      
     </div>
@@ -418,7 +474,12 @@ export default {
             // Sort column Reception
             columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu'],
             sortedColumn: '',
-            order: 'asc'
+            order: 'asc',
+            attachments: [],
+            currentEmpotage: null,
+            tabDoc: [],
+            currentIndex: 0,
+            currentPage: 1
         };
     },
     watch: {
@@ -440,6 +501,28 @@ export default {
         
     },
     methods: {
+        addNumDocin(empo){
+            var numDocin = "";
+            Vue.swal.fire({
+              title: 'Entrer le n° docin',
+              input: 'text',
+              inputAttributes: {
+                autocapitalize: 'off'
+              },
+              showCancelButton: true,
+              confirmButtonText: 'Look up',
+              showLoaderOnConfirm: true,
+              preConfirm: (val) => {
+                numDocin = val;
+              },
+              allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+              alert(numDocin);   
+            });
+        },
+        getDoc(index){
+            this.currentIndex = index;
+        },
         sortByColumn(column) {
             this.sortedColumn = column;
             this.order = (this.order === 'asc') ? 'desc' : 'asc';
@@ -448,15 +531,114 @@ export default {
             this.sortedColumnSearch = column;
             this.orderSearch = (this.orderSearch === 'asc') ? 'desc' : 'asc';
         },
+        getCountDoc(doc){
+            if(Array.isArray(doc)){
+                return doc.length;
+            }
+            return 0;
+        },
         disabledFutureDate(date) {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
           return date > today;
         },
+        handleFileUploadDoc(){
+                this.attachments = [];
+                for(var i=0; i<this.$refs.fileDoc.files.length;i++){
+                    this.attachments.push(this.$refs.fileDoc.files[i])
+                }
+            },
+        saveDocs(){
+            const data = new FormData();
+            
+            data.append('file[]', this.attachments);
+
+            for (let i = 0; i < this.attachments.length; i++) {
+                data.append('files' + i, this.attachments[i]);
+            }
+
+
+            data.append('TotalFiles', this.attachments.length);
+
+            data.append('Document[]', this.tabDoc); 
+
+            axios.post("/saveDocs/"+this.currentEmpotage, data,  {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        } 
+                }).then(response => {
+                   
+                    this.$refs.fileDoc.value = null;
+                    if(response.data.code==0){
+                         this.tabDoc = response.data.file;
+                         this.currentIndex = 0;
+                        Vue.swal.fire(
+                          'succés!',
+                          'Document(s) ajouté(s) avec succés!',
+                          'success'
+                        )         
+
+                    }else{
+                         Vue.swal.fire(
+                          'error!',
+                          response.data.message,
+                          'error'
+                        )
+                    }
+                   
+                });
+        },
+        removeDoc(nameDoc){
+
+                Vue.swal.fire({
+                  title: 'Confirmez la suppression du document',
+                  text: nameDoc,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'Oui, supprimer!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                       // remove Doc
+                       const data = new FormData();
+
+                        data.append('Document[]', this.tabDoc); 
+                        data.append('nameFile', nameDoc); 
+
+                        axios.post("/removeDocs/"+this.currentEmpotage, data,  {
+                                    headers: {
+                                        'Content-Type': 'multipart/form-data'
+                                    } 
+                            }).then(response => {
+                               
+                                if(response.data.code==0){
+                                     this.tabDoc = response.data.file;
+                                     this.currentIndex = 0;
+                                    Vue.swal.fire(
+                                      'succés!',
+                                      'Document(s) ajouté(s) avec succés!',
+                                      'success'
+                                    )         
+
+                                }else{
+                                     Vue.swal.fire(
+                                      'error!',
+                                      response.data.message,
+                                      'error'
+                                    )
+                                }
+                               
+                            });
+                  
+                  }
+                });
+            },
         search(page=1){
             this.showResult = true;
             this.isloading = true;
+            this.currentPage = page;
             this.reinit();
             axios.post('/search/histoEmpotage/'+this.clientCurrent.id+"?column="+this.sortedColumnSearch+"&order="+this.orderSearch,{
                 page: page,
@@ -491,9 +673,9 @@ export default {
         },
         detailsCommande(empotage){
             this.isDetail=true;
-            this.selected.numtc=empotage.numContenaire;
-            this.selected.typetc=empotage.typeContenaire;
-            this.selected.plomb=empotage.plomb;
+            this.selected.numtc    = empotage.numContenaire;
+            this.selected.typetc   = empotage.typeContenaire;
+            this.selected.plomb    = empotage.plomb;
             this.selected.identifiant = empotage.id;
             this.selected.typeCmd    = empotage.typeCommandeID;
             this.selected.dossier = empotage.reference;
@@ -524,6 +706,19 @@ export default {
             var labelCmd = pre.typeCommande.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
             this.pdfFileModal = 'dossier-'+pre.reference+'_'+labelCmd+'_numtc-'+pre.numContenaire+'_plomb-'+pre.plomb+".pdf";
        },
+       showDocument(empo){
+            this.tabDoc = [];
+            this.currentEmpotage = empo.id;
+            if(Array.isArray(empo.document)){
+                this.tabDoc = empo.document;
+            }
+            
+           
+       },
+        closeModalDoc(){
+            this.$refs.closePoupDoc.click();
+            this.search(this.currentPage);
+        },
        closeModalPdf(){
             this.$refs.closePoupPdf.click();
         },

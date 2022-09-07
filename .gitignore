@@ -13,3 +13,4 @@ npm-debug.log
 yarn-error.log
 /public/pdf
 /public/assets/factures
+/public/assets/documents

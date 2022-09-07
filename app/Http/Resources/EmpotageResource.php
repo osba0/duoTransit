@@ -44,6 +44,7 @@ class EmpotageResource extends JsonResource
             "date"           => Carbon::parse($this->created_at)->format('d/m/Y'),
             "dateDepartEng"     => $this->dateDepart!=null ? $this->dateDepart:'',
             "dateArriveeEng"    => $this->dateArrivee!=null ? $this->dateArrivee: '',
+            "document"  =>  isset($this->docs) && !is_null($this->docs)? json_decode($this->docs) : json_decode("[]")
         ];
     }
 }
