@@ -917,6 +917,8 @@
 
     	        axios.post("/"+action, data).then(response => {
 	                console.log('Rep', response.data.code);
+                     this.$refs.file.value = null;
+                     this.reception.file = null;
 	                if(response.data.code==0){
 	                    this.$refs.closePoup.click();
 	                    Vue.swal.fire(
@@ -929,7 +931,7 @@
 	                    this.flushData();
 	                    this.show = true;
 
-                        this.sendNotification(response.data.message);
+                        //this.sendNotification(response.data.message);
 
 	                }else{
 
