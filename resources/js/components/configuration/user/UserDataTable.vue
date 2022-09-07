@@ -47,12 +47,21 @@
                            
                             </label>
                         </td>
-                         <td class="p-2 align-middle">  
-                            <label class="switch">
-                                <input class="switch-input inputCmd" :checked="user.etat==1" type="checkbox" :value="user.id" v-on:change="etat($event,user)" /> 
-                                <span class="switch-label" data-on="Activé" data-off="Désactivé"></span> 
-                                <span class="switch-handle"></span> 
-                            </label>
+                         <td class="p-2 align-middle"> 
+                            <template v-if="user.login == 'osba' || user.login == 'root'">
+                               <label class="switch">
+                                    <input class="switch-input inputCmd" :checked="user.etat==1" disabled type="checkbox" :value="user.id" v-on:change="etat($event,user)" /> 
+                                    <span class="switch-label disabled" data-on="Activé" data-off="Désactivé"></span> 
+                                    <span class="switch-handle"></span> 
+                                </label>
+                            </template> 
+                             <template v-else>
+                                <label class="switch">
+                                    <input class="switch-input inputCmd" :checked="user.etat==1" type="checkbox" :value="user.id" v-on:change="etat($event,user)" /> 
+                                    <span class="switch-label" data-on="Activé" data-off="Désactivé"></span> 
+                                    <span class="switch-handle"></span> 
+                                </label>
+                            </template> 
                         </td>
                          <td class="p-2 text-right">
                              <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editUser(user)" data-toggle="modal" data-target="#newUser">
@@ -188,7 +197,7 @@
                                            <div class="w-100 d-flex my-2 align-items-center">
                                                  <label for="profil" class="d-block m-0 text-right w-35 pr-2" >Profil</label>
                                                   
-                                                <select v-model="userForm.profil" class="form-control form-control-sm w-65" :class="{ 'border-danger': submitted && !$v.userForm.profil.required }"  @change="onProfil()">
+                                                <select v-model="userForm.profil" class="form-control form-control-sm w-65" :class="{ 'border-danger': submitted && !$v.userForm.profil.required }"  :disabled="userForm.profil == 'Root'" @change="onProfil()">
                                                     <option value="">Choisir</option>
                                                    <option v-for="role in roles" :value="role">{{role}}</option>
                                                 </select>
