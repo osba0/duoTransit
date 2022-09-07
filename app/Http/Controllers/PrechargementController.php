@@ -58,7 +58,7 @@ class PrechargementController extends Controller
 
         $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
 
-        $contenaires = Contenaire::whereIn('id',$entite->contenaires_id)->get(); 
+        $contenaires = Contenaire::whereIn('id',(array) $entite->contenaires_id)->get(); 
 
         $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
 
