@@ -27,7 +27,7 @@ class CreateClientsTable extends Migration
             $table->string('pays');
             $table->string('cletat'); 
             $table->timestamp('clcrea');
-            $table->timestamp('clupda');
+            $table->timestamp('clupda')->default(\DB::raw('CURRENT_TIMESTAMP'));
 
         });
     }
