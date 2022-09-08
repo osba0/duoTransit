@@ -554,8 +554,8 @@ export default {
 
             if(!this.attachments.length > 0){
                  Vue.swal.fire(
-                          'warning!',
-                          'Ajouter un document ajouté avant de valider!',
+                          '',
+                          'Ajouter un document avant de valider!',
                           'warning'
                         )   
                 return false;
