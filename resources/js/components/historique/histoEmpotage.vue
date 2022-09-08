@@ -510,7 +510,7 @@ export default {
                 autocapitalize: 'off'
               },
               showCancelButton: true,
-              confirmButtonText: 'Look up',
+              confirmButtonText: 'Valider',
               showLoaderOnConfirm: true,
               preConfirm: (val) => {
                 numDocin = val;
@@ -618,7 +618,7 @@ export default {
                                      this.currentIndex = 0;
                                     Vue.swal.fire(
                                       'succés!',
-                                      'Document(s) ajouté(s) avec succés!',
+                                      'Document(s) supprimé(s) avec succés!',
                                       'success'
                                     )         
 
