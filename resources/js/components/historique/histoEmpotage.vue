@@ -551,6 +551,15 @@ export default {
             },
         saveDocs(){
             const data = new FormData();
+
+            if(!this.attachments.length > 0){
+                 Vue.swal.fire(
+                          'warning!',
+                          'Ajouter un document ajouté avant de valider!',
+                          'warning'
+                        )   
+                return false;
+            }
             
             data.append('file[]', this.attachments);
 
