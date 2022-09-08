@@ -368,7 +368,7 @@
                         </template>
 
                     </tbody>
-                    <tfoot class="thead-blue position-relative">
+                    <tfoot class="thead-blue position-relative"  :class="[run? 'disabled-row':'']">
                              <tr>
                                 <th class="p-2 border-right border-white h6">#</th>
                                 <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
