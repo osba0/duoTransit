@@ -306,11 +306,11 @@
                             </tr>
                         </thead>
                         <tbody class="bgStripe">
-                        <template v-if="!reception.data || !reception.data.length">
+                        <template v-if="!dries.data || !dries.data.length">
                             <tr><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
                         </template>
                         <template v-else>
-                            <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white"  v-bind:style="[dry.dossier_id > 0 ? {'opacity': 0.3} : {'opacity': '1'}]">
+                            <tr v-for="dry in dries.data" :key="dry.reidre" class="bg-white"  v-bind:style="[dry.dossier_id > 0 ? {'opacity': 0.3} : {'opacity': '1'}]">
                             
                             <td class="p-2 align-middle position-relative">
                                 <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>
@@ -389,7 +389,7 @@
                 </div>
             <div class="d-flex mt-4 justify-content-center">
                 <pagination
-                    :data="reception"
+                    :data="dries"
                     @pagination-change-page="getReception"
                 ></pagination>
                 
@@ -471,7 +471,7 @@
                 selectedTypeCmd: "",
                 typeCommandeUsed: {},
                 prechargement:{},
-                reception: {},
+                dries: {},
                 paginateRecep: 200,  // bug lors de la selection de la 2 page les stats sont renitialisé
                 typeCommande: "",
                 entrepot:'',
@@ -647,7 +647,7 @@
             this.isLoading=true;
             axios.get('/prechargement/getreception/'+this.idClient+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID+"&entrepotID="+this.selected.entrepotID+"&keysearch="+this.search+"&rate="+this.filtreRate+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
                
-                this.reception = response.data;
+                this.dries = response.data;
 
                 this.isLoading = false;
             });
