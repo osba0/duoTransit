@@ -171,7 +171,7 @@ class PrechargementController extends Controller
                 'type_commandes.tcolor as typecmdColor',
                 'entrepots.id as entrepots_id',
                 'entrepots.nomEntrepot as entrepots_name',
-                'contenaires.nom as contenaire')->groupBy('dossier_prechargements.id', 'receptions.dossier_prechargements_id')->where('dossier_prechargements.clients_id', request('id'));
+                'contenaires.nom as contenaire')->groupBy('dossier_prechargements.id')->where('dossier_prechargements.clients_id', request('id'));
 
             if($keyword!=''){
                 $term = "%$keyword%";

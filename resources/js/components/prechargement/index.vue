@@ -306,69 +306,69 @@
                             </tr>
                         </thead>
                         <tbody class="bgStripe">
-                <template v-if="!reception.data || !reception.data.length">
-                    <tr><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
-                </template>
-                <template v-else>
-                    <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white"  v-bind:style="[dry.dossier_id > 0 ? {'opacity': 0.3} : {'opacity': '1'}]">
-                    
-                    <td class="p-2 align-middle position-relative">
-                        <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>
-                        {{ dry.reidre }}
-                    </td>
-                    <td class="p-2 align-middle">
-                         <!--label class="badge badge-primary mr-1 numCmdLab w-100">{{ dry.rencmd }}</label-->
-                         {{ dry.rencmd }}
-                    </td> 
-                    <td class="p-2 align-middle">{{ dry.refere }}</td>
-                    <td class="p-2 align-middle">{{ dry.reecvr }}</td>
-                    <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
-                    <td class="p-2 align-middle white-space-nowrap">
-                            <template v-if="dry.renbcl > 0">
-                                    <label class="badge badge-secondary mr-1">{{dry.renbcl}} Colis</label>
-                              </template>
-                              <template v-if="dry.renbpl > 0">
-                                 <label class="badge badge-info mr-1">{{dry.renbpl}} Pal</label>
-                              </template>
-                    
-                    </td>
-                    <td class="p-2 align-middle text-right">{{ dry.repoid }}</td>
-                    <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
-                    
-                    <td class="p-2 align-middle text-right">{{ dry.renufa }}</td>
-                    <td class="p-2 align-middle"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
-                    <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.reuser}}</td>
-                    <td class="p-2 align-middle rateCenter position-relative" @click="setID(dry.reidre)">
-
-                        <rate :id="'recep_'+dry.reidre" :length="3" :value="dry.priorite" :ratedesc="['Pas urgente', 'Normale', 'Urgente']" @after-rate="onAfterRate" :readonly="false" :disabled="false" />
-
-                    </td>
-                    <td class="p-2 text-right">
-
-                        <div class="d-flex align-items-center justify-content-end">
-
-                            <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
-                                <i class="fa fa-eye" aria-hidden="true"></i>
-                                 <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
-                            </a>
-
-                            <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)">
-                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
-                                <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
-                            </button>
+                        <template v-if="!reception.data || !reception.data.length">
+                            <tr><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
+                        </template>
+                        <template v-else>
+                            <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white"  v-bind:style="[dry.dossier_id > 0 ? {'opacity': 0.3} : {'opacity': '1'}]">
                             
-                            <label class="switch mr-0"  v-bind:style="[dry.dossier_id > 0 || selected.etat == 1 ? {'opacity': 0.5} : {'opacity': '1'}]">
-                                <input :disabled="dry.dossier_id > 0 || selected.etat == 1" class="switch-input inputCmd" :checked="selected.id == dry.idPre" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
-                                <span class="switch-label" data-on="OK" data-off="Choisir"></span> 
-                                <span class="switch-handle"></span> 
-                            </label>
-                        </div>
-                    </td>
-                </tr>
-                </template>
+                            <td class="p-2 align-middle position-relative">
+                                <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>
+                                {{ dry.reidre }}
+                            </td>
+                            <td class="p-2 align-middle">
+                                 <!--label class="badge badge-primary mr-1 numCmdLab w-100">{{ dry.rencmd }}</label-->
+                                 {{ dry.rencmd }}
+                            </td> 
+                            <td class="p-2 align-middle">{{ dry.refere }}</td>
+                            <td class="p-2 align-middle">{{ dry.reecvr }}</td>
+                            <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
+                            <td class="p-2 align-middle white-space-nowrap">
+                                    <template v-if="dry.renbcl > 0">
+                                            <label class="badge badge-secondary mr-1">{{dry.renbcl}} Colis</label>
+                                      </template>
+                                      <template v-if="dry.renbpl > 0">
+                                         <label class="badge badge-info mr-1">{{dry.renbpl}} Pal</label>
+                                      </template>
+                            
+                            </td>
+                            <td class="p-2 align-middle text-right">{{ dry.repoid }}</td>
+                            <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
+                            
+                            <td class="p-2 align-middle text-right">{{ dry.renufa }}</td>
+                            <td class="p-2 align-middle"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
+                            <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.reuser}}</td>
+                            <td class="p-2 align-middle rateCenter position-relative" @click="setID(dry.reidre)">
 
-                </tbody>
-                 <tfoot class="thead-blue position-relative" :class="[run? 'disabled-row':'']"  v-bind:style="[reception.data.length > 5 ? {'display': none} : '']">
+                                <rate :id="'recep_'+dry.reidre" :length="3" :value="dry.priorite" :ratedesc="['Pas urgente', 'Normale', 'Urgente']" @after-rate="onAfterRate" :readonly="false" :disabled="false" />
+
+                            </td>
+                            <td class="p-2 text-right">
+
+                                <div class="d-flex align-items-center justify-content-end">
+
+                                    <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                         <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
+                                    </a>
+
+                                    <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)">
+                                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                        <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
+                                    </button>
+                                    
+                                    <label class="switch mr-0"  v-bind:style="[dry.dossier_id > 0 || selected.etat == 1 ? {'opacity': 0.5} : {'opacity': '1'}]">
+                                        <input :disabled="dry.dossier_id > 0 || selected.etat == 1" class="switch-input inputCmd" :checked="selected.id == dry.idPre" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
+                                        <span class="switch-label" data-on="OK" data-off="Choisir"></span> 
+                                        <span class="switch-handle"></span> 
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        </template>
+
+                    </tbody>
+                    <tfoot class="thead-blue position-relative">
                              <tr>
                                 <th class="p-2 border-right border-white h6">#</th>
                                 <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
@@ -570,7 +570,7 @@
             }
             return "#aaa";
         },
-        showDossier(pre){
+        showDossier(pre){ 
             this.commandeSelected = [];
             this.commandeNoSelected = [];
 
@@ -646,7 +646,9 @@
         getReception(page = 1){
             this.isLoading=true;
             axios.get('/prechargement/getreception/'+this.idClient+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID+"&entrepotID="+this.selected.entrepotID+"&keysearch="+this.search+"&rate="+this.filtreRate+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
+               
                 this.reception = response.data;
+
                 this.isLoading = false;
             });
         },
