@@ -153,7 +153,6 @@ class PrechargementController extends Controller
             ->leftJoin('type_commandes', 'dossier_prechargements.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('contenaires', 'dossier_prechargements.contenaires_id', '=', 'contenaires.id')
             ->leftJoin('entrepots', 'dossier_prechargements.entrepots_id', '=', 'entrepots.id')
-            ->groupBy('dossier_prechargements.id', 'receptions.dossier_prechargements_id', 'dossier_prechargements.nbreContenaire', 'dossier_prechargements.users_id')
             ->select('receptions.dossier_prechargements_id', 
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
                 DB::raw('SUM(receptions.revolu) as total_volume'), 
@@ -172,7 +171,7 @@ class PrechargementController extends Controller
                 'type_commandes.tcolor as typecmdColor',
                 'entrepots.id as entrepots_id',
                 'entrepots.nomEntrepot as entrepots_name',
-                'contenaires.nom as contenaire')->where('dossier_prechargements.clients_id', request('id'));
+                'contenaires.nom as contenaire')->groupBy('dossier_prechargements.id')->where('dossier_prechargements.clients_id', request('id'));
 
             if($keyword!=''){
                 $term = "%$keyword%";
