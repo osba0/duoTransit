@@ -1118,3 +1118,24 @@ table .bgStripe .rowActif{
     height: 100%;
     background: rgba(255, 255, 255, 0.3);
 }
+
+.bgValid::after{
+    content: "";
+    position: absolute;
+    width:  100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.isValidate {
+  left: -2px;
+  background: green;
+  width: 10px;
+  height: 10px;
+  top: 2px;
+  border: 0;
+  font-size: 0;
+  border: 1px solid #fff;
+}

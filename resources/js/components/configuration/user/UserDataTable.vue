@@ -394,6 +394,7 @@
                     }
                     this.submitted = false;
                     this.noClientRole = true;
+                    this.value = [];
                    
                 });
             },

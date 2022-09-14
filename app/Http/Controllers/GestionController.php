@@ -550,7 +550,7 @@ class GestionController extends Controller
 
         $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
 
-        $contenaires = Contenaire::whereIn('id',(array) $entite->contenaires_id)->get(); 
+        $contenaires = Contenaire::whereIn('id', (array) $entite->contenaires_id)->get();  //json_decode($entite->contenaires_id, true)
 
         $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
 
@@ -563,7 +563,7 @@ class GestionController extends Controller
             })->select('*','chargement_creations.type_commandes_id as type_commandes', 'chargement_creations.entrepots_id as entrepots', 'chargement_creations.id as idpre')->where(function($query){
                 $query->orWhereNull('empo.reference')->orWhereNull('empo.type_commandes_id')->orWhereNull('empo.entrepots_id');
 
-            })->where('chargement_creations.reetat', true)->get();
+            })/*->where('chargement_creations.reetat', true)*/->get();
 
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];

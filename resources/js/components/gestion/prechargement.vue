@@ -21,7 +21,7 @@
             </ol>
           </div>
         </div>
-
+ 
 
         <template v-if="!isDetail">
             <div class="row d-flex align-items-center justify-content-between mb-3">
@@ -795,9 +795,12 @@
                               'Supprimé!',
                               'Dossier préchargement supprimé.',
                               'success'
-                            );
-                             this.modeModify = false;
-                             this.getPrechargement();
+                            ).then((result) => {
+                                            // reload   
+                                            location.reload();
+                                        });
+                             /*this.modeModify = false;
+                             this.getPrechargement();*/
 
 
                         });

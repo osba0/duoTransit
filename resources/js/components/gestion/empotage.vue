@@ -18,8 +18,6 @@
         </div>
 
         <template v-if="!isDetail">
-
-
             <div class="row">
                 <div class="col-sm-12">
                     <div class="d-flex align-items-center justify-content-between mb-3">
@@ -99,9 +97,9 @@
                             <thead class="thead-blue" :class="[isLoading ? '' : 'hasborder']">
                                  <tr>
                                     <th class="p-2 border-right border-white h6">N° Dossier</th>
-                                    <th class="p-2 border-right border-white h6">N°TC</th>
+                                    <!--th class="p-2 border-right border-white h6">N°TC</th>
                                     <th class="p-2 border-right border-white h6">Type TC</th>
-                                    <th class="p-2 border-right border-white h6">N°Plomb</th>
+                                    <th class="p-2 border-right border-white h6">N°Plomb</th-->
                                     <th class="p-2 border-right border-white h6">Entrepôt</th>
                                     <th class="p-2 border-right border-white h6" title="Date départ du bâteau">Date Départ</th>
                                     <th class="p-2 border-right border-white h6"  title="Date arrivée du bâteau">Date Arrivée</th>
@@ -121,7 +119,7 @@
                                             <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': empo.typeCmd_color} : {'background': '#ccc'}]"></div> {{ empo.reference }}
                                         </td>
                                        
-                                        <td class="p-2 align-middle">
+                                        <!--td class="p-2 align-middle">
                                             {{ empo.numContenaire }}
                                         </td>
                                         <td class="p-2 align-middle">
@@ -129,7 +127,7 @@
                                         </td>
                                         <td class="p-2 align-middle">
                                            {{ empo.plomb }}
-                                        </td>
+                                        </td-->
                                         <td class="p-2 align-middle">
                                            {{ empo.entrepot }}
                                         </td>
@@ -154,7 +152,19 @@
                                             <a v-if="empo.etat==1" href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-danger"  @click="showRapport(empo)" data-toggle="modal" data-target="#openFacture">
                                                     <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                                 </a>
-                                            <button v-if="empo.etat==0"  @click="showDossier(empo)" class="btn btn-info btn-sm">Ouvrir</button>
+                                            <!--button v-if="empo.etat==0"  @click="showDossier(empo)" class="btn btn-info btn-sm">Ouvrir</button-->
+                                            
+                                            <a href="#" title="Liste contenaire" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-warning"  @click="showContenaire(empo)">
+                                                <i class="fa fa-cube" aria-hidden="true"></i><span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{empo.totalContenaire}}</span></a>
+                                             <a v-if="empo.etat==0" href="#" title="Complément de document" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-warning"  @click="showDocument(empo)" data-toggle="modal" data-target="#openDocument">
+                                                        <i class="fa fa-files-o" aria-hidden="true"></i>
+                                                        <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDoc(empo.document) > 9 ? '+9' : getCountDoc(empo.document) }}</span>
+                                                     
+                                                    </a>
+                                            <a v-if="empo.etat==0"  title="Cloturer" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="cloturer(empo)">
+                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                            </a>
+
                                             <!--button title="Editer" href="#" class="btn btn-secondary btn-sm mx-2" v-on:click="editEmpotage(empotage)" data-toggle="modal" data-target="#newEmpotage">
                                                     <i class="fa fa-pencil" aria-hidden="true"></i> Modifier
                                             </button-->
@@ -188,81 +198,112 @@
         </template>
         <template v-else>
             <div class="mb-3 d-flex justify-content-between align-items-center">
-                <button class="btn btn-primary mb-3" @click="back()">
+                <button class="btn btn-primary mb-2" @click="back()">
                     <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                 </button>
-                <div class="d-flex">
+                <div>
+                    <div class="d-flex flex-row justify-content-center">
+                        <template v-for="contenaire, index in contenaires.data">
+                            <div class="position-relative ml-3" style="width:60px">
+                                <button v-on:click="contenaireSelectionner(index)" class="btn rounded-circle btn-default mb-2" :class="index==currentIndex ? 'bg-primary':'bg-light'"><span class="h1"><i class="fa fa-cube"></i></span>
+                                </button>
+                                <button v-if="contenaire.etat == 1" style="top: -3px; right: -3px;"  v-on:click="reactiver(contenaire, index)" class="badge badge-success position-absolute rounded-circle  border-0"><i class="fa fa-refresh"></i></button>
+                              
+                                <button v-if="contenaire.etat == 0" style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="supprimerContenaire(contenaire)"><i class="fa fa-times"></i></button>
+                            </div>
+                        </template>
+                        <template v-if="!(!contenaires.data || !contenaires.data.length)">
+                            <div class="position-relative ml-3" style="width:60px">
+                                <button class="btn  btn-transparent rounded-circle mb-2" data-toggle="modal" data-target="#creerContenaire"><span class="h1"><i class="fa fa-plus"></i></span>
+                                </button>
+                            </div>
+                        </template>
+                       
+                        <template v-else>
+                            <div class="position-relative ml-3">
+                                <button class="text-white h2 btn btn-primary font-weight-bold" data-toggle="modal" data-target="#creerContenaire">  <span class="mb-0 align-middle"><i class="fa fa-plus"></i></span><span class="mb-0 pl-1">Ajouter un contenaire</span>
+                                </button>
+                            </div>
+                        </template>
+                       
+                    </div>
+                </div>
+            </div>
+            <template v-if="!contenaires.data || !contenaires.data.length">
+                <hr>
+                <div class="text-center">Aucun contenaire crée.</div>
+            </template>
+            <template v-else>
+                <div class="d-flex mb-2">
                     <div class="h5 mb-0 rounded bg-white py-2 px-3 border">N°TC: <b>{{ selected.numtc }}</b></div>
                     <div class="h5 mb-0 rounded bg-white py-2 px-3 border mx-3">Type TC: <b>{{ selected.typetc }}</b></div>
                     <div class="h5 mb-0 rounded bg-white py-2 px-3 border">Plomb: <b>{{ selected.plomb }}</b></div>
                 </div>
-            </div>
-           
-            <div class="mb-3 mb-3 d-block">
-                <VueScrollFixedNavbar>
-                <table class="table table-bordered bg-white"> 
-                <tr>
-                    <th class="text-uppercase thead-blue py-1 w-60">Total
-                    <span class="ml-2 py-0 px-2 rounded text-lowercase bg-warning" v-if="selected.etat==0">En cours</span>
-                    <span class="ml-2 py-0 px-2 rounded text-lowercase bg-success" v-if="selected.etat==1">Validé</span>
-                    </th>
-                    <th class="text-uppercase thead-blue py-1">Etat contenaire</th>
-                </tr>
-                <tr>
-                    <td class="align-middle">
-                        <div class="d-flex justify-content-between detailPrecharge position-relative">
-                            <ul class="w-100 legend m-0 p-0 position-absolute" style="top:-10px">
-                                <li class="w-100 text-center font-weight-bold">
-                                    <span class="float-none d-inline-block etat_T m-0 mr-1 border-0" :style="{'background': getColorTypeCmd(selected.idCmd)}"></span> 
-                                    {{ selected.typeCmd}}
-                                </li>
-                            </ul>
-                            <table class="table m-0 mt-3 table-striped">
-                                <tbody> 
-                                     <tr>
-                                        <th>Nbre Commande: {{ format_nbr(selected.nbrCmd) }}</th>
-                                        <th>Nbre de colis empoté: {{ format_nbr(selected.nbrColis) }}</th>
-                                        <th>Poids empoté: {{ format_nbr(selected.poids) }} KG</th>
-                                        <th>Volume empoté: {{ format_nbr(selected.volume) }} m<sup>3</sup></th>
-                                    </tr>
-                              
-                                </tbody>
+                <div class="mb-3 mb-3 d-block">
+                    <VueScrollFixedNavbar>
+                    <table class="table table-bordered bg-white"> 
+                    <tr>
+                        <th class="text-uppercase thead-blue py-1 w-60">Total
+                        <span class="ml-2 py-0 px-2 rounded text-lowercase bg-warning" v-if="selected.etat==0">En cours</span>
+                        <span class="ml-2 py-0 px-2 rounded text-lowercase bg-success" v-if="selected.etat==1">Validé</span>
+                        </th>
+                        <th class="text-uppercase thead-blue py-1">Etat contenaire</th>
+                    </tr>
+                    <tr>
+                        <td class="align-middle">
+                            <div class="d-flex justify-content-between detailPrecharge position-relative">
+                                <ul class="w-100 legend m-0 p-0 position-absolute" style="top:-10px">
+                                    <li class="w-100 text-center font-weight-bold">
+                                        <span class="float-none d-inline-block etat_T m-0 mr-1 border-0" :style="{'background': getColorTypeCmd(selected.idCmd)}"></span> 
+                                        {{ selected.typeCmd}}
+                                    </li>
+                                </ul>
+                                <table class="table m-0 mt-3 table-striped">
+                                    <tbody> 
+                                         <tr>
+                                            <th>Nbre Commande: {{ format_nbr(selected.nbrCmd) }}</th>
+                                            <th>Nbre de colis empoté: {{ format_nbr(selected.nbrColis) }}</th>
+                                            <th>Poids empoté: {{ format_nbr(selected.poids) }} KG</th>
+                                            <th>Volume empoté: {{ format_nbr(selected.volume) }} m<sup>3</sup></th>
+                                        </tr>
+                                  
+                                    </tbody>
 
-                            </table>
-                        </div>
-                     
-                    </td>
-                    <td class="pt-1 pb-4">
-                        <div class="d-flex m-0 customRadio justify-content-center">
+                                </table>
+                            </div>
+                         
+                        </td>
+                        <td class="pt-1 pb-4">
+                            <div class="d-flex m-0 customRadio justify-content-center">
 
 
-                            <p class="pr-3 m-0" v-for="contenaire in listContenaire" >
+                                <p class="pr-3 m-0" v-for="contenaire in listContenaire" >
 
-                                <input type="radio" disabled :value="contenaire.volume" v-model="capacite" @change="switchContenaire(contenaire.id, contenaire.volume)" :id="'cont_'+contenaire.volume" name="radio-group">
-                                <label :for="'cont_'+contenaire.volume"><span v-if="defaultContenaire.id==contenaire.id">{{ nbrContenaire }}</span> x {{contenaire.nom}}</label>
-                            </p>
-        
-                        </div>
-                        
-                        <div class="conteneurState">
-                           <div id="currentState" v-bind:style="{left: volumePercent+'%'}"></div> 
-                            <div class="valuePercent" v-bind:style="{left: volumePercent+'%'}">{{volumePercent}}%</div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            </VueScrollFixedNavbar>
-            </div>
-            <div class="d-flex justify-content-end align-items-center mr-3  mb-3 sucesss"> 
-                <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
-    
-                <div>
-                     <!--button class="btn btn-lg btn-secondary text-white mr-3  mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button-->
-                    <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
+                                    <input type="radio" disabled :value="contenaire.volume" v-model="capacite" @change="switchContenaire(contenaire.id, contenaire.volume)" :id="'cont_'+contenaire.volume" name="radio-group">
+                                    <label :for="'cont_'+contenaire.volume"><span v-if="defaultContenaire.id==contenaire.id">{{ nbrContenaire }}</span> x {{contenaire.nom}}</label>
+                                </p>
+            
+                            </div>
+                            
+                            <div class="conteneurState">
+                               <div id="currentState" v-bind:style="{left: volumePercent+'%'}"></div> 
+                                <div class="valuePercent" v-bind:style="{left: volumePercent+'%'}">{{volumePercent}}%</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                </VueScrollFixedNavbar>
                 </div>
-               
-            </div>
-            <hr>
+                <div v-if="selected.etat==0" class="d-flex justify-content-end align-items-center mr-3  mb-3 sucesss"> 
+                    <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
+        
+                    <div>
+                         <!--button class="btn btn-lg btn-secondary text-white mr-3  mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button-->
+                        <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
+                    </div>
+                   
+                </div>
+                <hr>
 
             <!--div class="d-flex justify-content-between align-content-center mb-2">
                 <div class="d-flex align-items-end">
@@ -293,7 +334,7 @@
                 </div>
                
             </div-->  
-                
+            <div :class="[selected.etat==1? 'position-relative bgValid':'']" >
                 <table class="table">
                     <thead class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
                          <tr>
@@ -401,11 +442,13 @@
                     ></pagination>
                     
                 </div>
+                </div>
                 <hr>
-                <div class="d-flex justify-content-end mr-3  mb-5 sucesss"> 
+                <div v-if="selected.etat==0" class="d-flex justify-content-end mr-3  mb-5 sucesss"> 
                     <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
                     <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
+            </template>
         </template>
         <!-- Modal Empotage-->
         <div class="modal fade" id="newEmpotage" tabindex="-1" role="dialog" aria-labelledby="myModalEmpotage"
@@ -471,7 +514,7 @@
                                  </div>
                                 
                              </div>
-                              <div class="row">
+                              <!--div class="row">
                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                          <label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
@@ -496,10 +539,7 @@
                                        Type TC
                                        </label>
                                        
-                                        <!--select class="w-65 form-control" v-model="empotageForm.typetc">
-                                            <option value="4">20 DRY</option>
-                                            <option value="3">40 DRY</option>
-                                        </select-->
+                                      
                                         <select class="form-control ml-2" v-model="empotageForm.typetc">
                                             <option value=''>Choisir le contenaire</option>
                                             <option v-for="contenaire in listContenaire"  :value="contenaire.id">{{contenaire.nom}}</option>
@@ -508,7 +548,7 @@
                                     </div>
                                  </div>
                                 
-                             </div>
+                             </div-->
                              <div class="row">
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2 dateW65">
@@ -532,6 +572,78 @@
                                 <template v-else>
                                     <button type="submit" class="btn btn-success">Enregister</button>
                                     <button type="button" v-on:click="closeModal()" class="btn btn-warning">Annuler</button>
+                                </template>
+                               
+                            </div>
+                         </form>
+                    </div>
+                    
+             </div>
+            
+          </div>
+        </div>
+
+        <!-- Modal Contenire-->
+        <div class="modal fade" id="creerContenaire" tabindex="-1" role="dialog" aria-labelledby="myModalContenaire"
+          aria-hidden="true"  data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="document">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left">
+                        <h4 class="modal-title w-100 font-weight-bold">
+                            <template v-if="modeModifyContenaire">Modifier</template>
+                        <template v-else>Nouveau contenaire</template>
+                        
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" v-on:click="closeModal()" aria-label="Close" ref="closePoupContenaire">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3">
+                         <form @submit.prevent="saveContenaire" enctype="multipart/form-data" key=1 >
+                            
+                              <div class="row">
+                                <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                         <label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                       Plomb
+                                       </label>
+                                        <input class="w-65 form-control" id="plomb" v-model="empotageFormContenaire.plomb"/>
+                                    </div>
+                                    
+                                 </div>
+                                  <div class="col-6 my-2 d-flex flex-row justify-content-between align-items-center">
+                                    
+
+                                    <div class="w-49 d-flex align-items-center my-2">
+                                       <label for="tc"  class="d-block m-0 text-left pr-2" style='white-space: nowrap;'>
+                                        N° TC
+                                       </label>
+                                        <input class="w-65 form-control" id="tc" v-model="empotageFormContenaire.tc" />
+                                    </div>
+                                    
+                                    <div class="w-49 d-flex align-items-center my-2">
+                                         <label for="typetc"  class="d-block m-0 text-left  w-35 pr-2" style='white-space: nowrap;'>
+                                       Type TC
+                                       </label>
+                                        <select class="form-control ml-2" v-model="empotageFormContenaire.typetc">
+                                            <option value=''>Choisir le contenaire</option>
+                                            <option v-for="contenaire in listContenaire"  :value="contenaire.id">{{contenaire.nom}}</option>
+                                        </select>
+                                       
+                                    </div>
+                                 </div>
+                                
+                             </div>
+                             <div class="modal-footer d-flex justify-content-center mt-2"> 
+
+                                <template v-if="modeModifyContenaire">
+                                        <button type="submit" class="btn btn-success">Modifier</button>
+                                        <button type="button" v-on:click="closeModal()" class="btn btn-warning">Annuler la modification</button>
+                                </template>
+                                <template v-else>
+                                    <button type="submit" class="btn btn-success">Créer</button>
+                                    <button type="button" v-on:click="closeModalContenaire()" class="btn btn-warning">Annuler</button>
                                 </template>
                                
                             </div>
@@ -568,6 +680,59 @@
           </div>
         </div>
         <modalDetailsCommande></modalDetailsCommande>
+        <!-- Modal Document-->
+        <div class="modal fade fullscreenModal" id="openDocument" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+          aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="document">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left align-items-center">
+                        <h4 class="modal-title font-weight-bold">Documents</h4>
+                       
+                            <div class="flex-1 text-center">
+                                <label class="mb-0">Ajout un fichier</label>
+                                <input type="file" id="file" name="file" multiple ref="fileDoc" v-on:change="handleFileUploadDoc()"/>
+                                <button class="btn btn-success" v-on:click="saveDocs()">Enregister</button>
+                            </div>
+                      
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupDoc" v-on:click="getEmpotage()">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                        
+                    </div>
+                    <div class="modal-body mx-3 overflow-hidden">
+                        <div class="d-flex justify-content-between h-100">
+                            <div>
+                                <div class="d-flex flex-column">
+                                    <template v-for="doc, index in tabDoc">
+                                        <div class="position-relative">
+                                            <button v-on:click="getDoc(index)" class="btn rounded-circle  btn-default mb-2" :class="index==currentIndexDoc ? 'bg-light':''">
+                                                <span class="h1"><i class="fa fa-file"></i></span>
+                                            </button>
+                                            
+                                            <button style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="removeDoc(doc)"><i class="fa fa-times"></i></button>
+                                            
+                                        </div>
+                                    </template>
+                                   
+                                </div>
+                            </div>
+                             <template v-if="tabDoc.length > 0">
+                                <embed :src="'/assets/documents/'+tabDoc[currentIndexDoc]" frameborder="0" width="95%" height="450px">
+                              </template>
+                             <template v-else>
+                                <div class="w-100 text-center">Aucun document </div> 
+                              </template>
+                            
+                         </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" v-on:click="closeModalDoc()" class="btn btn-warning">Fermer</button>
+                  </div>
+             </div>
+            
+          </div>
+        </div>
 
     </div>
 </template>
@@ -657,6 +822,12 @@
                     dateArrivee: ''
 
                 },
+                empotageFormContenaire: {
+                    reference: '',
+                    tc: '',
+                    typetc: '',
+                    plomb: ''
+                },
                 checkedCommandes: [],
                 isDetail: false,
                 commandeSelected: [],
@@ -682,7 +853,13 @@
                 columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis'],
                 sortedColumn: '',
                 order: 'asc',
-                run: false
+                run: false,
+                modeModifyContenaire: false,
+                contenaires: {},
+                currentIndex: 0,
+                currentIndexDoc: 0,
+                attachments: [],
+                tabDoc: []
             }
 
         },
@@ -811,11 +988,12 @@
             }, 
             getReception(page = 1){
                 this.isLoading=true;
-                axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
+               
+                axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order+"&contenaireSelected="+this.contenaires.data[this.currentIndex].id+"&contenaireEtat="+this.contenaires.data[this.currentIndex].etat).then(response => {
 
                     this.reception = response.data;
 
-                    if(this.selected.etat==0){
+                    //if(this.selected.etat==0){
                         this.selected.nbrCmd   = 0;
                         this.selected.nbrColis  = 0;
                         this.selected.poids    = 0;
@@ -860,7 +1038,7 @@
                         this.selected.nbrColis = nbColis;
                         this.selected.nbrCmd = nbCommande;
                         this.setProgressCont(this.selected.volume);
-                    }
+                   // }
                    
                     this.isLoading = false;
                 });
@@ -874,7 +1052,7 @@
                 return dateTime;
             },
             getCmdSelected(id, typeCommande, genererPDF){
-                axios.get('/gerer/getCmd/empoter/'+id+'/'+typeCommande).then(response => {
+                axios.get('/gerer/getCmd/empoter/'+id+'/'+typeCommande+"?IDContenaire="+this.contenaires.data[this.currentIndex].id).then(response => {
                     this.checkedCommandes = response.data.result;
                      if(genererPDF){
                         this.generatePdf(true);
@@ -885,14 +1063,6 @@
                 this.commandeSelected = [];
                 this.commandeNoSelected = [];
                 var self = this;
-                /*$(".inputCmd").each(function(){
-                    if($(this).is(':checked')){
-                        self.commandeSelected.push($(this).val());
-                    }else{
-                        self.commandeNoSelected.push($(this).val());
-                    }
-                    
-                });*/
 
                 $(".val-douane").each(function(){
                     if($(this).val()!=''){
@@ -942,7 +1112,8 @@
                                 'ignored': this.commandeNoSelected,
                                 'idEmpotage' : this.selected.identifiant,
                                 'typeCmd' : this.selected.idCmd,
-                                'id_dossier': this.selected.dossier
+                                'id_dossier': this.selected.dossier,
+                                'IDContenaire': this.contenaires.data[this.currentIndex].id
 
                             }).then(response => {
 
@@ -1249,11 +1420,52 @@
                 */
         
                },
+               showContenaire(empo){
+                    this.isDetail = true;
+                    this.selected.identifiant = empo.id;
+                    this.selected.dossier     = empo.reference;
+                    this.selected.typeCmd     = empo.typeCommande;
+                    this.selected.idCmd       = empo.typeCommandeID;
+                    this.selected.entrepot    =  empo.entrepot;
+                    this.selected.idEntrepot  =  empo.entrepotID;
+                    // get all contener
+                      axios.get('/gerer/empotage/getContenaire/'+empo.id)
+                        .then(response => {
+                            this.contenaires = response.data;
+                            if(this.contenaires.data.length > 0){
+                              this.contenaireSelectionner(0);
+
+                            }
+                    }).catch(error => {});
+               },
+               contenaireSelectionner(index){
+
+                    this.currentIndex = index;
+
+                    this.selected.etat = this.contenaires.data[index].etat;
+
+
+                    this.selected.plomb = this.contenaires.data[index].plomb;
+                    this.selected.numtc = this.contenaires.data[index].numContenaire;
+                    this.selected.typetc = this.contenaires.data[index].typeContenaire;
+
+
+                    this.selected.capacite = this.contenaires.data[index].capaciteContenaire;
+                    this.capacite = this.contenaires.data[index].capaciteContenaire;
+
+                    this.selected.poids      = this.contenaires.data[index].total_poids;
+                    this.selected.volume     = this.contenaires.data[index].total_volume;
+                    this.selected.nbrColis   = this.contenaires.data[index].colis_total;
+
+                    this.setProgressCont(this.contenaires.data[index].total_volume);
+                    this.getReception();
+
+               },
                showDossier(dossier){
                     console.log("EDED: ", dossier.total_poids);
                     this.commandeSelected = [];
                     this.commandeNoSelected = [];
-                    this.isDetail = true;
+                    
                     this.selected.identifiant = dossier.id;
                     this.selected.dossier         = dossier.reference;
                     this.selected.nbrCmd     = dossier.nbrCmd;
@@ -1288,6 +1500,7 @@
                 this.eventCmdSelected.ischecked = -1;
                 this.eventCmdSelected.idcmd = '';
                 this.run = false;
+                this.reception = {};
 
                },
                 getResults() {
@@ -1318,6 +1531,116 @@
                     this.modeModify = false;
 
                 },
+                closeModalContenaire(){
+                    this.$refs.closePoupContenaire.click();
+                    this.flushDataContenaire();
+                    this.modeModifyContenaire = false;
+
+                },
+                reactiver(contenaire, index){
+                     Vue.swal.fire({
+                      title: 'Confirmez la réactivation',
+                      text: "Contenaire n° "+contenaire.numContenaire,
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '',
+                      confirmButtonText: 'Oui, Valider!'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+
+                             Vue.swal({
+                                title: 'Réactivation',
+                                html: '<b>En cours...</b>',
+                                timerProgressBar: true,
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Vue.swal.showLoading()
+                                },
+                                willClose: () => {
+
+                                }
+                            }).then((result) => {});
+
+                           axios.post("/gerer/empotage/reactiver/"+contenaire.id, {
+                                
+                            }).then(response => {
+                                Vue.swal.fire(
+                                  'succés!',
+                                  'Réactivé avec succés!',
+                                  'success'
+                                ).then((result) => {
+
+
+                                    // rafraichir all contenaire 
+                                      axios.get('/gerer/empotage/getContenaire/'+this.selected.identifiant)
+                                        .then(response => {
+                                            this.contenaires = response.data;
+                                            if(this.contenaires.data.length > 0){
+                                                this.contenaireSelectionner(index);
+
+                                            }
+                                    }).catch(error => {});
+                                   
+                                });   
+                            });
+                        }
+                    });
+                },
+                saveContenaire(){
+                    const data = new FormData();
+                    data.append('idEmpo', this.selected.identifiant);
+                    data.append('tc', this.empotageFormContenaire.tc);
+                    data.append('typetc', this.empotageFormContenaire.typetc);
+                    data.append('plomb', this.empotageFormContenaire.plomb);
+
+                    let action = "createContenaireEmpotage";
+
+                    if(this.modeModify){
+                        data.append('id', this.empotageForm.id);    
+                        action = "modifyContenaireEmpotage";
+                    }
+
+                    axios.post("/gerer/empotage/"+action, data).then(response => {
+                      
+                        if(response.data.code==0){
+                            this.$refs.closePoupContenaire.click();
+                            this.flushData();
+                            Vue.swal.fire(
+                                  'succés!',
+                                  'Contenaire crée avec succés!',
+                                  'success'
+                                ).then((result) => {
+
+                                    this.flushContenaire();
+                                    // rafraichir all contenaire 
+                                      axios.get('/gerer/empotage/getContenaire/'+this.selected.identifiant)
+                                        .then(response => {
+                                            this.contenaires = response.data;
+                                            if(this.contenaires.data.length > 0){
+                                                this.contenaireSelectionner(this.contenaires.data.length-1);
+
+                                            }
+                                    }).catch(error => {});
+                                   
+                                });   
+                            
+                        }else{
+                             Vue.swal.fire(
+                              'error!',
+                              response.data.message,
+                              'error'
+                            )
+                        }
+                        this.modeModifyContenaire = false;
+                       
+                    });
+                },
+                flushContenaire(){
+                    this.empotageFormContenaire.tc = '';
+                    this.empotageFormContenaire.typetc = '';
+                    this.empotageFormContenaire.plomb = '';
+                },
                 saveEmpotage(){
                     this.submitted = true;
                     
@@ -1334,16 +1657,14 @@
 
                         return false;
                     }
-                
-
                     
                     
                     const data = new FormData();
                     data.append('reference', this.empotageForm.reference);
                     data.append('typeCmd', this.empotageForm.typeCmd);
-                    data.append('tc', this.empotageForm.tc);
+                    /*data.append('tc', this.empotageForm.tc);
                     data.append('typetc', this.empotageForm.typetc);
-                    data.append('plomb', this.empotageForm.plomb);
+                    data.append('plomb', this.empotageForm.plomb);*/
                     data.append('idClient', this.idClient);
                     data.append('idEntrepot', this.empotageForm.idEntrepot);
                     data.append('date_depart', this.empotageForm.dateDepart);
@@ -1388,6 +1709,11 @@
                     this.empotageForm.typeCmd = "";
                     this.empotageForm.idEntrepot = "";
                 },
+                flushDataContenaire(){
+                    this.empotageFormContenaire.tc = "";
+                    this.empotageFormContenaire.typetc = "";
+                    this.empotageFormContenaire.plomb = "";
+                },
                 setData(event) { 
                     for(var i=0; i< this.listeDossier.length; i++){
                         if(this.listeDossier[i].idpre==event.target.value){
@@ -1430,6 +1756,7 @@
                    
                     const data = new FormData();
                     data.append('idEmpotage', this.selected.identifiant);
+                    data.append('contenaireSelected', this.contenaires.data[this.currentIndex].id);
                     data.append('idreception', cmd.reidre);
                     data.append('douane', douane);
 
@@ -1458,25 +1785,80 @@
 
                 },
                 focusDoune(id){},
-                cloturer(){
+                cloturer(empotage){
                      Vue.swal.fire({
                       title: 'Confirmez la cloture',
-                      text:   'N°TC:'+this.selected.numtc+' - TYPE TC: '+ this.selected.typetc+' DRY - PLOMB: '+this.selected.plomb,
+                      text:   'N° Dossier: '+empotage.reference,
                       icon: 'warning',
                       showCancelButton: true,
-                      confirmButtonColor: '#d33',
-                      cancelButtonColor: '#3085d6',
+                      confirmButtonColor: '#38c172',
+                      //cancelButtonColor: '#f0c867',
                       confirmButtonText: 'Oui, cloturer!'
                     }).then((result) => {
                       if (result.isConfirmed) {
-                            axios.post('/gerer/empotage/cloturer/'+this.selected.identifiant).then(response => {
+                            axios.post('/gerer/empotage/cloturer/'+empotage.id+"?id_dossier="+empotage.reference+"&typeCmd="+empotage.typeCommandeID).then(response => {
                                 console.log(response);
-                                 Vue.swal.fire(
-                                  'Cloturé!',
-                                  'Dossier cloturé.',
-                                  'success'
-                                );
+                                if(response.data.code == 0){
+                                    Vue.swal.fire(
+                                      'Cloturé!',
+                                      'Dossier cloturé.',
+                                      'success'
+                                    ).then((result) => {
+                                        // redirection   
+                                        location.reload();
+                                    }); 
+                                 }else{
+                                    Vue.swal.fire(
+                                      'Warning!',
+                                      response.data.message,
+                                      'warning'
+                                    );
+                                 }
 
+                            });
+                      
+                      }
+                    })
+               },
+               supprimerContenaire(contenaire){
+                     Vue.swal.fire({
+                      title: 'Confirmez la suppression',
+                      text:   'N° Contenaire: '+contenaire.numContenaire,
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#e3342f',
+                      //cancelButtonColor: '#f0c867',
+                      confirmButtonText: 'Oui, supprimer!'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                            axios.post('/gerer/empotage/contenaire/suppression/'+contenaire.id).then(response => {
+                                
+                                if(response.data.code == 0){
+
+
+                                Vue.swal.fire(
+                                  'Supprimé!',
+                                  'Contenaire supprimé',
+                                  'success'
+                                ).then((result) => {
+                                    // rafraichir all contenaire 
+                                      axios.get('/gerer/empotage/getContenaire/'+this.selected.identifiant)
+                                        .then(response => {
+                                            this.contenaires = response.data;
+                                            if(this.contenaires.data.length > 0){
+                                                this.contenaireSelectionner(0);
+
+                                            }
+                                    }).catch(error => {});
+                                   
+                                });   
+                                 }else{
+                                    Vue.swal.fire(
+                                      'Error!',
+                                      '',
+                                      'error'
+                                    );
+                                 }
 
                             });
                       
@@ -1549,10 +1931,127 @@
                  closeModalPdf(){
                      this.$refs.closePoupPdf.click();
                 },
+                getCountDoc(doc){
+                    if(Array.isArray(doc)){
+                        return doc.length;
+                    }
+                    return 0;
+                },
+                handleFileUploadDoc(){
+                    this.attachments = [];
+                    for(var i=0; i<this.$refs.fileDoc.files.length;i++){
+                        this.attachments.push(this.$refs.fileDoc.files[i]);
+                    }
+                },
+                saveDocs(){
+                const data = new FormData();
+
+                if(!this.attachments.length > 0){
+                     Vue.swal.fire(
+                              '',
+                              'Ajouter un document avant de valider!',
+                              'warning'
+                            )   
+                    return false;
+                }
+                
+                data.append('file[]', this.attachments);
+
+                for (let i = 0; i < this.attachments.length; i++) {
+                    data.append('files' + i, this.attachments[i]);
+                }
+
+
+                data.append('TotalFiles', this.attachments.length);
+
+                data.append('Document[]', this.tabDoc); 
+
+                axios.post("/saveDocs/"+this.currentEmpotage, data,  {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            } 
+                    }).then(response => {
+                       
+                        this.$refs.fileDoc.value = null;
+                        if(response.data.code==0){
+                             this.tabDoc = response.data.file;
+                             this.currentIndexDoc = 0;
+                            Vue.swal.fire(
+                              'succés!',
+                              'Document(s) ajouté(s) avec succés!',
+                              'success'
+                            )         
+
+                        }else{
+                             Vue.swal.fire(
+                              'error!',
+                              response.data.message,
+                              'error'
+                            )
+                        }
+                       
+                    });
+                },
+                removeDoc(nameDoc){
+
+                Vue.swal.fire({
+                  title: 'Confirmez la suppression du document',
+                  text: nameDoc,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'Oui, supprimer!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                       // remove Doc
+                       const data = new FormData();
+
+                        data.append('Document[]', this.tabDoc); 
+                        data.append('nameFile', nameDoc); 
+
+                        axios.post("/removeDocs/"+this.currentEmpotage, data,  {
+                                    headers: {
+                                        'Content-Type': 'multipart/form-data'
+                                    } 
+                            }).then(response => {
+                               
+                                if(response.data.code==0){
+                                     this.tabDoc = response.data.file;
+                                     this.currentIndexDoc = 0;
+                                    Vue.swal.fire(
+                                      'succés!',
+                                      'Document(s) supprimé(s) avec succés!',
+                                      'success'
+                                    )         
+
+                                }else{
+                                     Vue.swal.fire(
+                                      'error!',
+                                      response.data.message,
+                                      'error'
+                                    )
+                                }
+                               
+                            });
+                  
+                  }
+                });
+            }, 
+             closeModalDoc(){
+                this.$refs.closePoupDoc.click();
+                this.getEmpotage();
+            },
+            showDocument(empo){
+                this.tabDoc = [];
+                this.currentEmpotage = empo.id;
+                if(Array.isArray(empo.document)){
+                    this.tabDoc = empo.document;
+                }
+            }
         },
         mounted() {
           this.getEmpotage();
-          console.log("dddd", this.listeDossier);
         }
     }
 </script>
