@@ -105,7 +105,7 @@ class PrechargementController extends Controller
                     "users_id"          => Auth::user()->id,
                     "clients_id"        => request('clientID'),
                     "type_commandes_id" => request('typeCmd'),
-                    "entrepots_id"      => request('entrepot')
+                    "entites_id"      => request('entite')
                 ]); 
                 return response([
                     "code" => 0,
@@ -152,7 +152,7 @@ class PrechargementController extends Controller
             ->leftJoin('users', 'dossier_prechargements.users_id', '=', 'users.id')
             ->leftJoin('type_commandes', 'dossier_prechargements.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('contenaires', 'dossier_prechargements.contenaires_id', '=', 'contenaires.id')
-            ->leftJoin('entrepots', 'dossier_prechargements.entrepots_id', '=', 'entrepots.id')
+            ->leftJoin('entites', 'dossier_prechargements.entites_id', '=', 'entites.id')
             ->select('receptions.dossier_prechargements_id', 
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
                 DB::raw('SUM(receptions.revolu) as total_volume'), 
@@ -169,8 +169,8 @@ class PrechargementController extends Controller
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.id as typecmdID',
                 'type_commandes.tcolor as typecmdColor',
-                'entrepots.id as entrepots_id',
-                'entrepots.nomEntrepot as entrepots_name',
+                'entites.id as entite_id',
+                'entites.nom as entite_name',
                 'contenaires.nom as contenaire')->groupBy('dossier_prechargements.id')->where('dossier_prechargements.clients_id', request('id'));
 
             if($keyword!=''){
@@ -230,7 +230,7 @@ class PrechargementController extends Controller
                 })->where(function($query2){
 
                     $query2->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL)->orWhere('dossier_prechargements_id', request('idPre'));
-                })->where('type_commandes_id', request('typecmd'))->where('entrepots_id', request('entrepotID'));
+                })->where('type_commandes_id', request('typecmd'))->where('entites_id', request('entiteID'));
 
             if($keyword!=''){
                 $dries = $dries->search($keyword); 
