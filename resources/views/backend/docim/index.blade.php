@@ -9,7 +9,7 @@
     <div class="row mt-4">
         <div class="col-md-12">
              <div class="d-flex justify-content-between mb-3">
-                <h2>Gestion des numéros Docim</h2>
+                <h2>Gestion des numéros DOCIM</h2>
             </div>
             <historique-empotage :list-fournisseurs = "{{ json_encode($fournisseurs) }}" 
                 :type-cmd="{{ json_encode($typeCmd) }}"

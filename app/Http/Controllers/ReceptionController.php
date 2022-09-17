@@ -207,7 +207,7 @@ class ReceptionController extends Controller
                 "entrepots_id" => request('entrepot'),
                 'users_id' => $user->id,
                 "repoid" => request('poidstotal'),
-                "revolu" => request('volumetotal'),
+                "revolu" => str_replace(",",".", request('volumetotal')),
                 "renbcl" => request('nbrcolis'),
                 
                 "reemba" => request('emballage'),

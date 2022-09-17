@@ -54,7 +54,7 @@ class EmpotageController extends Controller
             ->leftJoin('contenaires', 'contenaires_empotage.contenaires_id', '=', 'contenaires.id')
             ->leftJoin('entrepots', 'empotages.entrepots_id', '=', 'entrepots.id')
             
-            ->select(DB::raw('count(contenaires_empotage.id) as nbreContenaireEmpote'), 
+            ->select(DB::raw('count(DISTINCT contenaires_empotage.id) as nbreContenaireEmpote'), 
                 //'receptions.dossier_empotage_id',
                /* DB::raw('SUM(receptions.repoid) as total_poids'), 
                 DB::raw('SUM(receptions.revolu) as total_volume'), 

@@ -1085,7 +1085,7 @@
 
                 Vue.swal.fire({
                       title: 'Confirmez la validation',
-                      text: "Dossier n° "+this.selected.dossier,
+                      text: "N°TC: "+this.selected.numtc+" Plomb:"+this.selected.plomb,
                       icon: 'warning',
                       showCancelButton: true,
                       confirmButtonColor: '#3085d6',
@@ -2048,6 +2048,9 @@
                 if(Array.isArray(empo.document)){
                     this.tabDoc = empo.document;
                 }
+            },
+             getDoc(index){
+                this.currentIndexDoc = index;
             }
         },
         mounted() {
