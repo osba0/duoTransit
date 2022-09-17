@@ -155,13 +155,18 @@ Route::middleware(['web','auth'])->group(function () {
         Route::post('/empotage/modifyEmpotage', [EmpotageController::class, 'modifyEmpotage']);
         Route::delete('/deleteEmpotage/{id}', [EmpotageController::class, 'deleteEmpotage']); 
         Route::get('/livesearch', [EmpotageController::class, 'filterDossier']);
+        Route::get('/empotage/getContenaire/{idEmpotage}', [EmpotageController::class, 'getContenaire']); 
+        Route::post('/empotage/reactiver/{id}', [EmpotageController::class, 'reactiver']); 
+        Route::post('/empotage/contenaire/suppression/{id}', [EmpotageController::class, 'deleteContenaire']);
+         
+        Route::post('/empotage/createContenaireEmpotage', [EmpotageController::class, 'createContenaireEmpo'])->middleware(['auth']);
 
         Route::get('/dossier/empotage/reception/{id}/{typecmd}', [EmpotageController::class, 'listingReceptionEmpotage'])->middleware(['auth']); 
         Route::post('/updateDouane', [EmpotageController::class, 'updateDouane']);
         Route::post('/dossier/setEmpotage', [EmpotageController::class, 'empoter'])->middleware(['auth']);
         Route::get('/getCmd/empoter/{id}/{typecommande}', [EmpotageController::class, 'getCommandeEmpoter'])->middleware(['auth']);
         Route::post('/validationEmpotage/valider/{id}', [EmpotageController::class, 'valider'])->middleware(['auth']);
-        Route::post('/empotage/cloturer/{ref}', [EmpotageController::class, 'cloturer']);
+        Route::post('/empotage/cloturer/{id}', [EmpotageController::class, 'cloturer']);
         Route::post('/empotage/savepdf', [EmpotageController::class, 'savepdf']);
     });
 
@@ -169,7 +174,12 @@ Route::middleware(['web','auth'])->group(function () {
 
 Route::post('/saveDocs/{idEmpotage}', [EmpotageController::class, 'saveDoc'])->middleware(['auth']);
 
+Route::post('/saveDocsDouane/{idEmpotage}', [EmpotageController::class, 'saveDeclaration'])->middleware(['auth']); 
+
 Route::post('/removeDocs/{idEmpotage}', [EmpotageController::class, 'removeDoc'])->middleware(['auth']);
+
+Route::post('/removeDocsdouane/{idEmpotage}', [EmpotageController::class, 'removeDeclarationDouane'])->middleware(['auth']);
+
 
 
 Route::post('/chargement/save', [ChargementController::class, 'create'])->middleware(['auth']);
@@ -264,6 +274,11 @@ Route::get('/checksession', [IndexController::class, 'checksession']);
 
 
 Route::post('/sendNotificationReception', [ReceptionController::class, 'sendNotificationReception']); 
+Route::post('/addNumDocim/{id}', [EmpotageController::class, 'setNumEmpotage']); 
+
+Route::get('/numdocim/{id}', [HistoActionController::class, 'indexDocim'])->name('gestion-docim')->middleware(['auth']);
+Route::post('/numdocum/cloturer/{id}', [HistoActionController::class, 'cloturer'])->middleware(['auth']);
+
 
 
 require __DIR__.'/auth.php';

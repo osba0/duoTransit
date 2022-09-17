@@ -13,28 +13,19 @@ use App\Mail\receptionCommandesMail;
 class receptionCommandes extends Notification
 {
     use Queueable;
-    
-    public $transitaire;
-    public $societe;
-    public $commande;
+
+    public $commandes;
     public $emails;
-    public $pathFile;
-    public $nameFile;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($transitaire, $societe, $emails, $commande, $pathFile, $namefile)
+    public function __construct($emails, $commandes)
     {
-        $this->transitaire = $transitaire;
-        $this->societe = $societe;
-        $this->commande = $commande;
+        $this->commandes = $commandes;
         $this->emails = $emails;
-        $this->pathFile = $pathFile;
-        $this->nameFile = $namefile;
-
     }
 
     /**
@@ -45,7 +36,7 @@ class receptionCommandes extends Notification
      */
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        return ['mail'];
     }
 
     /**
@@ -56,11 +47,7 @@ class receptionCommandes extends Notification
      */
     public function toMail($notifiable)
     {
-        if(is_null($this->nameFile) || $this->nameFile==''){
-            return (new receptionCommandesMail($this->transitaire, $this->societe, $this->commande))->to($this->emails)->subject('Nouvelle commande n° '.$this->commande['rencmd'].'-'.$this->commande['typeCmd']);
-         }else{
-            return (new receptionCommandesMail($this->transitaire, $this->societe, $this->commande))->to($this->emails)->attach(public_path() . '/' .$this->pathFile)->subject('Nouvelle commande n° '.$this->commande['rencmd'].'-'.$this->commande['typeCmd']);
-         }
+         return (new receptionCommandesMail($this->commandes))->to($this->emails)->subject('Commande(s) ajouté(s)');
        
     }
 
@@ -72,14 +59,6 @@ class receptionCommandes extends Notification
      */
     public function toArray($notifiable)
     {
-        return [
-            'title' => 'Nouvelle commande n° '.$this->commande['rencmd'].', Type Commande:'.$this->commande['typeCmd'],
-            'description' => 'N° Commande:'.$this->commande['rencmd'].', Fournisseur: '.$this->commande['fournisseur'].', Poids(KG): '.$this->commande['repoid'].', Volume(m3): '.$this->commande['revolu'], 
-            'fichier' => '/' .$this->pathFile,
-            'user' => Auth::user(),
-            'slug' => $this->societe['slug']   
-        ];
+        return [];
     }
 }
-
-/*.', Entrepôt: '.$this->commande['entrepot'].', N°Facture:'.$this->commande['renufa'].', N°FE: '.$this->commande['refere'].', N°ECV: '.$this->commande['reecvr'].', Nbre Palette: '.$this->commande['renbpl'].', Nbre Colis: '.$this->commande['renbcl'].', Poids(KG): '.$this->commande['repoid'].', Volume: '.$this->commande['revolu'].', Montant Facture(€): '.$this->commande['revafa'].', Commantaire: '.$this->commande['recomt'].', Date livraison: '.$this->commande['redali']*/

@@ -80,7 +80,8 @@ $config = [
                             </a>
                         </li>
                         @endif
-                        @if (\Request::is('reception/*') or \Request::is('activity/*') or \Request::is('precharger/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is('gerer/*') or \Request::is('historique-empotage/*') or \Request::is('historique-prechargement/*') or \Request::is('notifications/*'))  
+                        @if (\Request::is('reception/*') or \Request::is('activity/*') or \Request::is('precharger/*') or (\Request::is('incidents/*')) or 
+                        \Request::is('numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is('gerer/*') or \Request::is('historique-empotage/*') or \Request::is('historique-prechargement/*') or \Request::is('notifications/*'))  
                             @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
                             <li class="nav-item">
                                 <a href="/reception/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('reception/*') ? 'active' : '' }}"><i class="nav-icon fa fa-sign-in"></i> <p>Réceptionner</p></a>
@@ -90,6 +91,9 @@ $config = [
                             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
                             <li class="nav-item">
                                 <a href="/precharger/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('precharger/*') ? 'active' : '' }}"><i class="nav-icon fa fa-asterisk"></i> <p>Préchargement</p></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/numdocim/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('numdocim/*') ? 'active' : '' }}"><i class="nav-icon fa fa-tags"></i> <p>Gestion Docim</p></a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('historique-prechargement', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-prechargement/*')) ? 'active' : '' }}">

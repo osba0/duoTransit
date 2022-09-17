@@ -564,8 +564,8 @@ class ConfigurationController extends Controller
                 "fax" => request('fax'),
                 "email" => request('email'),
                 'logo' => $filename,
-                "entrepots_id" => array_unique(json_decode(request('entrepots'))), 
-                "contenaires_id" => array_unique(json_decode(request('contenaires')))
+                "entrepots_id" => request('entrepots'),  //array_unique(json_decode(request('entrepots')))
+                "contenaires_id" => request('contenaires')
 
           ]);
 

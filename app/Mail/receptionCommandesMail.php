@@ -11,21 +11,16 @@ class receptionCommandesMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $transitaire;
-    public $societe;
-    public $commande;
-    public $emails;
+    public $commandes;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($transitaire, $societe, $commande)
+    public function __construct($commandes)
     {
-        $this->transitaire = $transitaire;
-        $this->societe = $societe;
-        $this->commande = $commande;
+        $this->commandes = $commandes;
     }
 
     /**
@@ -35,6 +30,6 @@ class receptionCommandesMail extends Mailable
      */
     public function build()
     {
-      return $this->view('emails.receptionCommande', ["commande"=>$this->commande, "societe" => $this->societe, "transitaire" => $this->transitaire ]);
+      return $this->view('emails.receptionCommande', ["commandes"=>$this->commandes]);
     }
 }

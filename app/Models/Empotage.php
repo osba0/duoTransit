@@ -19,7 +19,7 @@ class Empotage extends Model
         'complements_document' => 'array'
     ];
 
-    protected $fillable = ['id','reference', 'numContenaire', 'typeContenaire', 'plomb', 'poidEmpote','volumeEmpote','colisEmpote','reetat','is_close', 'users_id', 'clients_id','type_commandes_id','entrepots_id', 'contenaires_id','rapport_pdf','date_depart','date_arrivee', 'created_at', 'complements_document'];
+    protected $fillable = ['id','reference', 'numContenaire', 'typeContenaire', 'plomb', 'poidEmpote','volumeEmpote','colisEmpote','reetat','is_close', 'users_id', 'clients_id','type_commandes_id','entrepots_id', 'contenaires_id','rapport_pdf','date_depart','date_arrivee', 'created_at', 'complements_document', 'numDocim', 'declaration_douane'];
 
 
     protected static $ignoreChangedAttributes = ['updated_at'];

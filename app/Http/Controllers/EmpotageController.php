@@ -12,6 +12,7 @@ use App\Http\Resources\ReceptionResource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\EmpotageResource;
+use App\Http\Resources\ContenaireEmpotageResource;
 use App\Models\ChargementCreation;
 use App\Models\TypActivity;
 use App\Models\LogActivity;
@@ -19,6 +20,7 @@ use App\Models\Client;
 use App\Models\Entite; 
 use App\Models\User; 
 use App\Models\UserRole;
+use App\Models\ContenairesEmpotage;
 use DB;
 use File;
 
@@ -45,41 +47,46 @@ class EmpotageController extends Controller
 
         if (isset($paginate)) {
             $query = DB::table('empotages')
-            ->leftJoin('receptions', 'receptions.dossier_empotage_id', '=', 'empotages.id')
+            //->leftJoin('receptions', 'receptions.dossier_empotage_id', '=', 'empotages.id')
             ->leftJoin('users', 'empotages.users_id', '=', 'users.id')
             ->leftJoin('type_commandes', 'empotages.type_commandes_id', '=', 'type_commandes.id')
-            ->leftJoin('contenaires', 'empotages.contenaires_id', '=', 'contenaires.id')
+            ->leftJoin('contenaires_empotage', 'empotages.id', '=', 'contenaires_empotage.empotages_id')
+            ->leftJoin('contenaires', 'contenaires_empotage.contenaires_id', '=', 'contenaires.id')
             ->leftJoin('entrepots', 'empotages.entrepots_id', '=', 'entrepots.id')
-            ->groupBy('empotages.id')
-            ->select('receptions.dossier_empotage_id',
-                DB::raw('SUM(receptions.repoid) as total_poids'), 
+            
+            ->select(DB::raw('count(contenaires_empotage.id) as nbreContenaireEmpote'), 
+                //'receptions.dossier_empotage_id',
+               /* DB::raw('SUM(receptions.repoid) as total_poids'), 
                 DB::raw('SUM(receptions.revolu) as total_volume'), 
                 DB::raw('SUM(receptions.renbcl) as total_colis'), 
                 DB::raw('SUM(receptions.renbpl) as total_palette'), 
                 DB::raw('count(receptions.rencmd) as total_cmd'), 
-                'empotages.nbreContenaire', 
+                'empotages.nbreContenaire', */
+                 
                 'empotages.id as IdEmpotage', 
                 'empotages.reference as numDossier', 
-                'empotages.numContenaire as numContenaire', 
+              /*  'empotages.numContenaire as numContenaire', 
                 'contenaires.nom as nomContenaire', 
                 'contenaires.id as IDContenaire',
-                'contenaires.volume as capacite',
+                'contenaires.volume as capacite',*/
                 'empotages.users_id', 
-                'empotages.plomb as plomb', 
+               // 'empotages.plomb as plomb', 
                 'empotages.date_depart as dateDepart', 
                 'empotages.date_arrivee as dateArrivee', 
                 'empotages.is_close as cloture',
                 'empotages.created_at as created_at_empotage',
                 'empotages.reetat as etat',
                 'empotages.created_at as created_at',
-                'empotages.rapport_pdf as rapport_pdf',
+                'empotages.numDocim as numDocim',
+              //  'empotages.rapport_pdf as rapport_pdf',
+                'empotages.complements_document as docs',
                 'users.username as user',
                 'entrepots.nomEntrepot as nomEntrepot', 
                 'entrepots.id as idEntrepot',
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.tcolor as tcolor',
                 'type_commandes.id as typecmdID',
-                'contenaires.nom as contenaire')->where('empotages.reetat', false)->where('empotages.clients_id', request('id'))->orderBy('empotages.created_at', 'desc');
+                /*'contenaires.nom as contenaire'*/)->where('empotages.reetat', false)->where('empotages.clients_id', request('id'))->groupBy('empotages.id')->orderBy('empotages.created_at', 'desc');
 
             if(request('etatFiltre')!=""){
                  $query = $query->where('empotages.reetat', request('etatFiltre')); 
@@ -127,21 +134,21 @@ class EmpotageController extends Controller
 
         $store = Empotage::create([
             "reference" => request('reference'),
-            "numContenaire" => request('tc'),
-            "contenaires_id" => request('typetc'),
+            //"numContenaire" => request('tc'),
+            //"contenaires_id" => request('typetc'),
             "type_commandes_id" => request('typeCmd'),
             "entrepots_id" => request('idEntrepot'),
-            'plomb' => request('plomb'),
+            /*'plomb' => request('plomb'),
             "poidEmpote" => 0,
             "volumeEmpote" =>  0, 
-            "colisEmpote" => 0,
+            "colisEmpote" => 0,*/
             "clients_id" => request('idClient'), 
             "date_depart" => request('date_depart'), 
             "date_arrivee" => request('date_arrivee'), 
             "users_id" => Auth::user()->id,
             "reetat" => 0,
             "is_close" => false,
-            "rapport_pdf" => ""
+            //"rapport_pdf" => ""
         ]);
 
         return response([
@@ -195,13 +202,19 @@ class EmpotageController extends Controller
         if (isset($paginate)) {
 
             $dries = Reception::where('dossier_id', request('ref'))->where(function($query){
-                            $query->orWhere('dossier_empotage_id', request('id_empotage'))->orWhere('dossier_empotage_id', 0)->orWhere('dossier_empotage_id', NULL);
+                            $query->orWhere('dossier_empotage_id', request('id_empotage'))->orWhere('dossier_empotage_id', 0)->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '');
+                        })->where(function($query){
+                            $query->orWhere('numero_contenaire', request('contenaireSelected'))->orWhere('numero_contenaire', 0)->orWhere('numero_contenaire', NULL)->orWhere('numero_contenaire', '');
                         })
             ->leftJoin('empotages', 'empotages.id', '=', 'receptions.dossier_empotage_id')
             ->leftJoin('users as a', 'empotages.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
             ->select('*','receptions.type_commandes_id as typeCmd','b.username as user_created','a.username as prechargeur')->where('receptions.clients_id', request('id'))->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entrepots_id', request('idEntrepot')); 
 
+            if(request('contenaireEtat') == 1){
+                $dries = $dries->whereNotNull('douane');
+                $dries = $dries->where('douane', '!=', '');
+            }
 
             if($keyword!=''){
                 $dries = $dries->search($keyword);
@@ -240,22 +253,22 @@ class EmpotageController extends Controller
         Reception::where('reidre', request('idreception'))
           ->update([
             "dossier_empotage_id" => $value,
-            "douane" => request('douane')
+            "douane" => request('douane'),
+            "numero_contenaire" => request('contenaireSelected')
         ]);
         // recalcul total 
-        $results = DB::table('empotages')
-            ->leftJoin('receptions', 'receptions.dossier_empotage_id', '=', 'empotages.id')
-            ->leftJoin('users', 'empotages.users_id', '=', 'users.id')
-            ->leftJoin('type_commandes', 'empotages.type_commandes_id', '=', 'type_commandes.id')
-            ->leftJoin('contenaires', 'empotages.contenaires_id', '=', 'contenaires.id')
-            ->groupBy('empotages.id')
+        $results = DB::table('contenaires_empotage')
+            ->leftJoin('receptions', 'receptions.numero_contenaire', '=', 'contenaires_empotage.id')
+            //->leftJoin('users', 'empotages.users_id', '=', 'users.id')
+            //->leftJoin('type_commandes', 'empotages.type_commandes_id', '=', 'type_commandes.id')
+            ->groupBy('contenaires_empotage.id')
             ->select('receptions.dossier_empotage_id', 
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
                 DB::raw('SUM(receptions.revolu) as total_volume'), 
                 DB::raw('SUM(receptions.renbcl) as total_colis'), 
                 DB::raw('SUM(receptions.renbpl) as total_palette'), 
                 DB::raw('count(receptions.rencmd) as total_cmd'))
-            ->where('empotages.id', request('idEmpotage'))->get();
+            ->where('contenaires_empotage.empotages_id', request('idEmpotage'))->get();
     
         foreach ($results as $key) {
            
@@ -330,7 +343,7 @@ class EmpotageController extends Controller
 
 
     public function getCommandeEmpoter(){
-        $results = Reception::where('dossier_empotage_id',request('id'))->where('type_commandes_id', request('typecommande'))->get(); 
+        $results = Reception::where('dossier_empotage_id',request('id'))->where("numero_contenaire", request('IDContenaire'))->where('type_commandes_id', request('typecommande'))->get();  
         $details=[];
 
         foreach ($results as $key) {
@@ -354,6 +367,60 @@ class EmpotageController extends Controller
         ]);
     }
 
+
+    public function cloturer(){
+
+        // Verifier s'il y'a des contenaires en cours dans le dossier
+
+        $check = ContenairesEmpotage::where("empotages_id", request('id'))->where("etat", false)->get()->count();
+       
+        if($check > 0){
+             return response([
+                "code" => 1,
+                "message" => "Avant de cloturer, valider le(s) contenaire(s) en cours."
+            ]);
+        }
+
+        // Verifier s'il y'a des complement de dossier
+
+        $check = Empotage::where("id", request('id'))->where(function($query){
+                            $query->orWhere('complements_document', NULL)->orWhere('complements_document', '[]');
+                        })->get()->count();
+       
+        if($check > 0){
+             return response([
+                "code" => 1,
+                "message" => "Ajouter au moins un complement de dossier avant de cloturer."
+            ]);
+        }
+
+
+        // Desactiver le dossier dans Prechargement
+        DB::table('chargement_creations')->where("numdossier", request('id_dossier'))->where("type_commandes_id", request('typeCmd'))->update([
+                "is_empote" => true
+            ]);
+
+        // Réinitialiser les commandes qui n'ont pas été choisi (Pas de num de douane ou num contenaire)
+        Reception::where('dossier_id',request('id_dossier'))->where("type_commandes_id", request('typeCmd'))->where(function($query){ $query->orWhere('numero_contenaire', '')->orWhere('numero_contenaire', 0)->orWhere('numero_contenaire', NULL);
+                    })->update([
+            "dossier_id" => NULL,
+            "douane" => NULL,
+            "dossier_empotage_id" => NULL
+        ]);
+        
+        
+        // cloturer le dossier dans empotage 
+        Empotage::where('id', request('id'))
+              ->update([
+                "is_close"   => 0, // Le client va cloturer apres num Docim & declaration douane
+                "reetat"   => 1
+        ]);
+
+        return response([
+            "code" => 0
+        ]);
+   }
+
     public function valider(){
         $user =Auth::user();
         $client = Client::where('id', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
@@ -365,17 +432,19 @@ class EmpotageController extends Controller
 
 
         // Réinitialiser les commandes qui n'ont pas été choisi (Pas de num de douane)
-        if(sizeof(request('ignored')) > 0){
+        //A voir
+        /*if(sizeof(request('ignored')) > 0){
             Reception::whereIn('reidre',request('ignored'))->update([
                 "dossier_id" => null
             ]);
-        }
+        }*/
         
         // Empoter les commandes qui ont été choisies
         if(sizeof(request('idsCmd')) > 0){
             $response = Reception::whereIn('reidre',request('idsCmd'))
               ->update([
-                "dossier_empotage_id" => request('idEmpotage')
+                "dossier_empotage_id" => request('idEmpotage'),
+                "numero_contenaire" => request('IDContenaire')
             ]);
 
 
@@ -386,25 +455,29 @@ class EmpotageController extends Controller
 
         }
 
-        // Desactiver le dossier dans Prechargement
-        DB::table('chargement_creations')->where("numdossier", request('id_dossier'))->where("type_commandes_id", request('typeCmd'))->update([
-                "is_empote" => true
-            ]);
+        // Changer etat contenaire
+
+        DB::table('contenaires_empotage')->where("id", request('IDContenaire'))->update([
+            "etat" => 1
+        ]);
 
         if($response){
-            if(sizeof(request('ignored')) > 0){
+
+            // Revoir 
+            /*if(sizeof(request('ignored')) > 0){
                  $response = Reception::whereIn('reidre',request('ignored'))
                   ->update([
                     "dossier_empotage_id" => Null
                 ]);
-            }
+            }*/
             
             // Valider et cloturer en meme temps
-            $resp = Empotage::where('id',request('idEmpotage'))
+            //A voir aussi
+            /*$resp = Empotage::where('id',request('idEmpotage'))
               ->update([
                 "reetat" => true,
                 "is_close" => true
-            ]);
+            ]);*/
 
             return response([
                 "code" => 0,
@@ -421,17 +494,7 @@ class EmpotageController extends Controller
          }
     }
 
-    public function cloturer(){
-         
-        Empotage::where('id', request('ref'))
-              ->update([
-                "is_close"   => 1
-        ]);
-
-        return response([
-            "code" => 0
-        ]);
-   }
+    
 
    public function savepdf(){
          
@@ -595,4 +658,190 @@ class EmpotageController extends Controller
             "file" => $allFileName
         ]);
     }
+
+
+
+    
+
+    public function  createContenaireEmpo(Request $request){
+        $user = Auth::user();
+
+        $store = ContenairesEmpotage::create([
+            "empotages_id" => request('idEmpo'),
+            "numContenaire" => request('tc'),
+            "contenaires_id" => request('typetc'),
+            'plomb' => request('plomb'),
+            "poidEmpote" => 0,
+            "volumeEmpote" =>  0, 
+            "colisEmpote" => 0
+        ]);
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+    }
+
+    public function  getContenaire(Request $request){
+        $user = Auth::user();
+
+        $query = DB::table('contenaires_empotage')
+        ->leftJoin('contenaires', 'contenaires_empotage.contenaires_id', '=', 'contenaires.id')
+        ->select('*', 'contenaires_empotage.id as idContenaire', 'contenaires_empotage.etat as etatContanaire')
+        ->where('empotages_id', request('idEmpotage'))->get();
+
+
+
+
+        return ContenaireEmpotageResource::collection($query);
+    }
+
+
+    
+
+     public function reactiver(Request $request){
+        $user = Auth::user();
+
+        DB::table('contenaires_empotage')->where("id", request('id'))->update([
+            "etat" => 0
+        ]);
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+    }
+
+
+    public function deleteContenaire(Request $request){
+        $user = Auth::user();
+
+        // reinit all orders
+        $response = Reception::where('numero_contenaire',request('id'))
+              ->update([
+                "numero_contenaire" => NULL,
+                "douane" => NULL
+            ]);
+
+        $req = ContenairesEmpotage::where('id', request('id'))->firstOrFail();
+        
+        $req->delete();
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+    }
+
+    public function setNumEmpotage(Request $request){
+        $user = Auth::user();
+
+        DB::table('empotages')->where("id", request('id'))->update([
+            "numDocim" => request('docim')
+        ]);
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+    }
+
+    public function saveDeclaration(Request $request){
+        try{   
+                $filename = '';
+                $allFileName=[];
+                $docs = explode(",", $request->Document[0]);
+         
+
+               for ($x = 0; $x < $request->TotalFiles; $x++) 
+               {
+     
+                   if ($request->hasFile('files'.$x)) 
+                    {
+                        $current_date_time = Carbon::now()->toDateTimeString();
+                        $paseDate = explode(' ', $current_date_time);
+                        $file     = $request->file('files'.$x); 
+                        $filename = 'doc'.'_'.request('idEmpotage').'_'.($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
+
+                        $file->move("assets/declarationsDouane/", $filename);
+                        array_push($allFileName, $filename);
+                      
+                    }
+               } 
+        
+               for($i=0; $i<sizeof($docs); $i++){
+                    if($docs[$i]!=''){
+                        array_push($allFileName, $docs[$i]); 
+                    } 
+               }
+        
+                Empotage::where('id', request('idEmpotage'))
+                  ->update([
+                    "declaration_douane" => json_encode($allFileName) 
+                ]);
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        // get Files
+        //$files = Empotage::where('id', request('idEmpotage'))->pluck('complements_document')->first();
+
+         return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
+    }
+    
+     public function removeDeclarationDouane(Request $request){
+        try{   
+
+                $allFileName=[];
+                $docs = explode(",", $request->Document[0]);
+                $values=NULL;
+         
+                for($i=0; $i<sizeof($docs); $i++){
+                    if($docs[$i]!='' && $docs[$i]!=$request->nameFile){
+                        array_push($allFileName, $docs[$i]); 
+                    } 
+                }
+
+                if(sizeof($allFileName) > 0){
+                    $values = json_encode($allFileName);
+                }
+
+        
+                Empotage::where('id', request('idEmpotage'))
+                  ->update([
+                    "declaration_douane" => $values
+                ]);
+
+                // delete file
+
+                File::delete("assets/declarationsDouane/".$request->nameFile);
+                
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
+    }
+    
+
+    
+
+
+    
 }

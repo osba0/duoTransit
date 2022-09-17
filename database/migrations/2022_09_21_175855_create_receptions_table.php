@@ -40,11 +40,12 @@ class CreateReceptionsTable extends Migration
             $table->string('rencmd'); // N° commande 
             $table->text('recomt')->nullable(); // Commentaires
             $table->string('douane')->nullable(); // N douane 
+            $table->string('numero_contenaire')->nullable(); // N douane   
             $table->boolean('isPreLoad')->default(0);
             $table->boolean('isLoad')->default(0);
             $table->integer('dossier_prechargements_id')->nullable();
             $table->integer('dossier_empotage_id')->nullable();
-            $table->integer('dossier_id')->nullable();
+            $table->string('dossier_id')->nullable();
             $table->boolean('reinci')->default(0);
             $table->integer('priorite')->default(2);
             $table->timestamp('recrea');  
