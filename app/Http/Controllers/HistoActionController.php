@@ -149,6 +149,11 @@ class HistoActionController extends Controller
                 $term = "$cmd%";
                 $req = $req->where('receptions.rencmd', 'like', $term);
             }
+             if(request('filtre.docim')!=''){
+                $docim = request('filtre.docim');
+                $term = "$docim%";
+                $req = $req->where('empotages.numDocim', 'like', $term);
+            }
             if(request('filtre.dossier')!=''){
                 $cmd = request('filtre.dossier');
                 $term = "$cmd%";
@@ -254,7 +259,7 @@ class HistoActionController extends Controller
             ->leftJoin('users', 'dossier_prechargements.users_id', '=', 'users.id')
             ->leftJoin('type_commandes', 'dossier_prechargements.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('contenaires', 'dossier_prechargements.contenaires_id', '=', 'contenaires.id')
-             ->leftJoin('entrepots', 'dossier_prechargements.entrepots_id', '=', 'entrepots.id')
+            ->leftJoin('entites', 'dossier_prechargements.entites_id', '=', 'entites.id')
             ->groupBy('dossier_prechargements.id')
             ->select('receptions.dossier_prechargements_id', 
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
@@ -280,8 +285,8 @@ class HistoActionController extends Controller
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.id as typecmdID',
                 'type_commandes.tcolor as typecmdColor',
-                 'entrepots.id as entrepots_id',
-                'entrepots.nomEntrepot as entrepots_name',
+                'entites.id as entite_id',
+                'entites.nom as entite_name',
                 'contenaires.nom as contenaire')->where('receptions.clients_id', request('id'))->whereBetween('dossier_prechargements.updated_at', [request('filtre.dateDebut').' 00:00:00', request('filtre.dateFin').' 23:59:59']);
 
             if(request('filtre.typeCmd')!=''){

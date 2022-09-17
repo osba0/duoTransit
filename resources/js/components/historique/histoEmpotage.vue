@@ -6,43 +6,50 @@
                 <div class="col-md-12">
                     <div class="d-inline-block">
                         <div class="border p-3 bg-white justify-content-center rounded">
-                            <div class="d-inline-flex filtreTireur align-items-end">
+                            <div class="filtreTireur">
                                 <template v-if="gestionDocim!=1">
-                                    <div class="mr-3 text-left" style="width: 180px">
-                                        <label class="mr-3  text-left w-100 mb-0">Date Début</label>
-                                        <date-picker v-model="filtre.dateDebut" required valueType="YYYY-MM-DD"  :disabled-date="disabledFutureDate" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
-                                    </div>
-                                    <div class="mr-3 text-left" style="width: 180px">
-                                          <label class="text-left w-100 mb-0">Date Fin</label>
-                                          <date-picker v-model="filtre.dateFin" required valueType="YYYY-MM-DD" input-class="form-control w-100" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                                    <div class="d-flex mb-3">
+                                        <div class="mr-3 text-left" style="width: 180px">
+                                            <label class="mr-3  text-left w-100 mb-0">Date Début</label>
+                                            <date-picker v-model="filtre.dateDebut" required valueType="YYYY-MM-DD"  :disabled-date="disabledFutureDate" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                                        </div>
+                                        <div class="mr-3 text-left" style="width: 180px">
+                                              <label class="text-left w-100 mb-0">Date Fin</label>
+                                              <date-picker v-model="filtre.dateFin" required valueType="YYYY-MM-DD" input-class="form-control w-100" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                                        </div>
                                     </div>
                                 </template>
-                               
-                                <div class="mr-3 text-left" style="width: 180px">
-                                    <label class="text-left w-100 mb-0">Type Commande</label>
-                                    <select class="form-control" v-model="filtre.typeCmd">
-                                        <option value="">Tout</option>
-                                        <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
-                                    </select>
-                                </div>
-                                <div class="mr-3 text-left" style="width: 180px">
-                                    <label class="text-left w-100 mb-0">Fournisseur</label>
-                                    <select class="form-control" v-model="filtre.fournisseur">
-                                        <option value="">Tout</option>
-                                        <option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option>
-                                        
-                                    </select>
-                                </div>
-                                <div class="mr-3 text-left" style="width: 180px">
-                                    <label class="text-left w-100 mb-0">N°Dossier</label>
-                                    <input type="text" class="form-control"  v-model="filtre.dossier">
-                                </div>
-                                 <div class="mr-3 text-left" style="width: 180px">
-                                    <label class="text-left w-100 mb-0">N°Commande</label>
-                                    <input type="text" class="form-control"  v-model="filtre.commande">
-                                </div>
-                                <div>
-                                   <button type="submit" class="btn btn-success ml-3"> <span v-if="isloading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Rechercher</button>
+                                <div class="d-flex align-items-end">
+                                    <div class="mr-3 text-left" style="width: 180px">
+                                        <label class="text-left w-100 mb-0">Type Commande</label>
+                                        <select class="form-control" v-model="filtre.typeCmd">
+                                            <option value="">Tout</option>
+                                            <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="mr-3 text-left" style="width: 180px">
+                                        <label class="text-left w-100 mb-0">Fournisseur</label>
+                                        <select class="form-control" v-model="filtre.fournisseur">
+                                            <option value="">Tout</option>
+                                            <option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option>
+                                            
+                                        </select>
+                                    </div>
+                                    <div class="mr-3 text-left" style="width: 180px">
+                                        <label class="text-left w-100 mb-0">N°Dossier</label>
+                                        <input type="text" class="form-control"  v-model="filtre.dossier">
+                                    </div>
+                                     <div class="mr-3 text-left" style="width: 180px">
+                                        <label class="text-left w-100 mb-0">N°Commande</label>
+                                        <input type="text" class="form-control"  v-model="filtre.commande">
+                                    </div>
+                                     <div class="mr-3 text-left" style="width: 180px">
+                                        <label class="text-left w-100 mb-0">N°Docim</label>
+                                        <input type="text" class="form-control"  v-model="filtre.docim">
+                                    </div>
+                                    <div>
+                                       <button type="submit" class="btn btn-success ml-3"> <span v-if="isloading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Rechercher</button>
+                                    </div>
                                 </div>
                             </div>
                              
@@ -170,13 +177,13 @@
                                                     <a v-if="res.etat==1" href="#" title="Rapport Empotage" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(res)" data-toggle="modal" data-target="#openFacture">
                                                         <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                                     </a-->
-                                                    <a href="#" title="Liste contenaire" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 ml-2 position-relative"  @click="showContenaire(res)" :class="[res.etat==1? 'bg-primary':'bg-warning']">
-                                                        <i class="fa fa-cube" aria-hidden="true"></i>
+                                                    <a href="#" title="Liste contenaire" class="btn p-0 m-1 ml-2 position-relative"  @click="showContenaire(res)">
+                                                        <img src="/images/contenaire.png" alt="Contenaire" height="30">
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{res.totalContenaire}}</span>
                                                         <!--span v-if="gestionDocim==1" class="position-absolute d-flex align-items-center justify-content-center rounded-circle isValidate text-white">-</span-->
                                                     </a>
-                                                    <a v-if="res.etat==1" href="#" title="Complément de document" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative ml-2"  @click="showDocument(res)" data-toggle="modal" data-target="#openDocument" :class="[res.etat==1? 'bg-primary':'bg-warning']">
-                                                        <i class="fa fa-files-o" aria-hidden="true"></i>
+                                                    <a v-if="res.etat==1" href="#" title="Complément de document" class="btn p-0 m-1 position-relative ml-2"  @click="showDocument(res)" data-toggle="modal" data-target="#openDocument">
+                                                        <img src="/images/document_compl.png" alt="Documents" height="30">
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDoc(res.document) > 9 ? '+9' : getCountDoc(res.document) }}</span>
                                                         <!--span v-if="gestionDocim==1" class="position-absolute d-flex align-items-center justify-content-center rounded-circle isValidate text-white">-</span-->
                                                      
@@ -184,8 +191,8 @@
 
                                                     <template v-if="userRole=='client'">
                                                         
-                                                         <a v-if="res.etat==1" href="#" title="Déclaration Douane" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 ml-2 position-relative"  @click="showDeclarationDouane(res)" data-toggle="modal" data-target="#openDeclarationDouane" :class="[res.is_close==1? 'bg-primary':'bg-warning']">
-                                                            <i class="fa fa-user-secret" aria-hidden="true"></i>
+                                                         <a v-if="res.etat==1" href="#" title="Déclaration Douane" class="btn p-0 m-1 ml-2 position-relative"  @click="showDeclarationDouane(res)" data-toggle="modal" data-target="#openDeclarationDouane">
+                                                            <img src="/images/douane.png" alt="Documents" height="30">
                                                             <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDeclDouane(res.declDounae) > 9 ? '+9' : getCountDeclDouane(res.declDounae) }}</span>
                                                          
                                                         </a>
@@ -551,7 +558,8 @@ export default {
                 typeCmd: '',
                 fournisseur: '',
                 dossier: '',
-                commande: ''
+                commande: '',
+                docim: ''
             },
             isloading: false,
             paginate: 10,
