@@ -44,7 +44,7 @@
                                         <input type="text" class="form-control"  v-model="filtre.commande">
                                     </div>
                                      <div class="mr-3 text-left" style="width: 180px">
-                                        <label class="text-left w-100 mb-0">N°Docim</label>
+                                        <label class="text-left w-100 mb-0">N°DOCIM</label>
                                         <input type="text" class="form-control"  v-model="filtre.docim">
                                     </div>
                                     <div>
@@ -99,7 +99,7 @@
                                 <thead class="thead-blue" :class="[isloading ? '' : 'hasborder']">
                                      <tr>
                                         <template v-if="userRole=='client'">
-                                        <th class="p-2 border-right border-white h6 bg-primary">N° Docim</th>
+                                        <th class="p-2 border-right border-white h6 bg-primary">N° DOCIM</th>
                                         </template>
                                         <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[0])">
                                             
@@ -128,11 +128,12 @@
                                         <tr v-for="res in result.data" :key="res.id" class="bg-white position-relative">
                                             <template v-if="userRole=='client'">
                                                 <td class="position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> 
-                                                   <span v-if="res.numDocim != ''" class="text-primary font-weight-bold">
+                                                  
+                                                    <button v-if="res.numDocim == '' || res.numDocim == null" class="badge border-0 badge-info" v-on:click="addNumDocim(res)">Ajouter</button>
+                                                     <span v-else class="text-primary font-weight-bold cursor-pointer"  v-on:click="addNumDocim(res, res.numDocim)">
                                                         {{res.numDocim}} 
-                                                        <i v-if="gestionDocim==1" class="fa fa-pencil"  v-on:click="addNumDocim(res, res.numDocim)"></i>
+                                                        <i v-if="gestionDocim==1" class="fa fa-pencil"></i>
                                                     </span>  
-                                                    <button v-if="res.numDocim == ''" class="badge border-0 badge-info" v-on:click="addNumDocim(res)">Ajouter</button>
                                                    
                                                 </td>
                                             </template>
@@ -157,8 +158,11 @@
                                             <td>{{ res.total_volume }}</td-->
                                             
                                             <td>
-                                                <!--span v-if="res.etat==1" class="badge badge-success">Validé</span-->
-                                                <span v-if="res.is_close==1" class="badge badge-primary">Cloturé</span>
+                                                 <template v-if="userRole=='client' && res.is_close==0">
+                                                     <span v-if="res.etat==1" class="badge badge-success">Validé</span>
+                                                 </template>
+                                                <span v-if="res.is_close==1 || (res.etat==1 && userRole=='admin')" class="badge badge-primary">Cloturé</span>
+                                               
                                             </td>
                                              <!--td>
                                                 <div v-if="res.rapport_pdf!=null" class="d-flex align-items-center w-100 justify-content-center cursor-pointer"  @click="getpdf(res.rapport_pdf, res.id)">
@@ -196,7 +200,7 @@
                                                             <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDeclDouane(res.declDounae) > 9 ? '+9' : getCountDeclDouane(res.declDounae) }}</span>
                                                          
                                                         </a>
-                                                        <a title="Cloturer" v-if="gestionDocim==1" class="btn m-1 btn-circle border btn-circle-sm m-1 ml-3 bg-white" v-on:click="cloturer(res)">
+                                                        <a title="Cloturer" v-if="gestionDocim==1" class="btn m-1  border border-success bg-success text-white btn-circle border btn-circle-sm m-1 ml-3 bg-white" v-on:click="cloturer(res)">
                                                             <i class="fa fa-check" aria-hidden="true"></i>
                                                         </a>
                                                     </template>
@@ -227,11 +231,12 @@
                     <button class="btn btn-primary mb-3" @click="reinit()">
                         <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                     </button>
-                     <div>
-                        <div class="d-flex flex-row justify-content-center">
+                     <div class="mb-3">
+                        <div class="d-flex flex-row align-items-center justify-content-center outlineBtn">
                             <template v-for="contenaire, index in contenaires.data">
-                                <div class="position-relative ml-3" style="width:60px">
-                                    <button v-on:click="contenaireSelectionner(index)" class="btn rounded-circle btn-default mb-2" :class="index==currentIndexContenaire ? 'bg-primary':'bg-light'"><span class="h1"><i class="fa fa-cube"></i></span>
+                                <div class="position-relative ml-3">
+                                    <button v-on:click="contenaireSelectionner(index)" class="btn btn-default mb-0 p-0">
+                                        <img src="/images/contenaire.png" alt="Contenaire" height="35"  :class="index==currentIndexContenaire ? 'activeContent':'imageGrey'">
                                     </button>
                                     <button v-if="contenaire.etat == 1" title="Rapport d'empotage" style="top: -3px; right: -3px;"  v-on:click="showRapport(index)" class="badge bg-white border-0 shadow-sm position-absolute rounded-circle" data-toggle="modal" data-target="#openFacture"><i class="fa fa-file-pdf-o text-danger"></i></button>
                                   
@@ -263,11 +268,12 @@
                                     <table class="table m-0 mt-3 table-striped">
                                         <tbody> 
                                              <tr>
-                                                <th>N°Dossier: <b>{{ selected.dossier }}</b></th>
-                                                <th>Nombre de commande: <b>{{ selected.nbrcmd }}</b></th> 
-                                                <th>N°TC: <b>{{ selected.numtc }}</b></th>
-                                                <th>Type TC: <b>{{ selected.typetc }}</b></th>
-                                                <th>Plomb: <b>{{ selected.plomb }}</b></th>
+                                                <th class="align-middle">N°Dossier: <b>{{ selected.dossier }}</b></th>
+                                                <th class="align-middle">Nombre de commande: <b>{{ selected.nbrcmd }}</b></th> 
+                                                <th class="align-middle">N°TC: <b>{{ selected.numtc }}</b></th>
+                                                <th class="align-middle">Type TC: <b>{{ selected.typetc }}</b></th>
+                                                <th class="align-middle">Plomb: <b>{{ selected.plomb }}</b></th>
+                                                <th class="text-center"><button v-on:click="showRapport(currentIndexContenaire)" class="btn p-0 m-0 mb-0" data-toggle="modal" data-target="#openFacture" title="Rapport d'empotage"><span class="h3 mb-0"><i class="fa fa-file-pdf-o text-danger"></i></span></button></th>
                                             </tr>
                                       
                                         </tbody>
@@ -599,7 +605,8 @@ export default {
             contenaires: {},
             currentIndexContenaire: 0,
             tabDeclaration: [],
-            currentIndexDouane: 0
+            currentIndexDouane: 0,
+            messageError: ''
         };
     },
     watch: {
@@ -617,29 +624,48 @@ export default {
         },
         order: function(value) {
             this.getReception();
-       }
+        }, 
+       messageError: function(value){
+             this.messageError = value;
+        }
         
     },
     methods: {
         addNumDocim(empo, value=""){
             var numDocim = "";
             Vue.swal.fire({
-              title: 'Entrer le n° docin',
-              input: 'text',
-              inputValue: value,
+              title: 'Entrer le n° DOCIM',
+              //input: 'text',
+              html:
+                '<div class="d-flex justify-content-center align-items-center"><input id="swal-input1" style="width:150px;" class="swal2-input m-0"  autocomplete="off" autofocus/>' +'<span class="px-3">/</span>'+
+                '<input id="swal-input2" style="width:150px" value="'+new Date().getFullYear()+'" class="swal2-input m-0"></div>'+
+                '<div id="messageError" class="text-danger text-center w-100 pt-2">'+this.messageError+'</div>',
+             // inputValue: value==  '/' +new Date().getFullYear() ? value : value + new Date().getFullYear(),
               inputAttributes: {
                 autocapitalize: 'off'
               },
               showCancelButton: true,
               confirmButtonText: 'Valider',
               showLoaderOnConfirm: true,
+              focusConfirm: false,
               inputValidator: (value) => {
                     if (!value) {
                       return 'Entrer une valeur!'
                     }
                   },
               preConfirm: (val) => {
-                axios.post('/addNumDocim/'+empo.id+"?docim="+val).then(response => {
+
+                var numDoc = document.getElementById('swal-input1').value+'/'+document.getElementById('swal-input2').value;
+    
+                if(document.getElementById('swal-input2').value=='' || document.getElementById('swal-input1').value==''){
+                    this.messageError = "Entrer un n°DOCIM valide"; 
+                    Vue.swal.close();
+                    this.addNumDocim(empo, value);
+
+                    return false
+                }
+               
+                axios.post('/addNumDocim/'+empo.id+"?docim="+numDoc).then(response => {
                     console.log(response);
                     if(response.data.code == 0){
                         Vue.swal.fire(
@@ -1089,7 +1115,7 @@ export default {
         cloturer(empotage){
                      Vue.swal.fire({
                       title: 'Confirmez la cloture',
-                      text:   'N° Dossier: '+empotage.reference,
+                      text:   (empotage.numDocim==null || empotage.numDocim=='') ? '' : 'N° DOCIM: '+empotage.numDocim,
                       icon: 'warning',
                       showCancelButton: true,
                       confirmButtonColor: '#38c172',

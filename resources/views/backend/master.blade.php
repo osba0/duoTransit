@@ -93,13 +93,13 @@ $config = [
                                 <a href="/precharger/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('precharger/*') ? 'active' : '' }}"><i class="nav-icon fa fa-asterisk"></i> <p>Préchargement</p></a>
                             </li>
                             <li class="nav-item">
-                                <a href="/numdocim/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('numdocim/*') ? 'active' : '' }}"><i class="nav-icon fa fa-tags"></i> <p>Gestion Docim</p></a>
-                            </li>
-                            <li class="nav-item">
                                 <a href="{{ route('historique-prechargement', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-prechargement/*')) ? 'active' : '' }}">
                                   <i class="fa fa-clock-o nav-icon"></i>
                                   <p style="line-height: 18px; margin-top:3px">Historique <br> préchargement</p>
                                 </a>
+                            </li>
+                             <li class="nav-item">
+                                <a href="/numdocim/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('numdocim/*') ? 'active' : '' }}"><i class="nav-icon fa fa-tags"></i> <p>Gestion DOCIM</p></a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('historique-empotage', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-empotage/*')) ? 'active' : '' }}">

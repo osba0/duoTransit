@@ -60,7 +60,7 @@
                     <span></span>
                   </div>
                   <div class="text-center py-3">
-                    <h4 class="mb-0">{{ format_nbr(totalVolume) }}</h4>
+                    <h4 class="mb-0">{{ format_dec(totalVolume) }}</h4>
                   </div>
                 </div>
             </div>
@@ -764,8 +764,11 @@
             flushDataIncident(){
                 this.incidentForm.commande = "";
                 this.incidentForm.commentaires = "";
-                this.incidentForm.objet= "";
-               
+                this.incidentForm.objet = "";
+                this.$refs.fileIncident.value = null
+                this.incidentForm.file = "";
+                this.attachments = [];
+
             },
             getFournis(id){
                 for(var i=0; i<this.listFournisseurs.length; i++){
@@ -1156,6 +1159,9 @@
             },
             format_nbr(mnt){
                 return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            },
+            format_dec(mnt){
+                return mnt.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             }
         },
         

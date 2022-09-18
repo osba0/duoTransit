@@ -154,30 +154,22 @@
                                                 </a>
                                             <!--button v-if="empo.etat==0"  @click="showDossier(empo)" class="btn btn-info btn-sm">Ouvrir</button-->
                                             
-                                            <a href="#" title="Liste contenaire" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-warning"  @click="showContenaire(empo)">
-                                                <i class="fa fa-cube" aria-hidden="true"></i><span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{empo.totalContenaire}}</span></a>
-                                             <a v-if="empo.etat==0" href="#" title="Complément de document" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-warning"  @click="showDocument(empo)" data-toggle="modal" data-target="#openDocument">
-                                                        <i class="fa fa-files-o" aria-hidden="true"></i>
+                                            <a href="#" title="Liste contenaire" class="btn p-0 m-1 ml-2  position-relative"  @click="showContenaire(empo)">
+                                                <img src="/images/contenaire.png" alt="Contenaire" height="30"><span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{empo.totalContenaire}}</span></a>
+                                             <a v-if="empo.etat==0" href="#" title="Complément de document" class="btn p-0 m-1 ml-2  position-relative"  @click="showDocument(empo)" data-toggle="modal" data-target="#openDocument">
+                                                        <img src="/images/document_compl.png" alt="Documents" height="30">
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDoc(empo.document) > 9 ? '+9' : getCountDoc(empo.document) }}</span>
                                                      
                                                     </a>
-                                            <a v-if="empo.etat==0"  title="Cloturer" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="cloturer(empo)">
-                                                <i class="fa fa-check" aria-hidden="true"></i>
-                                            </a>
-
-                                            <!--button title="Editer" href="#" class="btn btn-secondary btn-sm mx-2" v-on:click="editEmpotage(empotage)" data-toggle="modal" data-target="#newEmpotage">
-                                                    <i class="fa fa-pencil" aria-hidden="true"></i> Modifier
-                                            </button-->
                                             <a v-if="empo.etat==0"  title="Editer" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white"  data-toggle="modal" data-target="#newEmpotage" v-on:click="editEmpotage(empo)">
                                                 <i class="fa fa-pencil" aria-hidden="true"></i>
+                                            </a>
+                                             <a v-if="empo.etat==0"  title="Cloturer" class="btn bg-success text-white border-success ml-3 m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="cloturer(empo)">
+                                                <i class="fa fa-check" aria-hidden="true"></i>
                                             </a>
                                             <a v-if="empo.etat==0"  title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1 bg-white" v-on:click="deleteEmpotage(empo)">
                                                 <i class="fa fa-close text-danger" aria-hidden="true"></i>
                                             </a>
-
-                                            <!--button title="Supprimer" href="#" class="btn btn-sm btn-danger" v-on:click="deleteEmpotage(empotage)">
-                                                <i class="fa fa-close text-white" aria-hidden="true"></i> Supprimer
-                                            </button-->
                                         </td>
                                     </tr>
                                 </template>
@@ -202,19 +194,20 @@
                     <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                 </button>
                 <div>
-                    <div class="d-flex flex-row justify-content-center">
+                    <div class="d-flex flex-row align-items-center justify-content-center outlineBtn">
                         <template v-for="contenaire, index in contenaires.data">
-                            <div class="position-relative ml-3" style="width:60px">
-                                <button v-on:click="contenaireSelectionner(index)" class="btn rounded-circle btn-default mb-2" :class="index==currentIndex ? 'bg-primary':'bg-light'"><span class="h1"><i class="fa fa-cube"></i></span>
+                            <div class="position-relative ml-3">
+                                <button v-on:click="contenaireSelectionner(index)" class="btn btn-default mb-0 p-0">
+                                    <img src="/images/contenaire.png" alt="Contenaire" height="35"  :class="index==currentIndex ? 'activeContent':'imageGrey'">
                                 </button>
-                                <button v-if="contenaire.etat == 1" style="top: -3px; right: -3px;"  v-on:click="reactiver(contenaire, index)" class="badge badge-success position-absolute rounded-circle  border-0"><i class="fa fa-refresh"></i></button>
+                                <button v-if="contenaire.etat == 1" style="top: -3px; right: -3px;"  v-on:click="reactiver(contenaire, index)" class="badge badge-success position-absolute rounded-circle  border-0" title="Réactiver le contenaire"><i class="fa fa-refresh"></i></button>
                               
-                                <button v-if="contenaire.etat == 0" style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="supprimerContenaire(contenaire)"><i class="fa fa-times"></i></button>
+                                <button v-if="contenaire.etat == 0" title="Supprimer le contenaire" style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="supprimerContenaire(contenaire)"><i class="fa fa-times"></i></button>
                             </div>
                         </template>
                         <template v-if="!(!contenaires.data || !contenaires.data.length)">
                             <div class="position-relative ml-3" style="width:60px">
-                                <button class="btn  btn-transparent rounded-circle mb-2" data-toggle="modal" data-target="#creerContenaire"><span class="h1"><i class="fa fa-plus"></i></span>
+                                <button class="btn  btn-transparent rounded-circle mb-0" data-toggle="modal" data-target="#creerContenaire"><span class="h1"><i class="fa fa-plus"></i></span>
                                 </button>
                             </div>
                         </template>
@@ -264,7 +257,7 @@
                                             <th>Nbre Commande: {{ format_nbr(selected.nbrCmd) }}</th>
                                             <th>Nbre de colis empoté: {{ format_nbr(selected.nbrColis) }}</th>
                                             <th>Poids empoté: {{ format_nbr(selected.poids) }} KG</th>
-                                            <th>Volume empoté: {{ format_nbr(selected.volume) }} m<sup>3</sup></th>
+                                            <th>Volume empoté: {{ format_dec(selected.volume) }} m<sup>3</sup></th>
                                         </tr>
                                   
                                     </tbody>
@@ -390,7 +383,7 @@
                          <td class="p-2 align-middle">
                               <img :class="'loader_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
                             
-                              <input class="text-center val-douane" type="text" :data-id="dry.reidre" v-model="douane[dry.reidre]" @focus="focusDoune(dry.reidre)" @blur="saveDouane(dry)" :placeholder="dry.douane"> 
+                              <input class="text-center val-douane" type="text" :data-id="dry.reidre" v-model="douane[dry.reidre]" @focus="focusDoune(dry.reidre)" @blur="saveDouane(dry)" :placeholder="dry.douane">   
                          </td>
                         <td class="p-2 text-right">
                             <div class="d-flex justify-content-end align-items-center">
@@ -1065,7 +1058,7 @@
                 var self = this;
 
                 $(".val-douane").each(function(){
-                    if($(this).val()!=''){
+                    if($(this).val()!='' || $(this).attr("placeholder")!=''){
                         self.commandeSelected.push($(this).attr("data-id"));
                     }else{
                         self.commandeNoSelected.push($(this).attr("data-id"));
@@ -1085,7 +1078,7 @@
 
                 Vue.swal.fire({
                       title: 'Confirmez la validation',
-                      text: "Dossier n° "+this.selected.dossier,
+                      text: "N°TC: "+this.selected.numtc+" Plomb:"+this.selected.plomb,
                       icon: 'warning',
                       showCancelButton: true,
                       confirmButtonColor: '#3085d6',
@@ -2048,6 +2041,12 @@
                 if(Array.isArray(empo.document)){
                     this.tabDoc = empo.document;
                 }
+            },
+             getDoc(index){
+                this.currentIndexDoc = index;
+            },
+            format_dec(mnt){
+                return mnt.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             }
         },
         mounted() {

@@ -53,6 +53,10 @@ class HistoActionController extends Controller
 
         $user = Auth::user();
 
+        if(!($user->hasRole(UserRole::ROLE_CLIENT))){
+            abort(401);
+        }
+
         $entite = Entite::where('id', $user->entites_id)->get()->first();
         
         $client = Client::get()->where('slug', request('id'))->first();
@@ -89,7 +93,7 @@ class HistoActionController extends Controller
             ->leftJoin('contenaires', 'contenaires_empotage.contenaires_id', '=', 'contenaires.id')
             ->leftJoin('entrepots', 'empotages.entrepots_id', '=', 'entrepots.id')
             ->groupBy('empotages.id')
-            ->select(DB::raw('count(contenaires_empotage.id) as nbreContenaireEmpote'),  
+            ->select(DB::raw('count(DISTINCT contenaires_empotage.id) as nbreContenaireEmpote'),  
                 /*'receptions.dossier_empotage_id', 
                 DB::raw('SUM(receptions.repoid) as total_poids'), 
                 DB::raw('SUM(receptions.revolu) as total_volume'), 
@@ -134,7 +138,9 @@ class HistoActionController extends Controller
                     $query->orWhere('declaration_douane', 0)->orWhere('declaration_douane', NULL)->orWhere('declaration_douane', '');
                     });*/
             }else{
-                $req = $req->where("empotages.is_close", 1);
+                if(!($user->hasRole(UserRole::ROLE_ADMIN))){
+                    $req = $req->where("empotages.is_close", 1);
+                }
                 $req = $req->whereBetween('empotages.created_at', [request('filtre.dateDebut').' 00:00:00', request('filtre.dateFin').' 23:59:59']);
             }
 
@@ -279,7 +285,7 @@ class HistoActionController extends Controller
                 'dossier_prechargements.created_at as created_at_pre',
                 'dossier_prechargements.updated_at as updated_at_pre', 
                 'dossier_prechargements.reetat as etat',
-                'dossier_prechargements.rapport_pdf as rapport_pdf',
+                //'dossier_prechargements.rapport_pdf as rapport_pdf',
                 
                 'users.username as user',
                 'type_commandes.typcmd as typecmd',

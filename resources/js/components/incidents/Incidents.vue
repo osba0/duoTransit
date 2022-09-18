@@ -334,6 +334,9 @@
                 this.incidentForm.commande = "";
                 this.incidentForm.commentaires = "";
                 this.incidentForm.objet= "";
+                this.attachments= []; 
+                this.$refs.file.value = null;
+                this.file = []; 
             },
             getIncident(page = 1){
                 axios.get('/incidents/getIncident/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate).then(response => {
