@@ -1139,3 +1139,20 @@ table .bgStripe .rowActif{
   font-size: 0;
   border: 1px solid #fff;
 }
+.imageGrey{
+    filter: grayscale(100%);
+    opacity: .7;
+}
+.outlineBtn button{
+    outline: none!important;
+    box-shadow: none !important;
+}
+.outlineBtn .btn-default:hover, .outlineBtn .btn-default:active, .outlineBtn .btn-default.hover {
+  background-color: transparent;
+}
+.outlineBtn button:hover{
+    opacity: 0.5;
+}
+.activeContent{
+    height: 50px !important;
+}

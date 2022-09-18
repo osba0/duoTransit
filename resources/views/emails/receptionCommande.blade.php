@@ -17,6 +17,7 @@
             <th style="height: 37px; padding: 0 15px; font-size: 15px">Entrepots</th>
             <th style="height: 37px; padding: 0 15px; font-size: 15px">Clients</th>
             <th style="height: 37px; padding: 0 15px; font-size: 15px">Transitaire</th> 
+            <th style="height: 37px; padding: 0 15px; font-size: 15px">Date</th> 
             <th style="height: 37px; padding: 0 15px; font-size: 15px">Facture</th> 
          </thead>
          <tbody>
@@ -28,6 +29,7 @@
                      <td style="padding: 0 15px; font-size: 14px">{{ $commande->nomEntrepot }}</td>
                      <td style="padding: 0 15px; font-size: 14px">{{ $commande->clnmcl }}</td> 
                      <td style="padding: 0 15px; font-size: 14px">{{ $commande->nom }}</td> 
+                     <td style="padding: 0 15px; font-size: 14px">{{ $commande->recrea }}</td> 
                      <td style="padding: 0 15px; font-size: 14px">
                         @if($commande->refasc !='')
                         <a href="{{ env('APP_URL') }}/assets/factures/{{ $commande->refasc }}">Voir</a>
@@ -39,6 +41,11 @@
              @endforeach
          </tbody>
       </table>
+      <br/><br/>
+      <div style="text-align: center; color: black; font-size: 14px;
+border: 1px solid black;
+padding: 5px 0;">Ceci est un <b>email</b> automatique, <b>merci de ne pas répondre.</b></div>
+      <br/><br/>
       Cordialement,<br/><br/>
       <h3 style="margin:0"><u>DuoTransit</u></h3>
    </div>

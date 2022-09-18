@@ -129,7 +129,7 @@
                                             <template v-if="userRole=='client'">
                                                 <td class="position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> 
                                                   
-                                                    <button v-if="res.numDocim == '' || res.numDocim == NULL" class="badge border-0 badge-info" v-on:click="addNumDocim(res)">Ajouter</button>
+                                                    <button v-if="res.numDocim == '' || res.numDocim == null" class="badge border-0 badge-info" v-on:click="addNumDocim(res)">Ajouter</button>
                                                      <span v-else class="text-primary font-weight-bold cursor-pointer"  v-on:click="addNumDocim(res, res.numDocim)">
                                                         {{res.numDocim}} 
                                                         <i v-if="gestionDocim==1" class="fa fa-pencil"></i>
@@ -161,7 +161,7 @@
                                                  <template v-if="userRole=='client' && res.is_close==0">
                                                      <span v-if="res.etat==1" class="badge badge-success">Validé</span>
                                                  </template>
-                                                <span v-if="res.is_close==1" class="badge badge-primary">Cloturé</span>
+                                                <span v-if="res.is_close==1 || (res.etat==1 && userRole=='admin')" class="badge badge-primary">Cloturé</span>
                                                
                                             </td>
                                              <!--td>
@@ -231,11 +231,12 @@
                     <button class="btn btn-primary mb-3" @click="reinit()">
                         <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                     </button>
-                     <div>
-                        <div class="d-flex flex-row justify-content-center">
+                     <div class="mb-3">
+                        <div class="d-flex flex-row align-items-center justify-content-center outlineBtn">
                             <template v-for="contenaire, index in contenaires.data">
-                                <div class="position-relative ml-3" style="width:60px">
-                                    <button v-on:click="contenaireSelectionner(index)" class="btn rounded-circle btn-default mb-2" :class="index==currentIndexContenaire ? 'bg-primary':'bg-light'"><span class="h1"><i class="fa fa-cube"></i></span>
+                                <div class="position-relative ml-3">
+                                    <button v-on:click="contenaireSelectionner(index)" class="btn btn-default mb-0 p-0">
+                                        <img src="/images/contenaire.png" alt="Contenaire" height="35"  :class="index==currentIndexContenaire ? 'activeContent':'imageGrey'">
                                     </button>
                                     <button v-if="contenaire.etat == 1" title="Rapport d'empotage" style="top: -3px; right: -3px;"  v-on:click="showRapport(index)" class="badge bg-white border-0 shadow-sm position-absolute rounded-circle" data-toggle="modal" data-target="#openFacture"><i class="fa fa-file-pdf-o text-danger"></i></button>
                                   
@@ -1114,7 +1115,7 @@ export default {
         cloturer(empotage){
                      Vue.swal.fire({
                       title: 'Confirmez la cloture',
-                      text:   'N° DOCIM: '+empotage.numDocim,
+                      text:   (empotage.numDocim==null || empotage.numDocim=='') ? '' : 'N° DOCIM: '+empotage.numDocim,
                       icon: 'warning',
                       showCancelButton: true,
                       confirmButtonColor: '#38c172',

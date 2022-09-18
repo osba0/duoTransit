@@ -764,8 +764,11 @@
             flushDataIncident(){
                 this.incidentForm.commande = "";
                 this.incidentForm.commentaires = "";
-                this.incidentForm.objet= "";
-               
+                this.incidentForm.objet = "";
+                this.$refs.fileIncident.value = null
+                this.incidentForm.file = "";
+                this.attachments = [];
+
             },
             getFournis(id){
                 for(var i=0; i<this.listFournisseurs.length; i++){

@@ -31,8 +31,8 @@ class EntiteSeeder extends Seeder
             'email' => 'marineplus@yopmail.com',
             'etat' => 1,
             'logo' => 'logo_1658251336.png', // Logo Marine plus
-            'entrepots_id' => json_encode($entrepot),
-            'contenaires_id' => json_encode($contenaire)
+            'entrepots_id' => $entrepot,
+            'contenaires_id' => $contenaire
         ]);
         
         $entite->save();

@@ -53,6 +53,10 @@ class HistoActionController extends Controller
 
         $user = Auth::user();
 
+        if(!($user->hasRole(UserRole::ROLE_CLIENT))){
+            abort(401);
+        }
+
         $entite = Entite::where('id', $user->entites_id)->get()->first();
         
         $client = Client::get()->where('slug', request('id'))->first();

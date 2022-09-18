@@ -57,7 +57,7 @@ class JournalCommandes extends Command
         foreach($clients as $client){
             // Get Orders du jour
         
-            $query = DB::table('receptions')->whereBetween('recrea', [/*Carbon::yesterday()->toDateString().*/'2022-08-01 00:00:00', Carbon::today()->toDateString().' 23:00:00'])->where("receptions.clients_id", $client->id)
+            $query = DB::table('receptions')->whereBetween('recrea', [Carbon::yesterday()->toDateString().' 00:00:00', Carbon::yesterday()->toDateString().' 23:59:59'])->where("receptions.clients_id", $client->id)
             ->leftJoin('type_commandes', 'receptions.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('fournisseurs', 'receptions.fournisseurs_id', '=', 'fournisseurs.id')
             ->leftJoin('entrepots', 'receptions.entrepots_id', '=', 'entrepots.id')
