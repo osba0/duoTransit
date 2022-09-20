@@ -39,6 +39,11 @@
                      </td>
                  </tr>
              @endforeach
+             @if(sizeof($commandes)==0)
+               <tr>
+                  <td style="padding: 10px 15px; font-size: 14px; text-align: center" colspan="8">Aucune commande receptionnée!!</td>
+               </tr>
+             @endif
          </tbody>
       </table>
       <br/><br/>
