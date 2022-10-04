@@ -1,5 +1,5 @@
 ## DuoTransit
-DuoTransit est une application WEB permettant de gérer et de superviser les commandes entre le transitaire et le client. 
+DuoTransit est une application WEB permettant de gérer et de superviser les commandes entre le transitaire et ses clients. 
 
 **Installation**
 
@@ -23,4 +23,8 @@ php artisan key:generate
 ```
 php artisan migrate
 php artisan db:seed
+
+**Log Version**
+1.5 Premiére version
+2.0 Integration des N° DOCIM - Historique DOCIM - Profil Consultation - Ajout label num contenaire dans Empotage
 ```

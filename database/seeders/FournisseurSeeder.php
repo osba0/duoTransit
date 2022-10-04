@@ -15,7 +15,7 @@ class FournisseurSeeder extends Seeder
     public function run()
     {
         $fournisseur = Fournisseur::create([
-            'fonmfo' => 'PLANET PHARMA',
+            'fonmfo' => 'A DEFINIR',
             'foadrs' => 'paris, France',
             'fotele' => '000 000 000 000',
             'foetat' => 1

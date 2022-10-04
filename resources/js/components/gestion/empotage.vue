@@ -36,7 +36,7 @@
                     <div class="d-flex align-items-end">
                         <div>
                             <div class="d-flex align-items-center">
-                                <label for="paginate" class="text-nowrap mr-2 mb-0"
+                                <label for="paginate" class="text-nowrap mr-2 mb-0" 
                                     >Nbre de ligne par Page</label> 
                                 <select
                                     v-model="paginate"
@@ -190,19 +190,20 @@
         </template>
         <template v-else>
             <div class="mb-3 d-flex justify-content-between align-items-center">
-                <button class="btn btn-primary mb-2" @click="back()">
+                <button class="btn btn-primary mb-2 mr-3" @click="back()">
                     <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                 </button>
-                <div>
-                    <div class="d-flex flex-row align-items-center justify-content-center outlineBtn">
+                <div class="w-100 overflow-auto">
+                    <div class="d-flex flex-row align-items-center justify-content-end outlineBtn">
                         <template v-for="contenaire, index in contenaires.data">
                             <div class="position-relative ml-3">
-                                <button v-on:click="contenaireSelectionner(index)" class="btn btn-default mb-0 p-0">
-                                    <img src="/images/contenaire.png" alt="Contenaire" height="35"  :class="index==currentIndex ? 'activeContent':'imageGrey'">
+                                <button v-on:click="contenaireSelectionner(index)" class="btn btn-default d-flex flex-column mb-0 p-0">
+                                    <img src="/images/contenaire.png" alt="Contenaire" height="45"  :class="index==currentIndex ? 'activeContent':'imageGrey'">
+                                    <span class="badge w-100 mt-1" :class="index==currentIndex ? 'badge-primary':'badge-secondary opacity-7'">{{ contenaire.numContenaire}}</span>
                                 </button>
                                 <button v-if="contenaire.etat == 1" style="top: -3px; right: -3px;"  v-on:click="reactiver(contenaire, index)" class="badge badge-success position-absolute rounded-circle  border-0" title="Réactiver le contenaire"><i class="fa fa-refresh"></i></button>
                               
-                                <button v-if="contenaire.etat == 0" title="Supprimer le contenaire" style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="supprimerContenaire(contenaire)"><i class="fa fa-times"></i></button>
+                                <button v-if="contenaire.etat == 0" title="Supprimer le contenaire" style="top: 0px; right: 0px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="supprimerContenaire(contenaire)"><i class="fa fa-times"></i></button>
                             </div>
                         </template>
                         <template v-if="!(!contenaires.data || !contenaires.data.length)">
@@ -381,9 +382,14 @@
                            
                         </td-->
                          <td class="p-2 align-middle">
-                              <img :class="'loader_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
+                            <img :class="'loader_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
+                            <div v-if="dry.douane!='' && dry.douane != null" :id="'label_'+dry.reidre">
+                                <span>{{dry.douane}}</span>
+                                <i class="fa fa-edit" v-on:click="editDouane(dry)"></i>
+                            </div>
+                            <form v-on:submit.prevent="saveDouane(dry)"><input :data-id="dry.reidre" :class="[dry.douane!='' && dry.douane != null? 'd-none':'d-block']" type="text" :id="dry.reidre" v-model="douane[dry.reidre]" style="width:90px" @blur="saveDouane(dry)" @onfocusout="saveDouane(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
                             
-                              <input class="text-center val-douane" type="text" :data-id="dry.reidre" v-model="douane[dry.reidre]" @focus="focusDoune(dry.reidre)" @blur="saveDouane(dry)" :placeholder="dry.douane">   
+                            <!--input v-else class="text-center val-douane" style="width:80px" :disabled="(dry.douane!='' && dry.douane != null)" type="text" :data-id="dry.reidre" v-model="douane[dry.reidre]" @focus="focusDoune(dry)" @blur="saveDouane(dry)" :placeholder="dry.douane"-->   
                          </td>
                         <td class="p-2 text-right">
                             <div class="d-flex justify-content-end align-items-center">
@@ -507,41 +513,6 @@
                                  </div>
                                 
                              </div>
-                              <!--div class="row">
-                                <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                       Plomb
-                                       </label>
-                                        <input class="w-65 form-control" id="plomb" v-model="empotageForm.plomb"/>
-                                    </div>
-                                    
-                                 </div>
-                                  <div class="col-6 my-2 d-flex flex-row justify-content-between align-items-center">
-                                    
-
-                                    <div class="w-49 d-flex align-items-center my-2">
-                                       <label for="tc"  class="d-block m-0 text-left pr-2" style='white-space: nowrap;'>
-                                        N° TC
-                                       </label>
-                                        <input class="w-65 form-control" id="tc" v-model="empotageForm.tc" />
-                                    </div>
-                                    
-                                    <div class="w-49 d-flex align-items-center my-2">
-                                         <label for="typetc"  class="d-block m-0 text-left  w-35 pr-2" style='white-space: nowrap;'>
-                                       Type TC
-                                       </label>
-                                       
-                                      
-                                        <select class="form-control ml-2" v-model="empotageForm.typetc">
-                                            <option value=''>Choisir le contenaire</option>
-                                            <option v-for="contenaire in listContenaire"  :value="contenaire.id">{{contenaire.nom}}</option>
-                                        </select>
-                                       
-                                    </div>
-                                 </div>
-                                
-                             </div-->
                              <div class="row">
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2 dateW65">
@@ -596,26 +567,17 @@
                          <form @submit.prevent="saveContenaire" enctype="multipart/form-data" key=1 >
                             
                               <div class="row">
-                                <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
+                               
+                                  <div class="col-4 my-2 d-flex flex-row justify-content-between align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                       Plomb
-                                       </label>
-                                        <input class="w-65 form-control" id="plomb" v-model="empotageFormContenaire.plomb"/>
-                                    </div>
-                                    
-                                 </div>
-                                  <div class="col-6 my-2 d-flex flex-row justify-content-between align-items-center">
-                                    
-
-                                    <div class="w-49 d-flex align-items-center my-2">
                                        <label for="tc"  class="d-block m-0 text-left pr-2" style='white-space: nowrap;'>
                                         N° TC
                                        </label>
-                                        <input class="w-65 form-control" id="tc" v-model="empotageFormContenaire.tc" />
+                                        <input class="w-65 form-control" id="tc" autocomplete="off" v-model="empotageFormContenaire.tc" />
                                     </div>
-                                    
-                                    <div class="w-49 d-flex align-items-center my-2">
+                                 </div>
+                                  <div class="col-4 my-2 d-flex flex-row justify-content-between align-items-center">                                   
+                                    <div class="w-100 d-flex align-items-center my-2">
                                          <label for="typetc"  class="d-block m-0 text-left  w-35 pr-2" style='white-space: nowrap;'>
                                        Type TC
                                        </label>
@@ -625,6 +587,15 @@
                                         </select>
                                        
                                     </div>
+                                 </div>
+                                  <div class="col-4 my-2 d-flex flex-column justify-content-start align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                         <label for="plomb"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                       Plomb
+                                       </label>
+                                        <input class="w-65 form-control" id="plomb" autocomplete="off" v-model="empotageFormContenaire.plomb"/>
+                                    </div>
+                                    
                                  </div>
                                 
                              </div>
@@ -1058,7 +1029,7 @@
                 var self = this;
 
                 $(".val-douane").each(function(){
-                    if($(this).val()!='' || $(this).attr("placeholder")!=''){
+                    if($(this).val()!='' || $('#label_'+$(this).attr("data-id")+' span').text()!=''){
                         self.commandeSelected.push($(this).attr("data-id"));
                     }else{
                         self.commandeNoSelected.push($(this).attr("data-id"));
@@ -1728,9 +1699,12 @@
                         $(".loader_"+id).hide(); 
                     });*/
 
-                    var douane = this.douane[cmd.reidre];
+                    var douane = $("#"+cmd.reidre).val(); //this.douane[cmd.reidre];
 
-                    var placeholder = $(".val-douane[data-id='"+cmd.reidre+"']").attr("placeholder");
+
+
+
+                    /*var placeholder = $(".val-douane[data-id='"+cmd.reidre+"']").attr("placeholder");
 
 
                     if(!(typeof(douane) !== 'undefined') || !(douane !== null)){
@@ -1744,7 +1718,7 @@
                             douane = placeholder;
                             this.douane[cmd.reidre] = douane;
                         }
-                    }          
+                    } */         
 
                    
                     const data = new FormData();
@@ -1772,12 +1746,18 @@
                         this.getReception();
                         $(".loader_"+cmd.reidre).hide(); 
 
+                        if(douane!=''){
+                            $("#label_"+cmd.reidre).show();
+                            $("#"+cmd.reidre).hide();
+                        }
+
                    
                       
                     });
 
                 },
-                focusDoune(id){},
+                focusDoune(cmd){
+                },
                 cloturer(empotage){
                      Vue.swal.fire({
                       title: 'Confirmez la cloture',
@@ -2047,6 +2027,13 @@
             },
             format_dec(mnt){
                 return mnt.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            },
+            editDouane(dry){
+                $("#label_"+dry.reidre).hide();
+                $("#"+dry.reidre).val(dry.douane);
+                $("#"+dry.reidre).show();
+                $("#"+dry.reidre).removeClass("d-none");
+                $("#"+dry.reidre).focus();
             }
         },
         mounted() {

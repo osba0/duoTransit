@@ -113,7 +113,23 @@ Route::get('/empotage/{id}/{numero}/{typeCmd}/{idSelected}', [ChargementControll
 
 Route::get('/incidents/{id}', [IncidentController::class, 'index'])->name('index')->middleware(['auth']);
 
-Route::get('/historique-empotage/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-empotage')->middleware(['auth']);
+Route::get('/historique-empotage/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-empotage')->middleware(['auth'])->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
+
+Route::middleware(['role:' . UserRole::ROLE_CLIENT])->group(function () {
+    Route::get('/historique-docim/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-docim');
+ });
+
+Route::middleware(['role:' . UserRole::ROLE_CONSULTATION])->group(function () {
+    Route::get('/consultation/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('consultation');
+ });
+
+/* Route::middleware(['auth'])->group(function () {
+      Route::middleware(['roles:' . UserRole::ROLE_CONSULTATION.','. UserRole::ROLE_CLIENT])->group(function () {
+        Route::get('/historique-docim/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-docim');
+     });
+});*/
+
+//Route::get('/historique-docim/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-docim')->middleware(['auth', 'role:' . UserRole::ROLE_CLIENT, 'role:' . UserRole::ROLE_CONSULTATION]);
 
 Route::get('/historique-prechargement/{id}', [HistoActionController::class, 'historiquePrechargement'])->name('historique-prechargement')->middleware(['auth']);
 
@@ -254,6 +270,8 @@ Route::get('/prechargementClient/getCmdChoisi/{id}', [PrechargementController::c
 Route::post('/prechargementClient/notification/{id}', [PrechargementController::class, 'notifier'])->middleware(['auth']); 
 
 Route::delete('/prechargementClient/delete/{id}', [PrechargementController::class, 'deletePre']);
+
+Route::post('/prechargementClient/cloturer/{id}', [PrechargementController::class, 'cloturer']);
 
 
 

@@ -323,7 +323,7 @@
                 });
             },
             onProfil(){
-                if(this.userForm.profil=='Client'){
+                if(this.userForm.profil=='Client' || this.userForm.profil=='Consultation'){
                     this.noClientRole = false;
                 }else{
                     this.noClientRole = true;
@@ -361,6 +361,15 @@
                 for(var i=0; i<this.value.length; i++){
                     var item = this.value[i];
                     this.userForm.idClientAuth.push(item.id);  
+                }
+
+                 if((this.userForm.profil=='Client' || this.userForm.profil=='Consultation') && this.userForm.idClientAuth.length == 0 ){
+                    Vue.swal.fire(
+                          'Warning!',
+                          'Choisir une société autorisée!',
+                          'warning'
+                        )
+                   return false;
                 }
 
                 data.append('clientsAuth',  JSON.stringify(this.userForm.idClientAuth));
@@ -448,7 +457,7 @@
                 this.userForm.password  = '******';
                 this.userForm.confirmPassword  = '******';
                 this.userForm.profil = user.roles[0].substr(0,1).toUpperCase()+user.roles[0].substr(1); 
-                if(this.userForm.profil=="Client"){
+                if(this.userForm.profil=="Client" || this.userForm.profil=="Consultation"){
                     this.noClientRole = false;
                     var selected = [];
                     for(var i=0; i< user.client_supervisor.length; i++){

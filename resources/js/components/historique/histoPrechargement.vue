@@ -91,6 +91,7 @@
                                         <th class="p-2 border-right border-white h6">Contenaire</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Date</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
+                                        <th class="p-2 border-right border-white h6">Etat</th>
                                         <th class="p-2 border-right border-white h6 text-right">Actions</th>
                                         
                                     </tr>
@@ -113,10 +114,15 @@
                                             </td>
                                             <td class="p-2 align-middle">{{ res.updated_at }}</td>
                                             <td class="p-2 align-middle">{{ res.user }}</td>
+                                            <td>
+                                                <span v-if="res.totalEmpote == res.nbrCmd " class="badge badge-success">Cloturé</span>
+                                               <span v-if="res.totalEmpote < res.nbrCmd " class="badge badge-warning">En cours</span>
+                                            </td>
                                             <td class="p-2 align-middle">
                                                 <div class="d-flex justify-content-end align-items-center">
                                                     <div @click="detailsCommande(res)" class="d-flex cursor-pointer bg-primary position-relative rounded-circle boxAction justify-content-center align-items-center mr-2" title="Liste des commandes">
-                                                    <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre">{{ res.nbrCmd > 9 ? '+9' : res.nbrCmd }}</span> <i class="fa fa-list-ul" aria-hidden="true"></i>
+                                                        <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre">{{ res.nbrCmd > 9 ? '+9' : res.nbrCmd }}</span> 
+                                                        <i class="fa fa-list-ul" aria-hidden="true"></i>
                                                     </div>
                                                     <a v-if="res.etat==1" href="#" title="Rapport Préchargement" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(res)" data-toggle="modal" data-target="#openFacture">
                                                         <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
@@ -171,7 +177,7 @@
                         </tr>
                     </thead>
                     <tbody class="bgStripe">
-                    <template v-if="!reception.data || !reception.data.length">
+                    <template v-if="!reception.data || !reception.data.length"> 
                         <tr><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
                     </template>
                     <template v-else>
@@ -199,7 +205,13 @@
                             {{dry.prechargeur}}
                         </td>
                         <td>
-                            <span  class="badge badge-success" v-if="dry.dossier_id > 0">Préchargée</span>
+                            <div  v-if="dry.dossier_id > 0">
+                                <template v-if="dry.douane != '' && dry.douane != null">
+                                    <span class="badge badge-success">Empotée</span>
+                                </template>
+                                <template v-else> <span class="badge badge-primary">Préchargée</span></template>
+                            
+                            </div>
                             <span  class="badge badge-warning" v-else>En attente</span>
                         </td>
                          <td class="p-2 align-middle text-right">

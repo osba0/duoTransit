@@ -1154,5 +1154,8 @@ table .bgStripe .rowActif{
     opacity: 0.5;
 }
 .activeContent{
-    height: 50px !important;
+    height: 45px !important;
+}
+.opacity-7{
+    opacity: .7;
 }

@@ -84,7 +84,7 @@
                                 </div>
                         
                             </div>
-                            <div class="d-flex align-items-end">
+                            <div class="d-none align-items-end">
                                 <div>
                                     <div class="d-flex align-items-center">
                                         <label class="text-nowrap mr-2 mb-0"
@@ -153,13 +153,18 @@
                                             <td class="p-2 align-middle">{{ pre.user }}</td>
                                             <td class="p-2 align-middle">
                                                 <div class="w-100 text-right">
-                                                    <a v-if="pre.etat==1" href="#" title="Voir la facture" class="btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(pre)" data-toggle="modal" data-target="#openFacture">
+                                                    <button @click="showDossier(pre)" class="btn btn-info btn-sm">Ouvrir</button>
+                                                    <a v-if="pre.etat==1" href="#" title="Rapport Préchargement" class="btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(pre)" data-toggle="modal" data-target="#openFacture">
                                                         <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                                     </a>
-                                                    <button @click="showDossier(pre)" class="btn btn-info btn-sm" v-if="pre.etat==0">Ouvrir</button>
+
+                                                    
                                                      <a v-if="pre.etat==0" title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1 bg-white" v-on:click="deletePre(pre)">
                                                         <i class="fa fa-close text-danger" aria-hidden="true"></i>
                                                     </a>
+                                                     <a title="Cloturer" class="btn m-1  border border-success bg-success text-white btn-circle border btn-circle-sm m-1 ml-3 bg-white" v-on:click="cloturer(pre)">
+                                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                                        </a>
                                                 
                                                 </div>
                                             </td>
@@ -302,6 +307,7 @@
                                 <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
                                 <th class="p-2 border-right text-center border-white h6">Priorité</th>
+                                <th class="p-2 border-right text-center border-white h6" v-if="selected.etat==1">Etat</th>
                                 <th class="text-right p-2 border-right border-white h6">Actions</th>
                             </tr>
                         </thead>
@@ -310,7 +316,7 @@
                             <tr><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
                         </template>
                         <template v-else>
-                            <tr v-for="dry in dries.data" :key="dry.reidre" class="bg-white"  v-bind:style="[dry.dossier_id > 0 ? {'opacity': 0.3} : {'opacity': '1'}]">
+                            <tr v-for="dry in dries.data" :key="dry.reidre" class="bg-white"  v-bind:style="[dry.dossier_id > 0 ? {'opacity': 0.9} : {'opacity': '1'}]">
                             
                             <td class="p-2 align-middle position-relative">
                                 <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>
@@ -342,6 +348,16 @@
 
                                 <rate :id="'recep_'+dry.reidre" :length="3" :value="dry.priorite" :ratedesc="['Pas urgente', 'Normale', 'Urgente']" @after-rate="onAfterRate" :readonly="false" :disabled="false" />
 
+                            </td>
+                             <td v-if="selected.etat==1">
+                                <div  v-if="dry.dossier_id > 0">
+                                    <template v-if="dry.douane != '' && dry.douane != null">
+                                        <span class="badge badge-success">Empotée</span>
+                                    </template>
+                                    <template v-else> <span class="badge badge-primary">Préchargée</span></template>
+                                
+                                </div>
+                                <span  class="badge badge-warning" v-else>En attente</span>
                             </td>
                             <td class="p-2 text-right">
 
@@ -382,6 +398,7 @@
                                 <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
                                 <th class="p-2 border-right text-center border-white h6">Priorité</th>
+                                <th class="p-2 border-right text-center border-white h6" v-if="selected.etat==1">Etat</th>
                                 <th class="text-right p-2 border-right border-white h6">Actions</th>
                             </tr>
                         </tfoot>
@@ -399,13 +416,13 @@
        </template>
 
         <!-- Modal Facture-->
-        <div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+        <div class="modal fade fullscreenModal" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
           aria-hidden="true" data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
              <div class="modal-content">
                 
                     <div class="modal-header text-left">
-                        <h4 class="modal-title w-100 font-weight-bold">Facture</h4>
+                        <h4 class="modal-title w-100 font-weight-bold">Dossier préchargement</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
                           <span aria-hidden="true">&times;</span>
                         </button>
@@ -486,7 +503,8 @@
                     isSelected: false,
                     etat: '',
                     mntFact: 0,
-                    entiteID: ''
+                    entiteID: '',
+                    isClose: false
                 },
                 capacite: this.defaultContenaire.volume,
                 nbrContenaire: 0,
@@ -586,9 +604,11 @@
             this.selected.isSelected = true;
             this.selected.etat           = pre.etat;
             this.selected.typeCommandeID = pre.typecmdID; 
+            this.isClose = pre.is_close;
             this.selected.entiteID     = pre.entiteID;
             this.setProgressCont(pre.total_volume);
             this.getReception();
+
            },
         preselectionner(event, cmd){
             this.run = true;
@@ -646,7 +666,7 @@
         },
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/prechargement/getreception/'+this.idClient+'?page=' + page + "&paginate=" + this.paginateRecep+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID+"&entiteID="+this.selected.entiteID+"&keysearch="+this.search+"&rate="+this.filtreRate+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
+            axios.get('/prechargement/getreception/'+this.idClient+'?page=' + page + "&paginate=" + this.paginateRecep+"&etatSelected="+this.selected.etat+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID+"&entiteID="+this.selected.entiteID+"&keysearch="+this.search+"&rate="+this.filtreRate+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
                
                 this.dries = response.data;
 
@@ -1127,7 +1147,42 @@
                  EventBus.$emit('VIEW_FACT', {
                     pathFile: fact
                 }); 
-            }
+            },
+            cloturer(pre){
+                     Vue.swal.fire({
+                      title: 'Confirmez la cloture',
+                      text:  'ID Préchargement: '+pre.id,
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#38c172',
+                      //cancelButtonColor: '#f0c867',
+                      confirmButtonText: 'Oui, cloturer!'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                            axios.post('/prechargementClient/cloturer/'+pre.id).then(response => {
+                                console.log(response);
+                                if(response.data.code == 0){
+                                    Vue.swal.fire(
+                                      'Cloturé!',
+                                      'Dossier Préchargement cloturé.',
+                                      'success'
+                                    ).then((result) => {
+                                        // redirection   
+                                        location.reload();
+                                    }); 
+                                 }else{
+                                    Vue.swal.fire(
+                                      'Warning!',
+                                      response.data.message,
+                                      'warning'
+                                    );
+                                 }
+
+                            });
+                      
+                      }
+                    })
+               },
 
         }, 
         mounted() {

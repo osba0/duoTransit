@@ -75,14 +75,18 @@ $config = [
                         @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))  
                         <li class="nav-item">
                             <a href="{{route('home')}}" class="nav-link {{ (request()->is('/')) ? 'active' : '' }}">
-                              <i class="fa fa-tachometer nav-icon"></i>
-                              <p>Tableau de bord</p>
+                                <i class="fa fa-tachometer nav-icon"></i>
+                                @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
+                                  <p>Accueil</p>
+                                @else
+                                 <p>Tableau de bord</p>
+                                @endif
                             </a>
                         </li>
                         @endif
                         @if (\Request::is('reception/*') or \Request::is('activity/*') or \Request::is('precharger/*') or (\Request::is('incidents/*')) or 
-                        \Request::is('numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is('gerer/*') or \Request::is('historique-empotage/*') or \Request::is('historique-prechargement/*') or \Request::is('notifications/*'))  
-                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
+                        \Request::is('numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is('gerer/*') or \Request::is('historique-empotage/*') or \Request::is('historique-docim/*') or \Request::is('consultation/*') or \Request::is('historique-prechargement/*') or \Request::is('notifications/*'))  
+                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
                             <li class="nav-item">
                                 <a href="/reception/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('reception/*') ? 'active' : '' }}"><i class="nav-icon fa fa-sign-in"></i> <p>Réceptionner</p></a>
                             </li>
@@ -102,9 +106,9 @@ $config = [
                                 <a href="/numdocim/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('numdocim/*') ? 'active' : '' }}"><i class="nav-icon fa fa-tags"></i> <p>Gestion DOCIM</p></a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('historique-empotage', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-empotage/*')) ? 'active' : '' }}">
+                                <a href="{{ route('historique-docim', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-docim/*')) ? 'active' : '' }}">
                                   <i class="fa  fa-clock-o nav-icon"></i>
-                                  <p>Histo empotage</p>
+                                  <p>Histo DOCIM</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -115,7 +119,18 @@ $config = [
                             </li>
                             @endif
 
-                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
+
+                            @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
+
+                            <li class="nav-item">
+                                <a href="{{ route('consultation', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('consultation/*')) ? 'active' : '' }}">
+                                  <i class="fa  fa-clock-o nav-icon"></i>
+                                  <p>Histo DOCIM</p>
+                                </a>
+                            </li>
+                            @endif
+
+                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                                 @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ADMIN || auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT)))  
                                 <li class="nav-item {{ request()->is('gerer/prechargement/*') || request()->is('gerer/empotage/*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link">
@@ -145,7 +160,7 @@ $config = [
                                   </li>
                                   @endif
                               @endif
-                              @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER)) 
+                              @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER)) 
                                <li class="nav-item">
                                 <a href="{{ route('historique-empotage', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-empotage/*')) ? 'active' : '' }}">
                                   <i class="fa  fa-clock-o nav-icon"></i>
@@ -153,7 +168,7 @@ $config = [
                                 </a>
                               </li>
                               @endif
-                               @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && false)  
+                               @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && false)  
                                 <li class="dropdown-submenu  nav-item {{ (request()->is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or Request::is('empotage/*') or  \Request::is('historique/*')) ? 'menu-open' : '' }}">
                                 <a href="/chargement-list/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('chargement-list/*')? 'active' : '' }}">
                                   <i class="nav-icon fa fa-download"></i>
@@ -167,7 +182,7 @@ $config = [
                                       <p>Préchargement</p>
                                     </a>
                                   </li>
-                                  @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT)) 
+                                  @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION)) 
                                    <li class="nav-item">
                                     <a href="/empotage/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('empotage/*')) ? 'active' : '' }}">
                                       <i class="fa fa-cube nav-icon"></i>
@@ -175,7 +190,7 @@ $config = [
                                     </a>
                                   </li>
                                   @endif
-                                  @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT)) 
+                                  @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION)) 
                                    <li class="nav-item">
                                         <a href="/historique/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('historique/*')) ? 'active' : '' }}">
                                           <i class="fa  fa-clock-o nav-icon"></i>
@@ -190,7 +205,7 @@ $config = [
                             @endif
                         @endif
 
-                        @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
+                        @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                             @if (!\Request::is('configuration/*'))
                                  <li class="nav-item">
                                     <a href="{{ route('listNotif', ['client' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('notifications/*')) ? 'active' : '' }}">
@@ -296,7 +311,7 @@ $config = [
             <!-- To the right -->
             <div class="float-right d-flex align-items-center">
                 <img src="{{ asset('images/itransit-logo.png') }}" alt="Logo"
-                    class="brand-image" height="20"> <span>{{ $config['appName'] }} v1.5</span>
+                    class="brand-image" height="20"> <span>{{ $config['appName'] }} v2.0</span>
             </div>
             <!-- Default to the left -->
             <strong>&copy; {{ now()->year }} <a href="#">{{ config('app.name', 'Laravel') }}</a>.</strong> All rights

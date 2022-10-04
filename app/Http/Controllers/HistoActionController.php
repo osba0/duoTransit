@@ -155,6 +155,12 @@ class HistoActionController extends Controller
                 $term = "$cmd%";
                 $req = $req->where('receptions.rencmd', 'like', $term);
             }
+             if(request('filtre.numfact')!=''){
+                $numfact = request('filtre.numfact');
+                $fact = "$numfact%";
+                $req = $req->where('receptions.renufa', 'like', $fact);
+                
+            }
              if(request('filtre.docim')!=''){
                 $docim = request('filtre.docim');
                 $term = "$docim%";
@@ -165,6 +171,7 @@ class HistoActionController extends Controller
                 $term = "$cmd%";
                 $req = $req->where('empotages.reference', 'like', $term);
             }
+
             if($sort!=''){
                 $order = request('order');
                 $req = $req->orderBy(strval($sort), $order);
@@ -273,6 +280,7 @@ class HistoActionController extends Controller
                 DB::raw('SUM(receptions.renbcl) as total_colis'), 
                 DB::raw('SUM(receptions.renbpl) as total_palette'), 
                 DB::raw('count(receptions.rencmd) as total_cmd'), 
+                DB::raw("count( ( CASE WHEN receptions.douane != '' THEN receptions.douane END ) ) AS nbreCmdEmpote"),
                 DB::raw('SUM(receptions.revafa) as total_mnt'), 
                 'dossier_prechargements.nbreContenaire as nbreContenaire', 
                 'dossier_prechargements.id as idPre', 
@@ -285,6 +293,7 @@ class HistoActionController extends Controller
                 'dossier_prechargements.created_at as created_at_pre',
                 'dossier_prechargements.updated_at as updated_at_pre', 
                 'dossier_prechargements.reetat as etat',
+                'dossier_prechargements.is_close as isclose',
                 //'dossier_prechargements.rapport_pdf as rapport_pdf',
                 
                 'users.username as user',
@@ -306,6 +315,8 @@ class HistoActionController extends Controller
                 $term = "$cmd%";
                 $req = $req->where('receptions.rencmd', 'like', $term);
             }
+
+
             $req = $req->orderBy("dossier_prechargements.updated_at", 'DESC')->paginate($paginate); 
 
         }else{

@@ -254,7 +254,7 @@ class EmpotageController extends Controller
           ->update([
             "dossier_empotage_id" => $value,
             "douane" => request('douane'),
-            "numero_contenaire" => request('contenaireSelected')
+            "numero_contenaire" => request('douane')!=''? request('contenaireSelected'):null
         ]);
         // recalcul total 
         $results = DB::table('contenaires_empotage')

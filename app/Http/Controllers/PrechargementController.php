@@ -105,7 +105,8 @@ class PrechargementController extends Controller
                     "users_id"          => Auth::user()->id,
                     "clients_id"        => request('clientID'),
                     "type_commandes_id" => request('typeCmd'),
-                    "entites_id"      => request('entite')
+                    "entites_id"        => request('entite'),
+                    "is_close"          => 0
                 ]); 
                 return response([
                     "code" => 0,
@@ -159,12 +160,14 @@ class PrechargementController extends Controller
                 DB::raw('SUM(receptions.renbcl) as total_colis'), 
                 DB::raw('SUM(receptions.renbpl) as total_palette'), 
                 DB::raw('count(receptions.rencmd) as total_cmd'), 
+                DB::raw("count( ( CASE WHEN receptions.douane != '' THEN receptions.douane END ) ) AS nbreCmdEmpote"),
                 DB::raw('SUM(receptions.revafa) as total_mnt'), 
                 'dossier_prechargements.nbreContenaire', 
                 'dossier_prechargements.id as idPre', 
                 'dossier_prechargements.users_id', 
                 'dossier_prechargements.created_at as created_at_pre',
                 'dossier_prechargements.reetat as etat',
+                'dossier_prechargements.is_close as isclose',
                 'users.username as user',
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.id as typecmdID',
@@ -187,9 +190,9 @@ class PrechargementController extends Controller
 
             if($etatFiltre!=''){
                 $query = $query->where('dossier_prechargements.reetat', $etatFiltre);
-            }else{
-                $query = $query->where('dossier_prechargements.reetat', 0);
             }
+
+            //$query = $query->where('dossier_prechargements.is_close', 0);
 
             $query = $query->orderBy('dossier_prechargements.id','DESC');
             
@@ -224,13 +227,20 @@ class PrechargementController extends Controller
 
         if (isset($paginate)) {
 
-            $dries = Reception::where('clients_id', request('id'))->where(function($query){
-                     
-                $query->orWhere('dossier_prechargements_id', request('idPre'))->orWhere('dossier_prechargements_id', 0)->orWhere('dossier_prechargements_id', NULL);
-                })->where(function($query2){
+            $dries = Reception::where('clients_id', request('id'))->where(function($query2){
 
                     $query2->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL)->orWhere('dossier_prechargements_id', request('idPre'));
                 })->where('type_commandes_id', request('typecmd'))->where('entites_id', request('entiteID'));
+
+            if(request('etatSelected')==true){
+
+                $dries = $dries->where('dossier_prechargements_id', request('idPre')); 
+
+            }else{
+                $dries = $dries ->where(function($query){   
+                    $query->orWhere('dossier_prechargements_id', request('idPre'))->orWhere('dossier_prechargements_id', 0)->orWhere('dossier_prechargements_id', NULL);
+                }); 
+            }
 
             if($keyword!=''){
                 $dries = $dries->search($keyword); 
@@ -455,4 +465,27 @@ class PrechargementController extends Controller
             "message" => "OK"
         ]);
     }
+
+    public function cloturer(){
+
+        $count = Reception::where('dossier_prechargements_id', request('id'))->get()->count();
+
+        if($count == 0){
+            return response([
+                "code" => 1,
+                "message" => "Choisir au moins une commande!"
+            ]);
+        }
+
+      // cloturer le dossier préchargement
+        DossierPrechargement::where('id', request('id'))
+              ->update([
+                "is_close" => 1
+               
+        ]);
+
+        return response([
+            "code" => 0
+        ]);
+   }
 }

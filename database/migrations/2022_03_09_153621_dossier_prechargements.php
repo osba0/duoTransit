@@ -22,6 +22,7 @@ class DossierPrechargements extends Migration
             $table->foreignId('users_id')->constrained();
             $table->foreignId('clients_id')->constrained();
             $table->boolean('reetat');  
+            $table->boolean('is_close');  
             $table->timestamps();
         });
     }

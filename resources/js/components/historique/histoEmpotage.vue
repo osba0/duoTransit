@@ -30,23 +30,29 @@
                                     <div class="mr-3 text-left" style="width: 180px">
                                         <label class="text-left w-100 mb-0">Fournisseur</label>
                                         <select class="form-control" v-model="filtre.fournisseur">
-                                            <option value="">Tout</option>
+                                            <option value="">Tout</option> 
                                             <option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option>
                                             
                                         </select>
                                     </div>
                                     <div class="mr-3 text-left" style="width: 180px">
-                                        <label class="text-left w-100 mb-0">N°Dossier</label>
+                                        <label class="text-left w-100 mb-0">N° Dossier</label>
                                         <input type="text" class="form-control"  v-model="filtre.dossier">
                                     </div>
                                      <div class="mr-3 text-left" style="width: 180px">
-                                        <label class="text-left w-100 mb-0">N°Commande</label>
+                                        <label class="text-left w-100 mb-0">N° Commande</label>
                                         <input type="text" class="form-control"  v-model="filtre.commande">
                                     </div>
-                                     <div class="mr-3 text-left" style="width: 180px">
-                                        <label class="text-left w-100 mb-0">N°DOCIM</label>
-                                        <input type="text" class="form-control"  v-model="filtre.docim">
+                                      <div class="mr-3 text-left" style="width: 180px">
+                                        <label class="text-left w-100 mb-0">N° Facture</label>
+                                        <input type="text" class="form-control"  v-model="filtre.numfact">
                                     </div>
+                                    <template v-if="userRole=='client' || userRole=='consultation'">
+                                        <div class="mr-3 text-left" style="width: 180px">
+                                            <label class="text-left w-100 mb-0">N° DOCIM</label>
+                                            <input type="text" class="form-control"  v-model="filtre.docim">
+                                        </div>
+                                    </template>
                                     <div>
                                        <button type="submit" class="btn btn-success ml-3"> <span v-if="isloading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Rechercher</button>
                                     </div>
@@ -98,21 +104,14 @@
                             <table class="table">
                                 <thead class="thead-blue" :class="[isloading ? '' : 'hasborder']">
                                      <tr>
-                                        <template v-if="userRole=='client'">
+                                        <template v-if="userRole=='client' || userRole=='consultation'">
                                         <th class="p-2 border-right border-white h6 bg-primary">N° DOCIM</th>
                                         </template>
                                         <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[0])">
                                             
-                                            N° Dossier <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                            N° Dossier Transitaire <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                         <th class="p-2 border-right border-white h6" title="Date départ du bâteau">Date Départ</th>
                                         <th class="p-2 border-right border-white h6"  title="Date arrivée du bâteau">Date Arrivée</th>
-                                        <!--th class="p-2 border-right border-white h6">N°TC</th>
-                                        <th class="p-2 border-right border-white h6">Type TC</th>
-                                        <th class="p-2 border-right border-white h6">N°Plomb</th>
-                                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[3])">Nbre colis total <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[1])">Poids total <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                                        <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[2])">Volume total <i class="fa fa-sort" aria-hidden="true" ></i></th-->
-                                        
                                         <th class="p-2 border-right border-white h6">Etat</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Date</th>
                                         <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
@@ -126,7 +125,7 @@
                                     </template>
                                     <template v-else>
                                         <tr v-for="res in result.data" :key="res.id" class="bg-white position-relative">
-                                            <template v-if="userRole=='client'">
+                                            <template v-if="userRole=='client' || userRole=='consultation'">
                                                 <td class="position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> 
                                                   
                                                     <button v-if="res.numDocim == '' || res.numDocim == null" class="badge border-0 badge-info" v-on:click="addNumDocim(res)">Ajouter</button>
@@ -137,63 +136,36 @@
                                                    
                                                 </td>
                                             </template>
-                                            <td class="position-relative"><div v-if="userRole!='client'" class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> {{ res.reference }}</td>
+                                            <td class="position-relative"><div v-if="userRole!='client' && userRole!='consultation'" class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> {{ res.reference }}</td>
                                             <td class="p-2 align-middle">
                                                {{ res.dateDepart }}
                                             </td>
                                             <td class="p-2 align-middle">
                                                {{ res.dateArrivee }}
                                             </td>
-                                            <!--td class="p-2 align-middle">
-                                                {{ res.numContenaire }}
-                                            </td>
-                                            <td class="p-2 align-middle">
-                                               {{ res.typeContenaire }}
-                                            </td>
-                                            <td class="p-2 align-middle">
-                                               {{ res.plomb }}
-                                            </td>
-                                            <td>{{ res.colis_total }}</td>
-                                            <td>{{ res.total_poids }}</td>
-                                            <td>{{ res.total_volume }}</td-->
                                             
                                             <td>
-                                                 <template v-if="userRole=='client' && res.is_close==0">
+                                                 <template v-if="(userRole=='client' || userRole=='consultation') && res.is_close==0">
                                                      <span v-if="res.etat==1" class="badge badge-success">Validé</span>
                                                  </template>
                                                 <span v-if="res.is_close==1 || (res.etat==1 && userRole=='admin')" class="badge badge-primary">Cloturé</span>
                                                
                                             </td>
-                                             <!--td>
-                                                <div v-if="res.rapport_pdf!=null" class="d-flex align-items-center w-100 justify-content-center cursor-pointer"  @click="getpdf(res.rapport_pdf, res.id)">
-                                                    <i class="fa fa-download mr-2" aria-hidden="true"></i>
-                                                    <span class="badge badge-danger">PDF</span>
-                                                </div>
-                                                
-                                            </td-->
                                             <td>{{ res.date }}</td>
                                             <td>{{ res.user }}</td>
                                              <td class="p-2 align-middle">
                                                 <div class="d-flex justify-content-end align-items-center">
-                                                    <!--div @click="detailsCommande(res)" class="d-flex cursor-pointer bg-primary position-relative rounded-circle boxAction justify-content-center align-items-center mr-2" title="Liste des commandes">
-                                                    <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre">{{ res.nbrCmd > 9 ? '+9' : res.nbrCmd }}</span> <i class="fa fa-list-ul" aria-hidden="true"></i>
-                                                    </div>
-                                                    <a v-if="res.etat==1" href="#" title="Rapport Empotage" class="boxAction btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(res)" data-toggle="modal" data-target="#openFacture">
-                                                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
-                                                    </a-->
                                                     <a href="#" title="Liste contenaire" class="btn p-0 m-1 ml-2 position-relative"  @click="showContenaire(res)">
                                                         <img src="/images/contenaire.png" alt="Contenaire" height="30">
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{res.totalContenaire}}</span>
-                                                        <!--span v-if="gestionDocim==1" class="position-absolute d-flex align-items-center justify-content-center rounded-circle isValidate text-white">-</span-->
                                                     </a>
                                                     <a v-if="res.etat==1" href="#" title="Complément de document" class="btn p-0 m-1 position-relative ml-2"  @click="showDocument(res)" data-toggle="modal" data-target="#openDocument">
                                                         <img src="/images/document_compl.png" alt="Documents" height="30">
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDoc(res.document) > 9 ? '+9' : getCountDoc(res.document) }}</span>
-                                                        <!--span v-if="gestionDocim==1" class="position-absolute d-flex align-items-center justify-content-center rounded-circle isValidate text-white">-</span-->
                                                      
                                                     </a>
 
-                                                    <template v-if="userRole=='client'">
+                                                    <template v-if="userRole=='client' || userRole=='consultation'">
                                                         
                                                          <a v-if="res.etat==1" href="#" title="Déclaration Douane" class="btn p-0 m-1 ml-2 position-relative"  @click="showDeclarationDouane(res)" data-toggle="modal" data-target="#openDeclarationDouane">
                                                             <img src="/images/douane.png" alt="Documents" height="30">
@@ -225,22 +197,21 @@
                     </div>
                     
                 </div>
-                </template>
+                </template> 
             <template v-else> 
                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <button class="btn btn-primary mb-3" @click="reinit()">
-                        <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
+                    <button class="btn btn-primary mb-3 mr-4" @click="reinit()">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour 
                     </button>
-                     <div class="mb-3">
-                        <div class="d-flex flex-row align-items-center justify-content-center outlineBtn">
+                     <div class="mb-3 w-100 overflow-auto">
+                        <div class="d-flex flex-row align-items-center justify-content-end outlineBtn">
                             <template v-for="contenaire, index in contenaires.data">
                                 <div class="position-relative ml-3">
-                                    <button v-on:click="contenaireSelectionner(index)" class="btn btn-default mb-0 p-0">
+                                    <button v-on:click="contenaireSelectionner(index)" class="btn btn-default d-flex flex-column mb-0 p-0">
                                         <img src="/images/contenaire.png" alt="Contenaire" height="35"  :class="index==currentIndexContenaire ? 'activeContent':'imageGrey'">
-                                    </button>
-                                    <button v-if="contenaire.etat == 1" title="Rapport d'empotage" style="top: -3px; right: -3px;"  v-on:click="showRapport(index)" class="badge bg-white border-0 shadow-sm position-absolute rounded-circle" data-toggle="modal" data-target="#openFacture"><i class="fa fa-file-pdf-o text-danger"></i></button>
-                                  
-                                    <button v-if="contenaire.etat == 0" style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="supprimerContenaire(contenaire)"><i class="fa fa-times"></i></button>
+                                         <span class="badge w-100 mt-1" :class="index==currentIndex ? 'badge-primary':'badge-secondary opacity-7'">{{ contenaire.numContenaire}}</span>
+                                    </button>                                  
+                                    <button v-if="contenaire.etat == 0" style="top: 0px; right: 0px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="supprimerContenaire(contenaire)"><i class="fa fa-times"></i></button>
                                 </div>
                             </template>                            
                         </div>
@@ -402,7 +373,11 @@
              <div class="modal-content">
                 
                     <div class="modal-header text-left">
-                        <h4 class="modal-title w-100 font-weight-bold">Facture</h4>
+                        <h4 class="modal-title w-100 font-weight-bold">
+                            <template v-if="pdfFile != null">Facture</template>
+                            <template v-if="pdfFileModal != null">Rapport d'empotage</template>
+                            <template v-if="pdfFileModal != null && pdfFile != null"> Document </template>
+                            </h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
                           <span aria-hidden="true">&times;</span>
                         </button>

@@ -45,7 +45,7 @@
     @endif
     <div class="pull-right mr-3">
         <span class="badge badge-default text-uppercase">Profil:</span> 
-        <span class="badge text-uppercase {{Auth::user()->roles[0]=='root'?'badge-danger ':''}} {{Auth::user()->roles[0]=='client'?'badge-warning ':''}} {{Auth::user()->roles[0]=='user'?'badge-secondary ':''}} {{Auth::user()->roles[0]=='admin'?'badge-info ':''}}">{{Auth::user()->roles[0]}}</span>
+        <span class="badge text-uppercase {{Auth::user()->roles[0]=='root'?'badge-danger ':''}} {{Auth::user()->roles[0]=='client'?'badge-warning ':''}} {{Auth::user()->roles[0]=='user'?'badge-secondary ':''}} {{Auth::user()->roles[0]=='admin' || Auth::user()->roles[0]=='consultation' ?'badge-info ':''}}">{{Auth::user()->roles[0]}}</span>
     </div>
     <ul class="nav pull-right navTop">
         <li class="dropdown">

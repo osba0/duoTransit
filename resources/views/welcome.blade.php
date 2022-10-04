@@ -105,7 +105,11 @@ $config = [
           <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2">
             <div class="flex-grow-1 mb-1 mb-md-0">
               <h1 class="h3 fw-bold mb-2">
-                Tableau de bord
+                @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))
+                    Tableau de bord
+                @else
+                    Accueil
+                @endif
               </h1>
               <h2 class="h6 fw-medium fw-medium text-muted mb-0">
                 Bienvenu <a class="text-primary">{{ Auth::user()->firstname }} {{ Auth::user()->lastname }}</a>

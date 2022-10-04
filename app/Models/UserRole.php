@@ -11,6 +11,7 @@ class UserRole
     const ROLE_ADMIN = 'admin';
     const ROLE_USER = 'user';
     const ROLE_CLIENT = 'client';
+    const ROLE_CONSULTATION = 'consultation';
 
     /**
      * @var array
@@ -19,11 +20,12 @@ class UserRole
         self::ROLE_ROOT => ['*'],
         self::ROLE_ADMIN  => [
             self::ROLE_USER,
-            self::ROLE_CLIENT,
+            //self::ROLE_CLIENT,
         ],
 
         self::ROLE_USER   => [],
-        self::ROLE_CLIENT => []
+        self::ROLE_CLIENT => [],
+        self::ROLE_CONSULTATION => []
     ];
 
     /**
@@ -48,7 +50,8 @@ class UserRole
             static::ROLE_ROOT  => 'Root',
             static::ROLE_ADMIN  => 'Admin',
             static::ROLE_USER   => 'User',
-            static::ROLE_CLIENT => 'Client'
+            static::ROLE_CLIENT => 'Client',
+            static::ROLE_CONSULTATION => 'Consultation'
         ];
     }
 

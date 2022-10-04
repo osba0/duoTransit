@@ -36,6 +36,8 @@ class DossierPrechargementResource extends JsonResource
             //"entrepot"                  => $this->entrepots_name,
             "entiteID"                  => $this->entite_id,
             "entite"                    => $this->entite_name,
+            "is_close"                  => $this->isclose,
+            "totalEmpote"               => $this->nbreCmdEmpote
             //"rapport_pdf"               => isset($this->rapport_pdf) ? Carbon::parse($this->updated_at_pre)->format('d/m/Y'):''
 
 

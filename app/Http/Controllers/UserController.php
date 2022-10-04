@@ -104,7 +104,7 @@ class UserController extends Controller
                 "roles"    => array(request('profil')),
                 "password"  => Hash::make(request('password')),
                 "entites_id" => $user->entites_id,
-                "client_supervisor" => (request('profil')==UserRole::ROLE_CLIENT?json_decode(request('clientsAuth')):'')    
+                "client_supervisor" => ((request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION)?json_decode(request('clientsAuth')):'')    
             ]);
         }catch(\Exceptions $e){
               return response([
