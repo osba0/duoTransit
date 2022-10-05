@@ -542,7 +542,7 @@ class EmpotageController extends Controller
         
         $base64_pdf = trim(request('base64_file_pdf'), "data:application/pdf;base64,");
         $base64_decode = base64_decode($base64_pdf);
-        $pathFile = 'pdf/empotage/dossier-'.request('id_dossier').'_'.request('typeCmd').'_numtc-'.request('numtc').'_plomb-'.request('plomb').'.pdf';
+        $pathFile = 'pdf/empotage/'.request('namefile'); //dossier-'.request('id_dossier').'_'.request('typeCmd').'_numtc-'.request('numtc').'_plomb-'.request('plomb').'.pdf';
         $pdf = fopen($pathFile, 'w');
         fwrite($pdf, $base64_decode);
         fclose($pdf);

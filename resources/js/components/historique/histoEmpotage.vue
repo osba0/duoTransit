@@ -970,7 +970,7 @@ export default {
 
                         this.contenaireSelectionner(index);
                          var labelCmd = this.selected.typeCommande.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
-                        this.pdfFileModal = 'dossier-'+this.selected.dossier+'_'+labelCmd+'_numtc-'+this.selected.numtc+'_plomb-'+this.selected.plomb+".pdf";
+                        this.pdfFileModal = 'dossier-'+this.formatage(this.selected.dossier)+'_'+labelCmd+'_numtc-'+this.formatage(this.selected.numtc)+'_plomb-'+this.formatage(this.selected.plomb)+".pdf";
 
                     }else{
                         Vue.swal.fire(
@@ -982,6 +982,9 @@ export default {
             }).catch(error => {});
 
            
+       },
+       formatage(str){
+        return str.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
        },
        detailsCommande(empotage){
             this.isDetail=true;

@@ -1294,7 +1294,9 @@
 
                     var labelCmd1 =  that.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
                 
-                    var nameFile = 'dossier-'+that.selected.dossier+'_'+labelCmd1+"_numtc-"+that.selected.numtc+"_plomb-"+that.selected.plomb+".pdf";
+                    var nameFile = 'dossier-'+that.formatage(that.selected.dossier)+'_'+labelCmd1+"_numtc-"+that.formatage(that.selected.numtc)+"_plomb-"+that.formatage(that.selected.plomb)+".pdf";
+
+                    console.log("Name file=", nameFile); 
 
 
                     var qrTotaux = [];
@@ -1327,7 +1329,8 @@
                             'typeCommande': self.selected.typeCmd,
                             'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
                             'base64_file_pdf': url,
-                            'IDclient': self.idClient
+                            'IDclient': self.idClient,
+                            'namefile': nameFile
 
                         }); /*.then(response => {
                             Vue.swal.close();
@@ -1899,7 +1902,7 @@
                 showRapport(empo){
                     var labelCmd = empo.typeCommande.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
                 
-                    this.pdfFileModal = 'dossier-'+empo.reference+'_'+labelCmd+"_numtc-"+empo.numContenaire+"_plomb-"+empo.plomb+".pdf";
+                    this.pdfFileModal = 'dossier-'+this.formatage(empo.reference)+'_'+labelCmd+"_numtc-"+this.formatage(empo.numContenaire)+"_plomb-"+this.formatage(empo.plomb)+".pdf";
                },
                  closeModalPdf(){
                      this.$refs.closePoupPdf.click();
@@ -1916,6 +1919,9 @@
                         this.attachments.push(this.$refs.fileDoc.files[i]);
                     }
                 },
+                formatage(str){
+                    return str.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
+                   },
                 saveDocs(){
                 const data = new FormData();
 
