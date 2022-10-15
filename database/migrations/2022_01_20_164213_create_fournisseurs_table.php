@@ -17,6 +17,7 @@ class CreateFournisseursTable extends Migration
             $table->id('id');
             $table->string('fonmfo');
             $table->string('fotele')->nullable();
+            $table->string('foemail')->nullable();
             $table->string('foadrs')->nullable();
             $table->string('fologo')->nullable();
             $table->string('foetat');

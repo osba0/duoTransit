@@ -116,6 +116,7 @@ $config = [
               </h2>
             </div>
             <div class="mt-3 mt-md-0 ms-md-3 space-x-1">
+                <img src="{{ asset('/images/logo/'.auth()->user()->entite->logo) }}" class="border rounded-lg" style="height: 70px">
              
             </div>
           </div>

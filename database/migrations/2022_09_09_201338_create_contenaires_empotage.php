@@ -23,6 +23,7 @@ class CreateContenairesEmpotage extends Migration
             $table->double('volumeEmpote')->nullable(); 
             $table->double('colisEmpote')->nullable(); 
             $table->boolean('etat');
+            $table->text('photos_chargement')->nullable();
             $table->timestamps();
         });
     }

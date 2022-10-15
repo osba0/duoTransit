@@ -47,7 +47,8 @@ class EmpotageResource extends JsonResource
             "document"  =>  isset($this->docs) && !is_null($this->docs)? json_decode($this->docs) : json_decode("[]"),
             "declDounae"  =>  isset($this->decldouane) && !is_null($this->decldouane)? json_decode($this->decldouane) : json_decode("[]"),
             "totalContenaire" => $this->nbreContenaireEmpote,
-            "numDocim"   => $this->numDocim
+            "numDocim"   => $this->numDocim,
+            "nbreContenaireNonValide" => isset($this->nbreContenaireNonValide)? $this->nbreContenaireNonValide:-1
         ];
     }
 }

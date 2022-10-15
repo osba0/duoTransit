@@ -136,7 +136,7 @@ $config = [
                                     <a href="#" class="nav-link">
                                       <i class="nav-icon fa fa-download"></i>
                                       <p>
-                                        Gérer
+                                        Etat Stock
                                         <i class="fa fa-angle-left right"></i>
                                       </p>
                                     </a>
@@ -146,7 +146,7 @@ $config = [
 
                                         <a href="/gerer/prechargement/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('gerer/prechargement/*')   ? 'active' : '' }}">
                                             <i class="fa fa-circle-o" aria-hidden="true"></i>
-                                          <p>Préchargement</p>
+                                          <p>Prévision</p>
                                         </a>
                                       </li>
                                       <li class="nav-item">

@@ -293,13 +293,13 @@
                 <table class="table">
                     <thead class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
                          <tr>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white cursor-pointer h6 white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white cursor-pointer h6 white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[5])">Poids(KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[6])">Volume(m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                             <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
                             <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-nowrap p-2 border-right border-white h6 white-space-nowrap">Crée par</th>
                             <th class="p-2 border-right border-white text-left h6 white-space-nowrap">Préchargé?</th>
@@ -314,8 +314,6 @@
                     </template>
                     <template v-else>
                         <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white">
-                        <td class="p-2 align-middle">{{ dry.rencmd }}</td>
-                        <td class="p-2 align-middle">{{ dry.refere }}</td>
                         <td class="p-2 align-middle">{{ dry.reecvr }}</td>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
                         <td class="p-2 align-middle white-space-nowrap">
@@ -329,7 +327,8 @@
                         </td>
                         <td class="p-2 align-middle text-right">{{ dry.repoid }}</td>
                         <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
-                        
+                        <td class="p-2 align-middle">{{ dry.renufa }}</td>
+                        <td class="p-2 align-middle">{{ format_nbr(dry.revafa)  }}</td>
                         
                         <td class="p-2 align-middle white-space-nowrap">{{ dry.redali }}</td>
                         <td class="p-2 align-middle text-nowrap"><span class="badge badge-info">{{ dry.user_created}}</span></td>
@@ -377,13 +376,14 @@
                     </tbody>
                     <tfoot class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
                          <tr>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white cursor-pointer h6 white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                           
+                            <th class="p-2 border-right border-white cursor-pointer h6 white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[5])">Poids(KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[6])">Volume(m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                             <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
                             <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-nowrap p-2 border-right border-white h6 white-space-nowrap">Crée par</th>
                             <th class="p-2 border-right border-white text-left h6 white-space-nowrap">Préchargé?</th>
@@ -685,6 +685,12 @@
                 }
                 return "#aaa";
             },
+            format_nbr(mnt){
+                    if(mnt != '' && mnt != null){
+                        return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                    }
+                    return mnt;
+                },
             preselectionner(event, cmd){
                 this.run = true;
                 var ischecked=0;

@@ -41,6 +41,7 @@ class ReceptionResource extends JsonResource
             "refasc"         => $this->refasc,
             "recomt"         => $this->recomt,
             "douane"         => $this->douane,
+            "depalettisation" => $this->depalettisation,
             "recrea"         => Carbon::parse($this->recrea)->format('d/m/Y H:i:s'),
             "isLoad"         => $this->isLoad,
             "isPreLoad"      => $this->isPreLoad,

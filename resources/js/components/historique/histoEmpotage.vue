@@ -128,7 +128,7 @@
                                             <template v-if="userRole=='client' || userRole=='consultation'">
                                                 <td class="position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> 
                                                   
-                                                    <button v-if="res.numDocim == '' || res.numDocim == null" class="badge border-0 badge-info" v-on:click="addNumDocim(res)">Ajouter</button>
+                                                    <button v-if="res.numDocim == '' || res.numDocim == null" class="position-relative badge border-0 badge-info" v-on:click="addNumDocim(res)">Ajouter <span class="position-absolute text-danger" style="top:-5px; right:-5px">●</span></button>
                                                      <span v-else class="text-primary font-weight-bold cursor-pointer"  v-on:click="addNumDocim(res, res.numDocim)">
                                                         {{res.numDocim}} 
                                                         <i v-if="gestionDocim==1" class="fa fa-pencil"></i>
@@ -169,7 +169,7 @@
                                                         
                                                          <a v-if="res.etat==1" href="#" title="Déclaration Douane" class="btn p-0 m-1 ml-2 position-relative"  @click="showDeclarationDouane(res)" data-toggle="modal" data-target="#openDeclarationDouane">
                                                             <img src="/images/douane.png" alt="Documents" height="30">
-                                                            <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDeclDouane(res.declDounae) > 9 ? '+9' : getCountDeclDouane(res.declDounae) }}</span>
+                                                            <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[getCountDeclDouane(res.declDounae) == 0? 'bg-danger':'']">{{ getCountDeclDouane(res.declDounae) > 9 ? '+9' : getCountDeclDouane(res.declDounae) }}</span>
                                                          
                                                         </a>
                                                         <a title="Cloturer" v-if="gestionDocim==1" class="btn m-1  border border-success bg-success text-white btn-circle border btn-circle-sm m-1 ml-3 bg-white" v-on:click="cloturer(res)">
@@ -244,6 +244,21 @@
                                                 <th class="align-middle">N°TC: <b>{{ selected.numtc }}</b></th>
                                                 <th class="align-middle">Type TC: <b>{{ selected.typetc }}</b></th>
                                                 <th class="align-middle">Plomb: <b>{{ selected.plomb }}</b></th>
+                                                <th class="align-middle">
+                                                    <a @click="showPhoto( selected.photos )" data-toggle="modal" data-target="#openPhotoChargment" class="cursor-pointer">
+                                                        <p class="position-relative d-inline-block pr-4">
+                                                             <template v-if="selected.photos.length > 0">
+                                                                <span v-for="(photo, index) in selected.photos" class="border mr-1 mb-2 position-absolute shadow-sm rounded-circle" :style="{top:0.2*index-15+ 'px', left: 2*index+ 'px'}">             
+                                                                        <img :src="'/assets/photos_chargement/'+photo" width="50" height="50" class="rounded-circle">  
+                                                                </span>
+                                                              
+                                                            </template>
+                                                             <template v-else> 
+                                                               Aucune Photo
+                                                            </template>
+                                                        </p>
+                                                    </a>  
+                                                </th>
                                                 <th class="text-center"><button v-on:click="showRapport(currentIndexContenaire)" class="btn p-0 m-0 mb-0" data-toggle="modal" data-target="#openFacture" title="Rapport d'empotage"><span class="h3 mb-0"><i class="fa fa-file-pdf-o text-danger"></i></span></button></th>
                                             </tr>
                                       
@@ -281,7 +296,7 @@
                             v-model.lazy="searchRecep"
                             type="search"
                             class="form-control"
-                            placeholder="Rechercher par n°cmd, n°fe, n°ecv,n°fact, utilisateur, fournisseur..."
+                            placeholder="Rechercher par n°cmd, n°fe, n°ecv / bbe,n°fact, utilisateur, fournisseur..."
                         />
                     </div>
                    
@@ -289,16 +304,14 @@
                 <table class="table">
                     <thead class="thead-blue hasborder">
                          <tr>
-                            <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[0])">N°CDE 
-                                <i class="fa fa-sort" aria-hidden="true" ></i>
-                            </th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[2])">N°ECV / BBE<i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[5])">Poids <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[6])">Volume <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-nowrap p-2 border-right border-white h6">Factures</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Dépalettisation</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Douanes</th>
                             <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-nowrap p-2 border-right border-white h6">Crée par?</th>
@@ -313,8 +326,6 @@
                     </template>
                     <template v-else>
                         <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white">
-                        <td class="p-2 align-middle">{{ dry.rencmd }}</td>
-                        <td class="p-2 align-middle">{{ dry.refere }}</td>
                         <td class="p-2 align-middle">{{ dry.reecvr }}</td>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
                         <td class="p-2 align-middle">
@@ -330,6 +341,12 @@
                         <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
                         <td class="p-2 align-middle">
                              {{dry.renufa}}
+                        </td>
+                        <td class="p-2 align-middle">
+                             {{ format_nbr(dry.revafa)}}
+                        </td>
+                        <td class="p-2 align-middle">
+                             {{dry.depalettisation}}
                         </td>
                         <td class="p-2 align-middle">
                              {{dry.douane}}
@@ -451,6 +468,52 @@
             
           </div>
         </div>
+
+         <!-- Modal Photos Chargement-->
+        <div class="modal fade fullscreenModal" id="openPhotoChargment" tabindex="-1" role="dialog" aria-labelledby="myModalPhoto"
+          aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="photo">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left align-items-center">
+                        <h4 class="modal-title font-weight-bold">Photos Chargement</h4>
+                      
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPhoto">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                        
+                    </div>
+                    <div class="modal-body mx-3 overflow-hidden">
+                        <div class="d-flex justify-content-between h-100">
+                            <div>
+                                <div class="d-flex flex-column">
+                                    <template v-for="photo, index in tabPhoto">
+                                        <div class="position-relative">
+                                            <button v-on:click="getPhoto(index)" class="btn rounded-circle  btn-default mb-2" :class="index==currentIndexPhoto ? 'bg-light':''">
+                                                <span class="h1"><i class="fa fa-file-image-o"></i></span>
+                                            </button>
+                                            
+                                        </div>
+                                    </template>
+                                   
+                                </div>
+                            </div>
+                             <template v-if="tabPhoto.length > 0">
+                                <embed :src="'/assets/photos_chargement/'+tabPhoto[currentIndexPhoto]" frameborder="0" width="95%" height="450px">
+                              </template>
+                             <template v-else>
+                                <div class="w-100 text-center">Aucune Photo </div> 
+                              </template>
+                            
+                         </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" v-on:click="closeModalPhoto()" class="btn btn-warning">Fermer</button>
+                  </div>
+             </div>
+            
+          </div>
+        </div>
         
         <!-- Modal Declration douane-->
         <div class="modal fade fullscreenModal" id="openDeclarationDouane" tabindex="-1" role="dialog" aria-labelledby="myModalDouane"
@@ -557,7 +620,8 @@ export default {
                 typeCmd: '',
                 dossier: '',
                 nbrcmd: '',
-                typeCommande: ''
+                typeCommande: '',
+                photos:''
             },
             isDetail: false,
             pdfFileModal: null,
@@ -581,7 +645,10 @@ export default {
             currentIndexContenaire: 0,
             tabDeclaration: [],
             currentIndexDouane: 0,
-            messageError: ''
+            messageError: '',
+            currentIndexPhoto: 0,
+            attachmentsPhoto: [],
+            tabPhoto: []
         };
     },
     watch: {
@@ -807,6 +874,12 @@ export default {
                     }
                    
                 });
+        },
+        format_nbr(mnt){
+            if(mnt != '' && mnt != null){
+                return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            }
+            return mnt;
         },
         removeDoc(nameDoc){
 
@@ -1037,6 +1110,8 @@ export default {
             this.selected.volume     = this.contenaires.data[index].total_volume;
             this.selected.nbrColis   = this.contenaires.data[index].colis_total;
 
+            this.selected.photos = this.contenaires.data[index].photos_chargement;
+
             this.getReception();
 
        },
@@ -1125,6 +1200,23 @@ export default {
                       }
                     })
                },
+            getPhoto(index){
+                this.currentIndexPhoto = index;
+            },
+             showPhoto(photos){
+                
+                this.tabPhoto = [];
+
+                this.currentIndexPhoto = 0;
+
+                if(Array.isArray(photos)){
+                    console.log(photos, "Liste photo");
+                    this.tabPhoto = photos;
+                }
+            },
+             closeModalPhoto(){
+                this.$refs.closePoupPhoto.click();
+            }
     },
     mounted() {
       this.search();

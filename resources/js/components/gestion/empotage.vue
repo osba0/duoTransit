@@ -155,10 +155,11 @@
                                             <!--button v-if="empo.etat==0"  @click="showDossier(empo)" class="btn btn-info btn-sm">Ouvrir</button-->
                                             
                                             <a href="#" title="Liste contenaire" class="btn p-0 m-1 ml-2  position-relative"  @click="showContenaire(empo)">
-                                                <img src="/images/contenaire.png" alt="Contenaire" height="30"><span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{empo.totalContenaire}}</span></a>
+                                                <img src="/images/contenaire.png" alt="Contenaire" height="30">
+                                                <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[empo.nbreContenaireNonValide > 0? 'bg-danger':'']">{{empo.totalContenaire}}</span></a>
                                              <a v-if="empo.etat==0" href="#" title="Complément de document" class="btn p-0 m-1 ml-2  position-relative"  @click="showDocument(empo)" data-toggle="modal" data-target="#openDocument">
                                                         <img src="/images/document_compl.png" alt="Documents" height="30">
-                                                        <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDoc(empo.document) > 9 ? '+9' : getCountDoc(empo.document) }}</span>
+                                                        <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[getCountDoc(empo.document) == 0? 'bg-danger':'']">{{ getCountDoc(empo.document) > 9 ? '+9' : getCountDoc(empo.document) }}</span>
                                                      
                                                     </a>
                                             <a v-if="empo.etat==0"  title="Editer" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white"  data-toggle="modal" data-target="#newEmpotage" v-on:click="editEmpotage(empo)">
@@ -201,7 +202,7 @@
                                     <img src="/images/contenaire.png" alt="Contenaire" height="45"  :class="index==currentIndex ? 'activeContent':'imageGrey'">
                                     <span class="badge w-100 mt-1" :class="index==currentIndex ? 'badge-primary':'badge-secondary opacity-7'">{{ contenaire.numContenaire}}</span>
                                 </button>
-                                <button v-if="contenaire.etat == 1" style="top: -3px; right: -3px;"  v-on:click="reactiver(contenaire, index)" class="badge badge-success position-absolute rounded-circle  border-0" title="Réactiver le contenaire"><i class="fa fa-refresh"></i></button>
+                                <button v-if="contenaire.etat == 1" style="top: -0px; right: -3px;"  v-on:click="reactiver(contenaire, index)" class="badge badge-success position-absolute rounded-circle  border-0" title="Réactiver le contenaire"><i class="fa fa-refresh"></i></button>
                               
                                 <button v-if="contenaire.etat == 0" title="Supprimer le contenaire" style="top: 0px; right: 0px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="supprimerContenaire(contenaire)"><i class="fa fa-times"></i></button>
                             </div>
@@ -232,6 +233,27 @@
                     <div class="h5 mb-0 rounded bg-white py-2 px-3 border">N°TC: <b>{{ selected.numtc }}</b></div>
                     <div class="h5 mb-0 rounded bg-white py-2 px-3 border mx-3">Type TC: <b>{{ selected.typetc }}</b></div>
                     <div class="h5 mb-0 rounded bg-white py-2 px-3 border">Plomb: <b>{{ selected.plomb }}</b></div>
+                    <div class="h5 mb-0 rounded bg-white py-2 px-3 border mx-3 position-relative">
+                        <a @click="showPhoto( selected.photos )" data-toggle="modal" data-target="#openPhotoChargment" class="cursor-pointer ">
+                            <span>Photos chargement: </span>
+                            
+                                 <template v-if="selected.photos.length > 0">
+                                    <p class="position-relative d-inline-block pr-4">
+                                    <span v-for="(photo, index) in selected.photos" class="border mr-1 mb-2 position-absolute shadow-sm " :style="{top:0.5*index-5+ 'px', left: 2*index+ 'px'}">  
+                                        <a class="badge badge-primary position-absolute rounded-circle border-0 text-white" style="top: -5px;right: -13px;"><i class="fa fa-eye"></i></a> 
+                                        <img :src="'/assets/photos_chargement/'+photo" width="30" height="30" class="">  
+                                    </span></p>
+                                  
+                                </template>
+                                 <template v-else> 
+                                   <span class="position-absolute d-inline-block m-0" style="top: 2px; right: -40px;">
+                                    <img src="/images/icone-photo.png" height="30" >
+                                   </span>
+                                   <a class="badge badge-success position-absolute rounded-circle border-0 text-white" style="top: -5px;right: -50px;"><i class="fa fa-plus"></i></a> 
+                                </template>
+                            
+                        </a>
+                    </div>
                 </div>
                 <div class="mb-3 mb-3 d-block">
                     <VueScrollFixedNavbar>
@@ -332,16 +354,19 @@
                 <table class="table">
                     <thead class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
                          <tr>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <!--th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th-->
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
+                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])"><i class="fa fa-calendar" aria-hidden="true"></i> Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <!--th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th-->
                             <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->
+                            <th class="text-nowrap p-2 border-right border-white h6">Dépalettisation</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Douane</th>
                             <th class="text-right p-2 border-right border-white h6">Action</th>
                         </tr>
@@ -352,8 +377,8 @@
                     </template>
                     <template v-else>
                         <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white">
-                        <td class="p-2 align-middle">{{ dry.rencmd }}</td>
-                        <td class="p-2 align-middle">{{ dry.refere }}</td>
+                        <!--td class="p-2 align-middle">{{ dry.rencmd }}</td>
+                        <td class="p-2 align-middle">{{ dry.refere }}</td-->
                         <td class="p-2 align-middle">{{ dry.reecvr }}</td>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
                         <td class="p-2 align-middle white-space-nowrap">
@@ -368,9 +393,10 @@
                         <td class="p-2 align-middle text-right">{{ dry.repoid }}</td>
                         <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
                         
-                        
-                        <td class="p-2 align-middle white-space-nowrape"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
-                        <td class="p-2 align-middle text-nowrap white-space-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td>
+                        <td class="p-2 align-middle">{{ dry.renufa }}</td>
+                        <td class="p-2 align-middle">{{ format_nbr(dry.revafa) }}</td>
+                        <td class="p-2 align-middle white-space-nowrape">{{ dry.redali }}</td>
+                        <!--td class="p-2 align-middle text-nowrap white-space-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td-->
                         <!--td class="p-2 align-middle">
                             
                             <template v-if="dry.idPre > 0">
@@ -381,6 +407,16 @@
                             </template>
                            
                         </td-->
+                         <td class="p-2 align-middle">
+                            <img :class="'loaderDepal_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
+                            <div v-if="dry.depalettisation!='' && dry.depalettisation != null" :id="'labelDepal_'+dry.reidre">
+                                <span>{{ dry.depalettisation }}</span>
+                                <i class="fa fa-edit" v-on:click="editDepaletissation(dry)"></i>
+                            </div>
+                            <form v-on:submit.prevent="saveDepalettisation(dry)"><input :data-id="dry.reidre" :class="[dry.depalettisation!='' && dry.depalettisation != null? 'd-none':'d-block']" type="text" :id="'depal_'+dry.reidre" v-model="depaletissation[dry.reidre]" style="width:90px" @blur="saveDepalettisation(dry)" @onfocusout="saveDepalettisation(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
+                            
+                           
+                         </td>
                          <td class="p-2 align-middle">
                             <img :class="'loader_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
                             <div v-if="dry.douane!='' && dry.douane != null" :id="'label_'+dry.reidre">
@@ -419,16 +455,19 @@
                     </tbody>
                     <tfoot class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
                          <tr>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <!--th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th-->
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
                             <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
+                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])"><i class="fa fa-calendar" aria-hidden="true"></i> Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <!--th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th-->
                             <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->
+                            <th class="text-nowrap p-2 border-right border-white h6">Dépalettisation</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Douane</th>
                             <th class="text-right p-2 border-right border-white h6">Action</th>
                         </tr>
@@ -546,7 +585,59 @@
             
           </div>
         </div>
-
+          <!-- Modal Photos Chargement-->
+        <div class="modal fade fullscreenModal" id="openPhotoChargment" tabindex="-1" role="dialog" aria-labelledby="myModalPhoto"
+          aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="photo">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left align-items-center">
+                        <h4 class="modal-title font-weight-bold">Photos Chargement</h4>
+                       
+                            <div class="flex-1 text-center">
+                                <label class="mb-0">Ajout un fichier</label>
+                                <input type="file" id="photoChargement" name="photoChargement" multiple ref="filePhoto" v-on:change="handleFileUploadPhoto()"/>
+                                <button class="btn btn-success" v-on:click="savePhoto()">Enregister</button>
+                            </div>
+                      
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPhoto" v-on:click="getEmpotage()">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                        
+                    </div>
+                    <div class="modal-body mx-3 overflow-hidden">
+                        <div class="d-flex justify-content-between h-100">
+                            <div>
+                                <div class="d-flex flex-column">
+                                    <template v-for="photo, index in tabPhoto">
+                                        <div class="position-relative">
+                                            <button v-on:click="getPhoto(index)" class="btn rounded-circle  btn-default mb-2" :class="index==currentIndexPhoto ? 'bg-light':''">
+                                                <span class="h1"><i class="fa fa-file-image-o"></i></span>
+                                            </button>
+                                            
+                                            <button style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="removePhoto(photo)"><i class="fa fa-times"></i></button>
+                                            
+                                        </div>
+                                    </template>
+                                   
+                                </div>
+                            </div>
+                             <template v-if="tabPhoto.length > 0">
+                                <embed :src="'/assets/photos_chargement/'+tabPhoto[currentIndexPhoto]" frameborder="0" width="95%" height="450px">
+                              </template>
+                             <template v-else>
+                                <div class="w-100 text-center">Aucune Photo </div> 
+                              </template>
+                            
+                         </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" v-on:click="closeModalPhoto()" class="btn btn-warning">Fermer</button>
+                  </div>
+             </div>
+            
+          </div>
+        </div>
         <!-- Modal Contenire-->
         <div class="modal fade" id="creerContenaire" tabindex="-1" role="dialog" aria-labelledby="myModalContenaire"
           aria-hidden="true"  data-backdrop="static" data-keyboard="false">
@@ -768,6 +859,7 @@
                     isClosed: false,
                     entrepot: '',
                     idEntrepot:'',
+                    photos:''
                     
                 },
                 modeModify: false,
@@ -823,7 +915,11 @@
                 currentIndex: 0,
                 currentIndexDoc: 0,
                 attachments: [],
-                tabDoc: []
+                tabDoc: [],
+                currentIndexPhoto: 0,
+                attachmentsPhoto: [],
+                tabPhoto: [],
+                depaletissation: []
             }
 
         },
@@ -1194,12 +1290,14 @@
 
                     const data = [];
 
-                    const headerTab = ['Référence', 'Emballage', 'Designation', 'Poids(KG)', 'Volume(m3)', 'Factures', 'Douanes'];
+                    const headerTab = ['Référence', 'Emballage', 'Designation', 'Poids(KG)', 'Volume(m3)', 'Factures','Dépalettisation', 'Douanes'];
 
                     data.push(headerTab); 
 
                     var legend1 = "";
                     var legend2 = "";
+
+                    console.log("RES", that.checkedCommandes);
 
                     for(var i=0; i< that.checkedCommandes.length; i++){
                         var obj = that.checkedCommandes[i];
@@ -1234,11 +1332,11 @@
 
                         cmdCell.push(obj.refere+" "+prio);
 
-                        const item = [cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa, obj.douane];
+                        const item = [cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa, obj.depalettisation, obj.douane];
                         data.push(item);
                     }
 
-                    var table = new Table(data).widths([70,70,'*',60,60,80,80]).layout({
+                    var table = new Table(data).widths([70,70,'*',60,60,60,80,80]).layout({
                     color(columnIndex){
                     return columnIndex=== 0 ? "#cccccc": '';  
                     },
@@ -1416,6 +1514,8 @@
                     this.selected.numtc = this.contenaires.data[index].numContenaire;
                     this.selected.typetc = this.contenaires.data[index].typeContenaire;
 
+                    this.selected.IDContenaire = this.contenaires.data[index].id;
+
 
                     this.selected.capacite = this.contenaires.data[index].capaciteContenaire;
                     this.capacite = this.contenaires.data[index].capaciteContenaire;
@@ -1424,12 +1524,14 @@
                     this.selected.volume     = this.contenaires.data[index].total_volume;
                     this.selected.nbrColis   = this.contenaires.data[index].colis_total;
 
+                    this.selected.photos = this.contenaires.data[index].photos_chargement;
+
                     this.setProgressCont(this.contenaires.data[index].total_volume);
                     this.getReception();
 
                },
                showDossier(dossier){
-                    console.log("EDED: ", dossier.total_poids);
+
                     this.commandeSelected = [];
                     this.commandeNoSelected = [];
                     
@@ -1691,6 +1793,35 @@
                     }
                    
                   
+                },
+                saveDepalettisation(cmd){
+                    this.run = true;
+                    $(".loaderDepal_"+cmd.reidre).show();
+
+                    var value = $("#depal_"+cmd.reidre).val();  
+
+                   
+                    const data = new FormData();
+                    data.append('idEmpotage', this.selected.identifiant);
+                    data.append('contenaireSelected', this.contenaires.data[this.currentIndex].id);
+                    data.append('idreception', cmd.reidre);
+                    data.append('depalettisation', value);
+
+
+
+                    axios.post("/gerer/updateDepalettisation", data).then(response => {
+                        let res = response.data.result;
+                        this.getReception();
+                        $(".loaderDepal_"+cmd.reidre).hide(); 
+
+                        if(value!=''){
+                            $("#labelDepal_"+cmd.reidre).show();
+                            $("#depal_"+cmd.reidre).hide();
+                        }
+
+                   
+                      
+                    });
                 },
                 saveDouane(cmd){ 
                     this.run = true;
@@ -2034,12 +2165,162 @@
             format_dec(mnt){
                 return mnt.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             },
+            editDepaletissation(dry){
+                $("#labelDepal_"+dry.reidre).hide();
+                $("#depal_"+dry.reidre).val(dry.depalettisation);
+                $("#depal_"+dry.reidre).show();
+                $("#depal_"+dry.reidre).removeClass("d-none");
+                $("#depal_"+dry.reidre).focus();
+            },
             editDouane(dry){
                 $("#label_"+dry.reidre).hide();
                 $("#"+dry.reidre).val(dry.douane);
                 $("#"+dry.reidre).show();
                 $("#"+dry.reidre).removeClass("d-none");
                 $("#"+dry.reidre).focus();
+            },
+            showPhoto(photos){
+                
+                this.tabPhoto = [];
+
+                this.currentIndexPhoto = 0;
+
+                if(Array.isArray(photos)){
+                    console.log(photos, "Liste photo");
+                    this.tabPhoto = photos;
+                }
+            },
+            closeModalPhoto(){
+                this.$refs.closePoupPhoto.click();
+                this.getEmpotage();
+            },
+            savePhoto(){
+                const data = new FormData();
+
+                if(!this.attachmentsPhoto.length > 0){
+                     Vue.swal.fire(
+                              '',
+                              'Ajouter une photo avant de valider!',
+                              'warning'
+                            )   
+                    return false;
+                }
+                
+                data.append('file[]', this.attachmentsPhoto);
+
+                for (let i = 0; i < this.attachmentsPhoto.length; i++) {
+                    data.append('files' + i, this.attachmentsPhoto[i]);
+                }
+
+
+                data.append('TotalFiles', this.attachmentsPhoto.length);
+
+                data.append('Photos[]', this.tabPhoto); 
+
+                axios.post("/savePhotos/"+this.selected.IDContenaire, data,  {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            } 
+                    }).then(response => {
+                       
+                        this.$refs.filePhoto.value = null;
+                        if(response.data.code==0){
+                             this.tabPhoto = response.data.file;
+                             this.currentIndexPhoto = 0;
+
+                             // refresh 
+                             // get all contener
+                            axios.get('/gerer/empotage/getContenaire/'+this.selected.identifiant)
+                                .then(response => {
+                                    this.contenaires = response.data;
+                                    if(this.contenaires.data.length > 0){
+                                      this.contenaireSelectionner(this.currentIndex); 
+
+                                    }
+                            }).catch(error => {});
+
+                            Vue.swal.fire(
+                              'succés!',
+                              'Photo(s) ajouté(s) avec succés!',
+                              'success'
+                            )         
+
+                        }else{
+                             Vue.swal.fire(
+                              'error!',
+                              response.data.message,
+                              'error'
+                            )
+                        }
+                       
+                    });
+                },
+                removePhoto(name){
+
+                Vue.swal.fire({
+                  title: 'Confirmez la suppression de la photo',
+                  text: name,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'Oui, supprimer!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                       // remove Doc
+                       const data = new FormData();
+
+                        data.append('Photos[]', this.tabPhoto); 
+                        data.append('nameFile', name); 
+                        
+
+                        axios.post("/removePhotos/"+this.selected.IDContenaire, data,  {
+                                    headers: {
+                                        'Content-Type': 'multipart/form-data'
+                                    } 
+                        }).then(response => {
+                           
+                            if(response.data.code==0){
+                                 this.tabPhoto = response.data.file;
+                                 this.currentIndexPhoto = 0;
+
+                                  // refresh 
+                                 // get all contener
+                                axios.get('/gerer/empotage/getContenaire/'+this.selected.identifiant)
+                                    .then(response => {
+                                        this.contenaires = response.data;
+                                        if(this.contenaires.data.length > 0){
+                                          this.contenaireSelectionner(this.currentIndex); 
+
+                                        }
+                                }).catch(error => {});
+
+                                Vue.swal.fire(
+                                  'succés!',
+                                  'Photo supprimé avec succés!',
+                                  'success'
+                                )         
+
+                            }else{
+                                 Vue.swal.fire(
+                                  'error!',
+                                  response.data.message,
+                                  'error'
+                                )
+                            }
+                           
+                        });
+                      }
+                    });
+                },
+             handleFileUploadPhoto(){
+                this.attachmentsPhoto = [];
+                for(var i=0; i<this.$refs.filePhoto.files.length;i++){
+                    this.attachmentsPhoto.push(this.$refs.filePhoto.files[i]);
+                }
+            },
+             getPhoto(index){
+                this.currentIndexPhoto = index;
             }
         },
         mounted() {

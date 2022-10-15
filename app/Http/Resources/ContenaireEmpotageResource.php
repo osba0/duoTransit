@@ -26,7 +26,8 @@ class ContenaireEmpotageResource extends JsonResource
             "colis_total"    => $this->colisEmpote,
             "nomContenaire"   => $this->nom,
             "capaciteContenaire"   => $this->volume,
-             "etat"   => $this->etatContanaire
+             "etat"   => $this->etatContanaire,
+             "photos_chargement" =>  isset($this->photos_chargement) && !is_null($this->photos_chargement) && !empty($this->photos_chargement)? json_decode($this->photos_chargement) : json_decode("[]")
          
         ];
     }

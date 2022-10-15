@@ -18,6 +18,7 @@ class FournisseurResource extends JsonResource
             'id'        => $this->id,
             'nom'       => $this->fonmfo,
             'telephone' => $this->fotele,
+            'email'     => $this->foemail,
             'adresse'   => $this->foadrs,
             'logo'      => $this->fologo,
             'etat'      => $this->foetat

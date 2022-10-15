@@ -118,7 +118,7 @@
                     v-model.lazy="search"
                     type="search"
                     class="form-control"
-                    placeholder="Rechercher par n°cmd, n°fe, n°ecv,n°fact, utilisateur, fournisseur..."
+                    placeholder="Rechercher par n°cmd, n°fe, n°ecv / bbe,n°fact, utilisateur, fournisseur..."
                 />
             </div>
         </div>
@@ -134,7 +134,7 @@
                         </th>
                         <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[1])">
                         N°FE <i class="fa fa-sort" aria-hidden="true"></i></th>
-                        <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV <i class="fa fa-sort" aria-hidden="true"></i></th>
+                        <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true"></i></th>
                         <th class="p-2 border-right border-white h6 ">Fournisseur</th>
                         <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[7])">Emballage <i class="fa fa-sort" aria-hidden="true" ></i></th> 
                         <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[5])">Poids(KG)  <i class="fa fa-sort" aria-hidden="true" ></i></th>
@@ -214,7 +214,7 @@
                         <td class="p-2 align-middle h6 text-center border-right thead-blue">{{ format_nbr(nbrColis) }}</td>
                         <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ format_nbr(totalPoids) }}</td>
                         <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ format_nbr(totalVolume) }}</td>
-                        <td colspan="5" class="p-2 h5 align-middle text-center  border-right" :class="[nbrJoursMoy<=7?'bg-success':'', (nbrJoursMoy>8 && nbrJoursMoy<=15)?'bg-warning':'', nbrJoursMoy>15?'bg-danger':'']">Nbr Jours Moyen: {{nbrJoursMoy}}</td>
+                        <td colspan="5" class="p-2 h5 align-middle text-center  border-right" :class="[nbrJoursMoy<=8?'bg-success':'', (nbrJoursMoy>8 && nbrJoursMoy<=15)?'bg-warning':'', nbrJoursMoy>15?'bg-danger':'']">Nbr Jours Moyen: {{nbrJoursMoy}}</td>
                         
                     </tr>
                     </template>
@@ -361,7 +361,7 @@
 			                        <input autocomplete="off" class="w-65 form-control" v-model="reception.numfe" type="text" id="numfe" :class="{ 'border-danger': submitted && !$v.reception.numfe.required }" >
 			                    </div>
 			                     <div class="w-100 my-2 d-flex justify-content-between align-items-center">
-			                        <label class="d-block m-0 text-right w-35 pr-2" for="numecv">N°ECV</label>
+			                        <label class="d-block m-0 text-right w-35 pr-2" for="numecv">N°ECV / BBE</label>
 			                        <input autocomplete="off" class="w-65 form-control" type="text" id="numecv" v-model="reception.numecv" :class="{ 'border-danger': submitted && !$v.reception.numecv.required }" >
 			                    </div>
 

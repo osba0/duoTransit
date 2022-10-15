@@ -39,7 +39,7 @@
                                     </div>
                                 </div>
                                  <div class="w-100 my-2 d-flex justify-content-between align-items-center">
-                                    <label class="d-block m-0 text-right w-35 pr-2" for="numecv">N°ECV</label>
+                                    <label class="d-block m-0 text-right w-35 pr-2" for="numecv">N°ECV / BBE</label>
                                      <div class="w-65 pl-2 bg-light" >
                                         <span>{{ viewReception.reecvr }}</span>
                                     </div>
@@ -64,6 +64,9 @@
                                         <span>{{ viewReception.redali }}</span>
                                     </div>
                                 </div>
+                               
+
+                               
                                   
                          </div>
                           <div class="col-6 my-2 d-flex flex-column align-items-center">
@@ -110,6 +113,12 @@
                                         <span>{{ viewReception.revafa }}</span>
                                     </div>
                                 </div>
+                                 <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
+                                    <label data-error="wrong" data-success="right" for="formname" class="d-block m-0 text-right w-35 pr-2">Utilisateur</label>
+                                    <div class="w-65 pl-2 bg-light">
+                                        <span>{{ viewReception.user_created }}</span>
+                                    </div>
+                                </div>
                                 
                          </div>
                     </div>
@@ -136,7 +145,7 @@
                                     <li data-target="#carouselExampleIndicators" :data-slide-to="index" :class="(index==0?'active':'')"></li>
                                 </template>
                               </ol>
-                              <div class="text-center carousel-inner incidentPhoto">
+                              <div class="text-center carousel-inner incidentPhoto"> 
                                 <template v-for="(photo,index) in selectedPhotosModal">
                                      <div class="carousel-item" :class="(index==0?'active':'')">
                                       <img :src="'/assets/incidents/'+photo"/>

@@ -7,6 +7,7 @@
                         <th class="p-2 border-right border-white h6">#</th>
                         <th class="p-2 border-right border-white h6">Nom</th>
                         <th class="p-2 border-right border-white h6">Telephone</th>
+                        <th class="p-2 border-right border-white h6">Email</th>
                         <th class="p-2 border-right border-white h6">Adresse</th>
                         <th class="p-2 border-right border-white h6">Logo</th>
                         <th class="p-2 border-right border-white h6">Société</th>
@@ -22,11 +23,15 @@
                         <td class="p-2 align-middle">
                             {{ fournisseur.id }}
                         </td>
-                         <td class="p-2 align-middle">
+                        <td class="p-2 align-middle">
                             {{ fournisseur.nom }}
                         </td>
+                       
                         <td class="p-2 align-middle">
                             {{ fournisseur.telephone }}
+                        </td>
+                         <td class="p-2 align-middle">
+                            {{ fournisseur.email }}
                         </td>
                         <td class="p-2 align-middle">
                            {{ fournisseur.adresse }}
@@ -115,19 +120,7 @@
                                  </div>
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     
-                                    
                                     <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Adresse
-                                       </label>
-                                        <input class="w-65 form-control" id="adresse" v-model="fournisseurForm.adresse"/>
-                                    </div>
-                                 </div>
-                                
-                             </div>
-                              <div class="row">
-                                <div class="col-6 my-2 d-flex flex-column align-items-center">
-                                 <div class="w-100 d-flex align-items-center my-2">
                                             <div class="md-form w-100 d-flex justify-content-between align-items-center">
                                             <label for="tele" class="d-block m-0 text-right w-35 pr-2" >Telephone</label>
                                             <input class="w-65 form-control"  v-model="fournisseurForm.telephone" type="text" id="tele"/>
@@ -135,7 +128,31 @@
                                         </div>
                                     
                                     <div class="w-100 d-flex align-items-center my-2"></div>
+                                    
                                  </div>
+                                
+                             </div>
+                              <div class="row">
+                                <div class="col-6 my-2 d-flex flex-column align-items-center">
+                                 <div class="w-100 d-flex align-items-center my-2">
+                                         <label for="email"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Email
+                                       </label>
+                                        <input class="w-65 form-control" id="email" v-model="fournisseurForm.email"/>
+                                    </div>
+                                 </div>
+                                 <div class="col-6 my-2 d-flex flex-column">
+                                        <div class="w-100 d-flex align-items-center my-2">
+                                         <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Adresse
+                                       </label>
+                                        <input class="w-65 form-control" id="adresse" v-model="fournisseurForm.adresse"/>
+                                    </div>
+                                    
+                                 </div>
+                             </div>
+
+                              <div class="row">
                                  <div class="col-6 my-2 d-flex flex-column">
                                        <div class="w-100 d-flex my-2">
                                             <div class="md-form w-100 d-flex justify-content-between">
@@ -210,7 +227,8 @@
                     logo: '',
                     telephone: '',
                     client: '',
-                    idClients:''
+                    idClients:'',
+                    email: ''
 
                 },
                 hasImage: false,
@@ -226,6 +244,7 @@
         validations: {
             fournisseurForm : {
                 nom: { required }
+               // email: { email }
             },
         },
         watch: {
@@ -274,6 +293,7 @@
                 data.append('nom', this.fournisseurForm.nom);
                 data.append('adresse', this.fournisseurForm.adresse);
                 data.append('telephone', this.fournisseurForm.telephone);
+                data.append('email', this.fournisseurForm.email);
 
 
                 this.fournisseurForm.idClients = [];
@@ -327,6 +347,7 @@
             flushData(){
                 this.fournisseurForm.nom = "";
                 this.fournisseurForm.adresse = "";
+                this.fournisseurForm.email = "";
                 this.fournisseurForm.telephone= "";
                 this.fournisseurForm.logo= "";
                 this.fournisseurForm.client= "";
@@ -466,6 +487,7 @@
                 this.fournisseurForm.adresse = fournisseur.adresse;
                 this.fournisseurForm.telephone= fournisseur.telephone;
                 this.fournisseurForm.logo= fournisseur.logo;
+                this.fournisseurForm.email= fournisseur.email;
 
                 if(fournisseur.logo){
                     this.hasImage = true;

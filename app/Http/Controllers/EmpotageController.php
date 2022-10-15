@@ -55,6 +55,7 @@ class EmpotageController extends Controller
             ->leftJoin('entrepots', 'empotages.entrepots_id', '=', 'entrepots.id')
             
             ->select(DB::raw('count(DISTINCT contenaires_empotage.id) as nbreContenaireEmpote'), 
+                DB::raw("count( ( CASE WHEN contenaires_empotage.etat = 0 THEN contenaires_empotage.id END ) ) AS nbreContenaireNonValide"),
                 //'receptions.dossier_empotage_id',
                /* DB::raw('SUM(receptions.repoid) as total_poids'), 
                 DB::raw('SUM(receptions.revolu) as total_volume'), 
@@ -287,6 +288,19 @@ class EmpotageController extends Controller
       
 
    }
+
+   public function updateDepalettisation(){
+
+        Reception::where('reidre', request('idreception'))
+          ->update([
+            "depalettisation" => request('depalettisation')
+        ]);
+        
+        return response([
+            "code" => 0
+        ]); 
+
+   }
     /**
      * Display the specified resource.
      *
@@ -356,7 +370,7 @@ class EmpotageController extends Controller
                                   'renbcl'         => $key->renbcl,
                                   'renbpl'         => $key->renbpl,
                                   'revolu'         => $key->revolu,
-                                  'renufa'         => $key->renufa,
+                                  'depalettisation'=> $key->depalettisation,
                                   'fournisseurs'   => $key->fournisseur->fonmfo,
                                   'douane'         => $key->douane];
    
@@ -623,6 +637,91 @@ class EmpotageController extends Controller
     }
 
 
+    public function savePhotos(Request $request){
+        try{   
+                $filename = '';
+                $allFileName=[];
+                $photos = explode(",", $request->Photos[0]);
+         
+
+               for ($x = 0; $x < $request->TotalFiles; $x++) 
+               {
+     
+                   if ($request->hasFile('files'.$x)) 
+                    {
+                        $current_date_time = Carbon::now()->toDateTimeString();
+                        $paseDate = explode(' ', $current_date_time);
+                        $file     = $request->file('files'.$x); 
+                        $filename = 'doc'.'_'.request('idcontenaire').'_'.($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
+
+                        $file->move("assets/photos_chargement/", $filename);
+                        array_push($allFileName, $filename);
+                      
+                    }
+               } 
+        
+               for($i=0; $i<sizeof($photos); $i++){
+                    if($photos[$i]!=''){
+                        array_push($allFileName, $photos[$i]); 
+                    } 
+               }
+        
+                ContenairesEmpotage::where('id', request('idcontenaire'))
+                  ->update([
+                    "photos_chargement" => json_encode($allFileName)
+                ]);
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+         return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
+    }
+
+    public function removePhotos(Request $request){
+        try{   
+
+            $allFileName=[];
+            $photos = explode(",", $request->Photos[0]);
+           
+            for($i=0; $i<sizeof($photos); $i++){
+                if($photos[$i]!='' && $photos[$i]!=$request->nameFile){
+                    array_push($allFileName, $photos[$i]); 
+                } 
+            }
+ 
+            ContenairesEmpotage::where('id', request('idcontenaire'))
+              ->update([
+                "photos_chargement" => json_encode($allFileName)
+            ]);
+
+            // delete file
+
+            File::delete("assets/photos_chargement/".$request->nameFile);
+                
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
+    }
+
+
      public function removeDoc(Request $request){
         try{   
 
@@ -673,7 +772,8 @@ class EmpotageController extends Controller
             'plomb' => request('plomb'),
             "poidEmpote" => 0,
             "volumeEmpote" =>  0, 
-            "colisEmpote" => 0
+            "colisEmpote" => 0,
+            "photos_chargement" => ''
         ]);
 
         return response([

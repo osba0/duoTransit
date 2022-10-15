@@ -12,7 +12,7 @@ use DB;
 
 class Reception extends Model
 {
-    protected $fillable = ['refere', 'reecvr', 'renufa', 'revafa', 'fournisseurs_id', 'type_commandes_id', 'clients_id', 'repoid', 'revolu', 'renbcl','renbpl','reemba', 'reempl', 'redali', 'reinci', 'recomt','rencmd', 'reetat','refasc', 'recomnt', 'entrepots_id', 'users_id', 'entites_id', 'dossier_prechargements_id','numero_contenaire', 'dossier_empotage_id', 'priorite'];
+    protected $fillable = ['refere', 'reecvr', 'renufa', 'revafa', 'fournisseurs_id', 'type_commandes_id', 'clients_id', 'repoid', 'revolu', 'renbcl','renbpl','reemba', 'reempl', 'redali', 'reinci', 'recomt','rencmd', 'reetat','refasc', 'recomnt', 'entrepots_id', 'users_id', 'entites_id', 'dossier_prechargements_id','numero_contenaire', 'dossier_empotage_id', 'priorite', 'depalettisation'];
 
     use HasFactory, LogsActivity;
 
@@ -26,7 +26,7 @@ class Reception extends Model
 
     protected static $ignoreChangedAttributes = ['updated_at'];
 
-    protected static $logAttributes = ['reidre','refere', 'reecvr', 'renufa', 'revafa', 'fournisseurs_id', 'type_commandes_id', 'clients_id', 'repoid', 'revolu', 'renbcl','renbpl','reemba', 'reempl','dossier_id', 'redali', 'rencmd', 'reetat','refasc', 'recomnt', 'entrepots_id', 'users_id', 'entites_id', 'dossier_prechargements_id','dossier_empotage_id', 'priorite'];
+    protected static $logAttributes = ['reidre','refere', 'reecvr', 'renufa', 'revafa', 'fournisseurs_id', 'type_commandes_id', 'clients_id', 'repoid', 'revolu', 'renbcl','renbpl','reemba', 'reempl','dossier_id', 'redali', 'rencmd', 'reetat','refasc', 'recomnt', 'entrepots_id', 'users_id', 'entites_id', 'dossier_prechargements_id','dossier_empotage_id', 'priorite', 'depalettisation'];
 
     protected static $recordEvents = ['created', 'updated', 'deleted'];
 

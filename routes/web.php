@@ -179,6 +179,8 @@ Route::middleware(['web','auth'])->group(function () {
 
         Route::get('/dossier/empotage/reception/{id}/{typecmd}', [EmpotageController::class, 'listingReceptionEmpotage'])->middleware(['auth']); 
         Route::post('/updateDouane', [EmpotageController::class, 'updateDouane']);
+        Route::post('/updateDepalettisation', [EmpotageController::class, 'updateDepalettisation']);
+        
         Route::post('/dossier/setEmpotage', [EmpotageController::class, 'empoter'])->middleware(['auth']);
         Route::get('/getCmd/empoter/{id}/{typecommande}', [EmpotageController::class, 'getCommandeEmpoter'])->middleware(['auth']);
         Route::post('/validationEmpotage/valider/{id}', [EmpotageController::class, 'valider'])->middleware(['auth']);
@@ -189,6 +191,9 @@ Route::middleware(['web','auth'])->group(function () {
 });
 
 Route::post('/saveDocs/{idEmpotage}', [EmpotageController::class, 'saveDoc'])->middleware(['auth']);
+
+Route::post('/savePhotos/{idcontenaire}', [EmpotageController::class, 'savePhotos'])->middleware(['auth']);
+Route::post('/removePhotos/{idcontenaire}', [EmpotageController::class, 'removePhotos'])->middleware(['auth']);
 
 Route::post('/saveDocsDouane/{idEmpotage}', [EmpotageController::class, 'saveDeclaration'])->middleware(['auth']); 
 
