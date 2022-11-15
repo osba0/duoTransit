@@ -289,7 +289,8 @@ export default {
             'listFournisseurs',
             'typeCmd',
             'clientCurrent',
-            'listEntrepots'
+            'listEntrepots',
+            'idEntite'
     ],
     components: {
         modalDetailsCommande
@@ -338,7 +339,7 @@ export default {
             this.showResult = true;
             this.isloading = true;
             this.reinit();
-            axios.post('/search/histoPrechargement/'+this.clientCurrent.id,{
+            axios.post('/search/histoPrechargement/'+this.clientCurrent.id+'/'+this.idEntite,{
                 page: page,
                 paginate: this.paginateHisto,
                 filtre: this.filtre

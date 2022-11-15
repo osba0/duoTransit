@@ -55,23 +55,10 @@ class EmpotageController extends Controller
             ->leftJoin('entrepots', 'empotages.entrepots_id', '=', 'entrepots.id')
             
             ->select(DB::raw('count(DISTINCT contenaires_empotage.id) as nbreContenaireEmpote'), 
-                DB::raw("count( ( CASE WHEN contenaires_empotage.etat = 0 THEN contenaires_empotage.id END ) ) AS nbreContenaireNonValide"),
-                //'receptions.dossier_empotage_id',
-               /* DB::raw('SUM(receptions.repoid) as total_poids'), 
-                DB::raw('SUM(receptions.revolu) as total_volume'), 
-                DB::raw('SUM(receptions.renbcl) as total_colis'), 
-                DB::raw('SUM(receptions.renbpl) as total_palette'), 
-                DB::raw('count(receptions.rencmd) as total_cmd'), 
-                'empotages.nbreContenaire', */
-                 
+                DB::raw("count( ( CASE WHEN contenaires_empotage.etat = 0 THEN contenaires_empotage.id END ) ) AS nbreContenaireNonValide"),                 
                 'empotages.id as IdEmpotage', 
                 'empotages.reference as numDossier', 
-              /*  'empotages.numContenaire as numContenaire', 
-                'contenaires.nom as nomContenaire', 
-                'contenaires.id as IDContenaire',
-                'contenaires.volume as capacite',*/
                 'empotages.users_id', 
-               // 'empotages.plomb as plomb', 
                 'empotages.date_depart as dateDepart', 
                 'empotages.date_arrivee as dateArrivee', 
                 'empotages.is_close as cloture',
@@ -79,7 +66,6 @@ class EmpotageController extends Controller
                 'empotages.reetat as etat',
                 'empotages.created_at as created_at',
                 'empotages.numDocim as numDocim',
-              //  'empotages.rapport_pdf as rapport_pdf',
                 'empotages.complements_document as docs',
                 'users.username as user',
                 'entrepots.nomEntrepot as nomEntrepot', 
@@ -96,6 +82,8 @@ class EmpotageController extends Controller
             if(request('typeCmd')!=""){
                  $query = $query->where('empotages.type_commandes_id', request('typeCmd')); 
             }
+
+            $query = $query->where('empotages.entites_id', intval(request('entite')));
 
             if(request('keysearch')!=""){
                 $word = request('keysearch');
@@ -131,25 +119,19 @@ class EmpotageController extends Controller
             ]);
         }
 
-        Empotage::setIDClient(request('idClient'), $user->entites_id); 
+        Empotage::setIDClient(request('idClient'), intval(request('idEntite'))); 
 
         $store = Empotage::create([
             "reference" => request('reference'),
-            //"numContenaire" => request('tc'),
-            //"contenaires_id" => request('typetc'),
             "type_commandes_id" => request('typeCmd'),
             "entrepots_id" => request('idEntrepot'),
-            /*'plomb' => request('plomb'),
-            "poidEmpote" => 0,
-            "volumeEmpote" =>  0, 
-            "colisEmpote" => 0,*/
             "clients_id" => request('idClient'), 
             "date_depart" => request('date_depart'), 
             "date_arrivee" => request('date_arrivee'), 
             "users_id" => Auth::user()->id,
             "reetat" => 0,
             "is_close" => false,
-            //"rapport_pdf" => ""
+            "entites_id" => intval(request('idEntite'))
         ]);
 
         return response([
@@ -163,14 +145,9 @@ class EmpotageController extends Controller
 
         $rapport = Empotage::where('id', request('id'))->firstOrFail();
 
-        Empotage::setIDClient(request('idClient'), $user->entites_id); 
+        Empotage::setIDClient(request('idClient'),  intval(request('idEntite'))); 
 
-        $rapport->update([
-            "reference" => request('reference'),
-            "numContenaire" => request('tc'),
-            "contenaires_id" => request('typetc'),
-            "type_commandes_id" => request('typeCmd'),
-            'plomb' => request('plomb'),
+        $rapport->update([          
             "date_depart" => request('date_depart'), 
             "date_arrivee" => request('date_arrivee')
         ]);
@@ -437,7 +414,7 @@ class EmpotageController extends Controller
 
     public function valider(){
         $user =Auth::user();
-        $client = Client::where('id', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+        $client = Client::where('id', request('id'))->whereJsonContains('clenti', intval(request('entite')))->get()->first();
 
         if(!$client){
             abort(404);
@@ -465,7 +442,7 @@ class EmpotageController extends Controller
             // Associer les commandes à un numero de dossier
             activity(TypActivity::MODIFIER)->withProperties(request('idsCmd'))->performedOn($client)->log('Validation empotage n°dossier'.request('typeCmd'));
             $lastID = LogActivity::latest('id')->first();
-            $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $user->entites_id]);
+            $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => intval(request('entite'))]);
 
         }
 
@@ -533,21 +510,28 @@ class EmpotageController extends Controller
             $ids[] = $item['id'];
             
         }*/
-
+        
+        // Rénit les commandes
         Reception::where('dossier_empotage_id', request('id'))->update([
-            "dossier_empotage_id" => null
+            "dossier_empotage_id" => null,
+            "numero_contenaire" => null,
+            "depalettisation" => null,
+            "douane" => null
         ]);
+        
+        // Supprimer les contenaires associés
+        ContenairesEmpotage::where('empotages_id', request('id'))->delete();
         
         $rapport = Empotage::where('id', request('id'))->firstOrFail();
 
-        Empotage::setIDClient(request('idClient'), $user->entites_id); 
+        Empotage::setIDClient(request('idClient'), intval(request('entite'))); 
         
         $rapport->delete();
 
-          return response([
-                "code" => 0,
-                "message" => "OK"
-            ]);
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
     }
 
 
@@ -564,13 +548,13 @@ class EmpotageController extends Controller
        
         // Notification
 
-        $transitaire = Entite::where('id', $user->entites_id)->get()->first();
+        $transitaire = Entite::where('id', intval(request('entite')))->get()->first();
         $societe = Client::where('id', request('id'))->get()->first();
 
         $commandes = Reception::whereIn('reidre',request('idsCmd'));
 
 
-        $getMailClient = User::where("entites_id", $transitaire['id'])->whereJsonContains('roles', UserRole::ROLE_CLIENT)->whereJsonContains('client_supervisor', intval(request('IDclient')))->get();
+        $getMailClient = User::whereJsonContains("entites_id", $transitaire['id'])->whereJsonContains('roles', UserRole::ROLE_CLIENT)->whereJsonContains('client_supervisor', intval(request('IDclient')))->get();
 
         $emailSent=[];
 

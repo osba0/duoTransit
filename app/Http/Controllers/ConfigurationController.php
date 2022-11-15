@@ -98,11 +98,12 @@ class ConfigurationController extends Controller
     {
         $typeCmd = TypeCommande::get(); 
         $fournis = Fournisseur::get(); 
+        $entites = Entite::get(); 
 
         return response([
             "code" => 0,
             "typeCmd" => $typeCmd,
-            "fournis" => $fournis
+            "entites" => $entites
         ]);
         
     }
@@ -154,7 +155,7 @@ class ConfigurationController extends Controller
                 "cletat" => 1,
                 "clfocl" => json_decode(request('fournisseurs')), 
                 "cltyco" => json_decode(request('typecmd')), 
-                'clenti' => array($user->entites_id) 
+                "clenti" => json_decode(request('entite')) 
             ]; 
             $store = Client::create($new_client);
 
@@ -209,6 +210,7 @@ class ConfigurationController extends Controller
                 "cletat" => 1,
                 "clfocl" => json_decode(request('fournisseurs')), 
                 "cltyco" => json_decode(request('typecmd')), 
+                "clenti" => json_decode(request('entite')) 
           ]);
 
         return response([

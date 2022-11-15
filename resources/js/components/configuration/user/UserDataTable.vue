@@ -10,6 +10,7 @@
                         <th class="p-2 border-right border-white h6">Email</th>
                         <th class="p-2 border-right border-white h6">Login</th>
                         <th class="p-2 border-right border-white h6">Profil</th>
+                        <th class="p-2 border-right border-white h6">Transitaire</th>
                         <th class="p-2 border-right border-white h6">Société(s) autorisée(s)</th>
                         <th class="p-2 border-right border-white h6">Etat</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
@@ -32,9 +33,13 @@
                         <td class="p-2 align-middle">
                            {{ user.login }}
                         </td>
+                         
+                        <td class="p-2 align-middle">
+                          <label class="badge bg-success mr-2  text-capitalize" v-for="role in user.roles" >{{role}}</label>
+                        </td>
                         <td class="p-2 align-middle">
                           
-                          <label class="badge bg-success mr-2  text-capitalize" v-for="role in user.roles" >{{role}}</label>
+                          <label class="badge bg-success mr-2  text-capitalize" v-for="ent in user.entite" >{{getEntiteName(ent)}}</label>
                           
                         </td>
                         <td class="p-2 align-middle">
@@ -108,6 +113,35 @@
                     </div>
                     <div class="modal-body mx-3">
                          <form @submit.prevent="saveUser" enctype="multipart/form-data" key=1 >
+                            <div class="row">
+                                <div class="col-6 d-flex flex-column justify-content-start align-items-center">
+                                    <div class="w-100 d-flex my-2 align-items-center">
+                                     <label for="profil" class="d-block m-0 text-right w-35 pr-2" >Profil</label>
+                                      
+                                    <select v-model="userForm.profil" class="form-control form-control-sm w-65" :class="{ 'border-danger': submitted && !$v.userForm.profil.required }"  :disabled="userForm.profil == 'Root'" @change="onProfil()">
+                                        <option value="">Choisir</option>
+                                       <option v-for="role in roles" :value="role">{{role}}</option>
+                                    </select>
+
+                                    </div>
+                                </div>
+                                <div class="col-6 d-flex flex-wrap justify-content-start align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2" v-if="noClientRole">
+                                        <label  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                            Transitaire
+                                        </label>
+                                        <select v-model="userForm.entite" class="form-control form-control-sm w-65">
+                                            <option value="">Choisir</option>
+                                            <option v-for="entite in list_entites" :value="entite.id">{{ entite.nom }}</option>
+                                        </select>
+                                    </div>
+
+                                    <div v-for="entite in list_entites" class="d-block mr-3" v-else>
+                                        <input :id="'entite_'+entite.id" :value="entite.id" name="entiteCl" type="checkbox" v-model="userForm.entiteClients">
+                                        <label :for="'entite_'+entite.id"  class="mb-0 cursor-pointer">{{ entite.nom }}</label>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-12 d-flex justify-content-center">
                                     <div v-if="this.submitted && $v.userForm.email.$error" class="text-center">
@@ -193,31 +227,19 @@
                                  
                              </div>
                               <div class="row">
-                                   <div class="col-6 my-2 d-flex flex-column">
-                                           <div class="w-100 d-flex my-2 align-items-center">
-                                                 <label for="profil" class="d-block m-0 text-right w-35 pr-2" >Profil</label>
-                                                  
-                                                <select v-model="userForm.profil" class="form-control form-control-sm w-65" :class="{ 'border-danger': submitted && !$v.userForm.profil.required }"  :disabled="userForm.profil == 'Root'" @change="onProfil()">
-                                                    <option value="">Choisir</option>
-                                                   <option v-for="role in roles" :value="role">{{role}}</option>
-                                                </select>
-
+                                    
+                                    <div class="col-6 my-2 d-flex flex-column">
+                                        <div class="w-100 d-flex" v-if="isAdmin==0">
+                                            <label class="typo__label pt-3 d-block m-0 text-right w-35  pr-2 nowrap">Société(s) Autorisée(s)</label>
+                                            <div class="w-65 p-2">
+                                                <multiselect v-model="value" :options="clients" :disabled = "noClientRole" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Choisir" label="clnmcl" track-by="id" :preselect-first="false">
+                                                    <template slot="selection" slot-scope="{ values, search, isOpen }">
+                                                        <span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} client(s) selectionné(s)</span> 
+                                                    </template> 
+                                                </multiselect>
                                             </div>
-                                            <div class="w-100 d-flex align-items-center my-2"></div>
-                                        
-                                     </div>
-                                      <div class="col-6 my-2 d-flex flex-column">
-                                    <div class="w-100 d-flex" v-if="isAdmin==0">
-                                        <label class="typo__label pt-3 d-block m-0 text-right w-35  pr-2 nowrap">Société(s) Autorisée(s)</label>
-                                        <div class="w-65 p-2">
-                                            <multiselect v-model="value" :options="clients" :disabled = "noClientRole" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Choisir" label="clnmcl" track-by="id" :preselect-first="false">
-                                                <template slot="selection" slot-scope="{ values, search, isOpen }">
-                                                    <span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} client(s) selectionné(s)</span> 
-                                                </template> 
-                                            </multiselect>
                                         </div>
                                     </div>
-                                </div>
                             </div>
                              <div class="modal-footer d-flex justify-content-center"> 
 
@@ -247,6 +269,7 @@
         props: [
           'listRoles',
           'listClients',
+          'listEntites',
           'isAdmin'
         ],
          components: {
@@ -263,7 +286,9 @@
                     username: '',
                     password: '',
                     confirmPassword: '',
-                    idClientAuth: []
+                    idClientAuth: [],
+                    entite: '',
+                    entiteClients: []
 
                 },
                 hasImage: false,
@@ -273,6 +298,7 @@
                 paginate: 10,
                 modeModify: false,
                 clients: JSON.parse(this.listClients),
+                list_entites: JSON.parse(this.listEntites),
                 roles: JSON.parse(this.listRoles),
                 value: [],
                 options:  JSON.parse(this.listClients)
@@ -363,6 +389,18 @@
                     this.userForm.idClientAuth.push(item.id);  
                 }
 
+
+
+                 if((this.userForm.profil=='Client' || this.userForm.profil=='Consultation') && this.userForm.entiteClients.length == 0  ){
+                   
+                    Vue.swal.fire(
+                          'Warning!',
+                          'Choisir un transitaire!',
+                          'warning'
+                        )
+                   return false;
+                }
+
                  if((this.userForm.profil=='Client' || this.userForm.profil=='Consultation') && this.userForm.idClientAuth.length == 0 ){
                     Vue.swal.fire(
                           'Warning!',
@@ -372,7 +410,12 @@
                    return false;
                 }
 
+                
+                data.append('entite',  this.userForm.entite);
+                data.append('entiteClients',  JSON.stringify(this.userForm.entiteClients));
                 data.append('clientsAuth',  JSON.stringify(this.userForm.idClientAuth));
+
+
 
                 let action = "createUser";
 
@@ -464,9 +507,14 @@
                         selected.push(this.options.find(option => option.id === user.client_supervisor[i]));
                     }
                     this.value = selected;
+
+                    this.userForm.entiteClients = user.entite; 
                 }else{
                     this.noClientRole = true;
                     this.value = [];
+                     this.userForm.entite = user.entite[0]; 
+
+
                 }
                 this.userForm.username  = user.login;
                 
@@ -479,9 +527,19 @@
                 this.submitted = false;
                 this.modeModify = false;
 
+            },
+            getEntiteName(id){
+
+                for(var i=0; i<this.list_entites.length; i++){
+                  
+                    if(id==this.list_entites[i].id){
+
+                        return this.list_entites[i].nom;
+                    }
+                }
             }
         },
-        mounted() {console.log("ded dd", this.listRoles, "ded dd");
+        mounted() {console.log("ded dd", this.listEntites, "ded dd");
          this.getUser();
         }
     }

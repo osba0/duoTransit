@@ -17,6 +17,7 @@
                         <th class="p-2 border-right border-white h6">Telephone</th>
                         <th class="p-2 border-right border-white h6">Adresse</th>
                         <th class="p-2 border-right border-white h6">Pays</th>
+                        <th class="p-2 border-right border-white h6">Transitaire</th>
                         <th class="p-2 border-right border-white h6" width="20%">Fournisseurs</th>
                         <th class="p-2 border-right border-white h6">Type Commmande</th>
                         <th class="p-2 border-right border-white h6 text-center">Logo</th>
@@ -47,6 +48,18 @@
                         </td>
                         <td class="p-2 align-middle">
                            {{ client.pays }}
+                        </td>
+                        <td class="p-2 align-middle">   
+
+                            <span class="badge bg-primary mr-2 p-2 mb-2" v-for="value in client.clenti">
+                                <template v-for="transitaire in listTransitaire">
+                                    <template v-if="value == transitaire.id">
+                                        {{transitaire.nom}}
+                                    </template>
+                                </template>
+                           
+                            </span>            
+                           
                         </td>
                         <td class="p-2 align-middle">   
 
@@ -220,6 +233,20 @@
                                  </div>
                             </div>
                             <hr>
+                             <div class="row">  
+                                 <div class="col-12 my-2 d-flex flex-column">
+                                    <div class="w-100 d-flex justify-content-between flex-column align-items-center">
+                                        <label class="typo__label d-block m-0 w-100  pr-2 nowrap">Transitaire</label> 
+                                        <div class="w-100 p-0">
+                                            <multiselect v-model="clientForm.entite" :options="listTransitaire" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Choisir" label="nom" track-by="id" :preselect-first="false" :class="{ 'border-danger': submitted && !$v.clientForm.entite.required }">
+                                                <template slot="selection" slot-scope="{ values, search, isOpen }">
+                                                    <span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} transitaire(s) selectionné(s)</span> 
+                                                </template>
+                                            </multiselect>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-12 my-2 d-flex flex-column">
                                     <div class="w-100 d-flex justify-content-between flex-column align-items-center">
@@ -284,6 +311,9 @@
 
     export default {
         props: [
+            "listTypeCmds",
+            "listFournisseurs",
+            "listTransitaire"
         ],
          components: {
             Multiselect,
@@ -303,6 +333,8 @@
                     pays: '',
                     value: [],
                     valueTypeCmd: [],
+                    entite: [],
+                    idEntites: [],  
                     urlPreview:''
                 },
                 hasImage: false,
@@ -310,13 +342,6 @@
                 clients: {},
                 paginate: window.pagination,
                 modeModify: false,
-
-                
-                /*fournisseurs: [], 
-                typeCmd: [],*/
-
-                listFournisseurs: [],
-                listTypeCmds: [],
                 isLoading: true,
                 fileInputKey: 0,
                 loading: false
@@ -329,6 +354,7 @@
                 pays: { required },
                 value:{ required },
                 valueTypeCmd: { required },
+                entite: { required },
                 pays: { required }
             },
             
@@ -383,6 +409,7 @@
 
                 this.clientForm.idFournisseurs = [];
                 this.clientForm.idTypeCmd = [];
+                this.clientForm.idEntites = [];
 
                 // get fournisseurs
                 for(var i=0; i<this.clientForm.value.length; i++){
@@ -394,9 +421,16 @@
                     var item = this.clientForm.valueTypeCmd[i];
                     this.clientForm.idTypeCmd.push(item.id);  
                 }
+
+                // get transitaire
+                for(var i=0; i<this.clientForm.entite.length; i++){
+                    var item = this.clientForm.entite[i];
+                    this.clientForm.idEntites.push(item.id);  
+                }
              
                 data.append('fournisseurs', JSON.stringify(this.clientForm.idFournisseurs));
                 data.append('typecmd', JSON.stringify(this.clientForm.idTypeCmd));
+                data.append('entite', JSON.stringify(this.clientForm.idEntites));
 
                 this.loading=true;
 
@@ -443,13 +477,6 @@
                 axios.get('/configuration/getClient?page=' + page + "&paginate=" + this.paginate).then(response => {
                     this.clients = response.data;
                     this.closeLoader();
-                });
-            },
-            getConfig(){
-                axios.get('/configuration/config').then(response => {
-                   this.listTypeCmds=response.data.typeCmd;
-                   this.listFournisseurs=response.data.fournis;
-                   this.closeLoader();
                 });
             },
             deleteClient(client){
@@ -511,6 +538,14 @@
                     selected2.push(this.listTypeCmds.find(option => option.id === client.typeCmd[i]));
                 }
                 this.clientForm.valueTypeCmd = selected2;
+
+                // transitaire
+                this.clientForm.entite=[];
+                var selected3 = [];
+                for(var i=0; i<client.clenti.length;i++){
+                    selected3.push(this.listTransitaire.find(option => option.id === client.clenti[i]));
+                }
+                this.clientForm.entite = selected3;
                
             },
             closeModal(){
@@ -532,7 +567,6 @@
         },
         mounted() {
             this.getClient();
-            this.getConfig();
         }
     }
 </script>

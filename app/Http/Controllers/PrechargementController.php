@@ -47,11 +47,16 @@ class PrechargementController extends Controller
     {
         $user = Auth::user();
 
-        $entite = Entite::where('id', $user->entites_id)->get()->first();
+        $entite = Entite::where('slug', request('currententite'))->get()->first();
+
+        if(!$entite){
+            abort(404);
+
+        }
+
+        $client = Client::where('slug', request('id'))->whereJsonContains('clenti', $entite->id)->get()->first();
 
 
-
-        $client = Client::where('slug', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
         if(!$client)  abort(404);
 
         $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get();  
@@ -62,7 +67,7 @@ class PrechargementController extends Controller
 
         $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
 
-        $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])
+        $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])->where("entites_id", $entite->id)
                  ->select('type_commandes_id', DB::raw('count(*) as total'))
                  ->groupBy('type_commandes_id')->where(function($query){
                         $query->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
@@ -192,7 +197,7 @@ class PrechargementController extends Controller
                 $query = $query->where('dossier_prechargements.reetat', $etatFiltre);
             }
 
-            //$query = $query->where('dossier_prechargements.is_close', 0);
+            $query = $query->where('dossier_prechargements.entites_id', request('entite'));
 
             $query = $query->orderBy('dossier_prechargements.id','DESC');
             
@@ -230,7 +235,7 @@ class PrechargementController extends Controller
             $dries = Reception::where('clients_id', request('id'))->where(function($query2){
 
                     $query2->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL)->orWhere('dossier_prechargements_id', request('idPre'));
-                })->where('type_commandes_id', request('typecmd'))->where('entites_id', request('entiteID'));
+                })->where('type_commandes_id', request('typecmd'))->where('entites_id', request('entite')); //request('entiteID')
 
             if(request('etatSelected')==true){
 
@@ -305,7 +310,7 @@ class PrechargementController extends Controller
                 'dossier_prechargements.reetat as etat',
                 'users.username as user',
                 'type_commandes.typcmd as typecmd',
-                'contenaires.nom as contenaire' )->where('dossier_prechargements.id', request('idPrehargement'))->get();
+                'contenaires.nom as contenaire' )->where('dossier_prechargements.id', request('idPrehargement'))->where('receptions.entites_id', request('entite'))->get();
 
             //$empotage = ReceptionResource::collection($results);
     
@@ -329,7 +334,10 @@ class PrechargementController extends Controller
 
         $user = Auth::user();
 
-        $client = Client::where('id', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+
+
+        $client = Client::where('id', request('id'))->whereJsonContains('clenti', intval(request('entite')))->get()->first();
+        
         if(!$client){
             abort(404);
         }
@@ -350,7 +358,7 @@ class PrechargementController extends Controller
 
             activity(TypActivity::MODIFIER)->withProperties(request('idsCmd'))->performedOn($client)->log('Validation préchargement client n°'.request('id_prechargement'));
             $lastID = LogActivity::latest('id')->first();
-            $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $user->entites_id]);
+            $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => request('entite')]);
 
         }
 
@@ -372,6 +380,7 @@ class PrechargementController extends Controller
 
 
     public function notifier(){
+
         $user = Auth::user();
         
         $base64_pdf = trim(request('base64_file_pdf'), "data:application/pdf;base64,");
@@ -384,13 +393,13 @@ class PrechargementController extends Controller
        
         // Notification
 
-        $transitaire = Entite::where('id', $user->entites_id)->get()->first();
+        $transitaire = Entite::where('id', intval(request('entite')))->get()->first();
         $societe = Client::where('id', request('id'))->get()->first();
 
         $commandes = Reception::whereIn('reidre',request('idsCmd'));
 
 
-        $getMailTransitaire = User::where("entites_id", $transitaire['id'])->whereJsonContains('roles', UserRole::ROLE_ADMIN)->get();
+        $getMailTransitaire = User::whereJsonContains("entites_id", $transitaire['id'])->whereJsonContains('roles', UserRole::ROLE_ADMIN)->get();
 
         $emailSent=[];
 
@@ -405,7 +414,7 @@ class PrechargementController extends Controller
 
         $rep = [
             "code" => 0,
-            "message" => "OK"
+            "message" => "OK 2022"
         ];
 
         return response($rep);
@@ -455,7 +464,7 @@ class PrechargementController extends Controller
 
         $dossier =  DossierPrechargement::where('id','=',request('id'))->where('type_commandes_id', request('typeCmd'))->firstOrFail(); 
 
-        DossierPrechargement::setIDClient(request('clientID'), $user->entites_id); 
+        DossierPrechargement::setIDClient(request('clientID'), intval(request('entite'))); 
 
         $dossier->delete();
     

@@ -54,11 +54,10 @@ class GestionController extends Controller
              abort(401);
         }
 
-        $entite = Entite::where('id', $user->entites_id)->get()->first();
+        $entite = Entite::where('slug', request('currententite'))->get()->first();
 
 
-
-        $client = Client::where('slug', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+        $client = Client::where('slug', request('id'))->whereJsonContains('clenti', $entite->id)->get()->first();
 
         if(!$client)  abort(404);
 
@@ -70,7 +69,7 @@ class GestionController extends Controller
 
         $defaultContenaire = Contenaire::get()->where("isdefault", true)->first();
 
-        $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])->leftJoin('dossier_prechargements', 'receptions.dossier_prechargements_id', '=', 'dossier_prechargements.id')
+        $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])->where("receptions.entites_id", $entite->id)->leftJoin('dossier_prechargements', 'receptions.dossier_prechargements_id', '=', 'dossier_prechargements.id')
                  ->select('receptions.type_commandes_id', DB::raw('count(*) as total'))
                  ->groupBy('receptions.type_commandes_id')->whereNotNull('dossier_prechargements_id')->where(function($query){
                         $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
@@ -88,7 +87,7 @@ class GestionController extends Controller
 
         activity(TypActivity::LISTER)->performedOn($client)->log('Affichage validation préchargement');
         $lastID = LogActivity::latest('id')->first();
-        $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $user->entites_id]);
+        $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $entite->id]);
         
         
         return  view('backend.gestion.prechargement', $data);
@@ -108,7 +107,7 @@ class GestionController extends Controller
             ]);
         }
         try{    
-            ChargementCreation::setIDClient(request('clientID'), $user->entites_id); 
+            ChargementCreation::setIDClient(request('clientID'), request('entiteID')); 
 
             $store = ChargementCreation::create([
                 "numDossier"           => request('numdossier'),
@@ -118,6 +117,7 @@ class GestionController extends Controller
                 "users_id"             => $user->id,
                 "type_commandes_id"    => request('typeCmd'),
                 "entrepots_id"         => request('entrepot'),
+                "entites_id"           => request('entiteID'),
                 "is_empote"               => false,
                 "reetat"               => false
             ]); 
@@ -201,6 +201,8 @@ class GestionController extends Controller
                 $pre = $pre->where('chargement_creations.reetat', $etatFiltre);
             }
 
+            $pre = $pre->where('chargement_creations.entites_id', intval(request('entite')));
+
             
             $pre = $pre->paginate($paginate);
         }else{
@@ -238,7 +240,7 @@ class GestionController extends Controller
             ->leftJoin('dossier_prechargements', 'dossier_prechargements.id', '=', 'receptions.dossier_prechargements_id')
             ->leftJoin('users as a', 'dossier_prechargements.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
-            ->select('*','b.username as user_created','a.username as prechargeur')->where("dossier_prechargements.reetat", true)->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entrepots_id', request('idEntrepot')); 
+            ->select('*','b.username as user_created','a.username as prechargeur')->where("dossier_prechargements.reetat", true)->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entites_id', intval(request('entite')))->where('receptions.entrepots_id', request('idEntrepot')); 
 
             if($keyword!=''){
                 $dries = $dries->search($keyword);
@@ -292,30 +294,8 @@ class GestionController extends Controller
         $results = DB::table('receptions')->select(DB::raw("SUM(repoid) as total_poids")
                               ,DB::raw("SUM(revolu) as total_volume")
                               ,DB::raw("SUM(renbcl) as total_colis")
-                              ,DB::raw("SUM(renbpl) as total_palette"))->whereIn('reidre',request('listCmd'))->get();
+                              ,DB::raw("SUM(renbpl) as total_palette"))->whereIn('reidre',request('listCmd'))->where('receptions.entites_id', request('entite'))->get();
 
-      // var_dump($results); die();
-
-        /*$results = DB::table('chargement_creations')
-            ->leftJoin('receptions', 'receptions.dossier_id', '=', 'chargement_creations.numdossier')
-            ->leftJoin('users', 'chargement_creations.users_id', '=', 'users.id')
-            ->leftJoin('type_commandes', 'chargement_creations.type_commandes_id', '=', 'type_commandes.id')
-            ->groupBy('chargement_creations.id')
-            ->select('receptions.dossier_id', 
-                DB::raw('SUM(receptions.repoid) as total_poids'), 
-                DB::raw('SUM(receptions.revolu) as total_volume'), 
-                DB::raw('SUM(receptions.renbcl) as total_colis'), 
-                DB::raw('SUM(receptions.renbpl) as total_palette'), 
-                DB::raw('count(receptions.rencmd) as total_cmd'), 
-
-                'chargement_creations.numdossier', 
-                'chargement_creations.users_id', 
-                'chargement_creations.dateDebut',
-                'chargement_creations.dateCloture',
-                'chargement_creations.reetat as etat',
-                'chargement_creations.created_at as creation_dos',
-                'users.username as user',
-                'type_commandes.typcmd as typecmd')->where('chargement_creations.numdossier', request('idPrehargement'))->get(); */
 
 
             $details=[];
@@ -373,7 +353,7 @@ class GestionController extends Controller
 
         $user = Auth::user();
 
-        $client = Client::where('id', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+        $client = Client::where('id', request('id'))->whereJsonContains('clenti', intval(request('entite')))->get()->first();
         if(!$client){
             abort(404);
         }
@@ -390,7 +370,7 @@ class GestionController extends Controller
 
             activity(TypActivity::MODIFIER)->withProperties(request('idsCmd'))->performedOn($client)->log('Validation préchargement n°dossier'.request('id_dossier'));
             $lastID = LogActivity::latest('id')->first();
-            $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $user->entites_id]);
+            $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => request('entite')]);
 
         }
 
@@ -434,7 +414,7 @@ class GestionController extends Controller
        
         // Notification
 
-        $transitaire = Entite::where('id', $user->entites_id)->get()->first();
+        $transitaire = Entite::where('id', intval(request('entite')))->get()->first();
         $societe = Client::where('id', request('id'))->get()->first();
 
         $commandes = Reception::whereIn('reidre',request('idsCmd'));
@@ -494,7 +474,7 @@ class GestionController extends Controller
 
         $dossier =  ChargementCreation::where('numDossier','=',request('id'))->where('type_commandes_id', request('typeCmd'))->firstOrFail(); 
 
-        ChargementCreation::setIDClient(request('clientID'), $user->entites_id); 
+        ChargementCreation::setIDClient(request('clientID'), intval(request('entite'))); 
 
         $dossier->delete();
     
@@ -509,7 +489,7 @@ class GestionController extends Controller
         
         $dossier =  ChargementCreation::where('id','=',request('identifiant'))->firstOrFail(); 
         
-        ChargementCreation::setIDClient(request('clientID'), $user->entites_id); 
+        ChargementCreation::setIDClient(request('clientID'), intval(request('entite'))); 
 
         $rep = $dossier->update(["reetat" => false]);
 
@@ -539,11 +519,11 @@ class GestionController extends Controller
              abort(401);
         }
 
-        $entite = Entite::where('id', $user->entites_id)->get()->first();
+        $entite = Entite::where('slug', request('currententite'))->get()->first();
 
 
 
-        $client = Client::where('slug', request('id'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+        $client = Client::where('slug', request('id'))->whereJsonContains('clenti',$entite->id)->get()->first();
         if(!$client)  abort(404);
 
         $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get(); 
@@ -556,7 +536,7 @@ class GestionController extends Controller
 
         $entrepots = Entrepot::get(); 
 
-        $listeDossier =  DB::table('chargement_creations')
+        $listeDossier =  DB::table('chargement_creations')->where('chargement_creations.entites_id',$entite->id)
             ->leftJoin('empotages as empo', function($join){
                 $join->on('empo.reference', '=', 'chargement_creations.numdossier');
                 $join->on('empo.type_commandes_id','=','chargement_creations.type_commandes_id');    
@@ -573,7 +553,7 @@ class GestionController extends Controller
 
         activity(TypActivity::LISTER)->performedOn($client)->log('Affichage empotage');
         $lastID = LogActivity::latest('id')->first();
-        $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $user->entites_id]);
+        $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $entite->id]);
         
         return  view('backend.gestion.empotage', $data);
     }

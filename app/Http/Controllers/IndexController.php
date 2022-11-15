@@ -32,6 +32,7 @@ class IndexController extends Controller
         if(is_null($user)){
             return  redirect(route('login'));
         }
+
         $client = Client::get()->count();
 
         $receptions = 0;
@@ -48,10 +49,21 @@ class IndexController extends Controller
         $typeCmdTotal = 0;
         $journal = 0;
 
-        if($user->hasRole(UserRole::ROLE_CLIENT)){
-            
-           
+        // check multiEntité
 
+       
+
+        if(sizeof($user->entites_id) > 1 && is_null(request('entite')) ){ 
+            return  view('chosseEntite', ['chooseEntite' => true, 'slug' => ""]);   
+        }
+
+        $slugEntite = is_null(request('entite'))? Entite::whereIn("id", $user->entites_id)->first()->toArray()['slug'] : request('entite');
+
+        $idEntite = $user->getIDEntite($slugEntite);
+
+
+        if($user->hasRole(UserRole::ROLE_CLIENT)){
+        
             $req = Reception::where(function($query){
                 $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', 0);
             })->where(function($query){
@@ -60,7 +72,7 @@ class IndexController extends Controller
                 $query->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
             })->where('reetat', true)->where('clients_id', $user['client_supervisor'][0]);
 
-            $receptions = $req->get()->count();
+            $receptions = $req->where('entites_id', $idEntite)->get()->count();
 
             
         
@@ -89,18 +101,18 @@ class IndexController extends Controller
 
             $fournisseur = Fournisseur::get()->count();
             $entrepot = Entrepot::get()->count();
-            $dry = Reception::get()->count();
+            $dry = Reception::where('entites_id', $idEntite)->get()->count();
             $entite = Entite::get()->count();
             $contenaire = Contenaire::get()->count();
 
             $journal = LogActivity::get()->count();
 
             if($user->hasRole(UserRole::ROLE_ADMIN)){
-                $users = User::where("entites_id", $user->entites_id)->where(function($query){
+                $users = User::orWhereJsonContains("entites_id", $user->entites_id)->where(function($query){
                     $query->orWhereJsonContains('roles', UserRole::ROLE_ADMIN)->orWhereJsonContains('roles', UserRole::ROLE_USER);
                 })->get()->count();
             }else{
-                $users = User::where("entites_id", $user->entites_id)->get()->count();
+                $users = User::orWhereJsonContains("entites_id", $user->entites_id)->get()->count();
             }
 
             $fournis = Fournisseur::get();
@@ -119,6 +131,12 @@ class IndexController extends Controller
 
             }
         }
+
+
+
+
+        //$multiProfil = false;
+
         
         $request->session()->put('typeCmd', $listTypeCmd);
         $request->session()->put('fournis', $fournis);
@@ -126,7 +144,7 @@ class IndexController extends Controller
         $request->session()->put('clientSup', $user->getClientSupervisor()); 
 
        
-        return  view('home', ['roles' => $user->roles[0],'totalCmdAttente' => $receptions,'totalClient' => $client, 'totalEntite' => $entite,'totalContenaire' => $contenaire, 'totalJournal' => $journal, 'totalUser' => $users,'totalFournisseur' => $fournisseur, 'four'=>$four , 'totaEntrepot' => $entrepot,"typeCmdNbr" => $typeCmd->count(),"fourNbr" => $fournis->count(), 'totalCommande'=> $dry, 'recap'=> $recap, 'typeCmdTotal' => $typeCmdTotal, 'fournis' => FournisseurResource::collection($fournis), 'clientSup'=> json_encode($user->getClientSupervisor())]);
+        return  view('home', ['roles' => $user->roles[0],'totalCmdAttente' => $receptions,'totalClient' => $client, 'totalEntite' => $entite,'totalContenaire' => $contenaire, 'totalJournal' => $journal, 'totalUser' => $users,'totalFournisseur' => $fournisseur, 'four'=>$four , 'totaEntrepot' => $entrepot,"typeCmdNbr" => $typeCmd->count(),"fourNbr" => $fournis->count(), 'totalCommande'=> $dry, 'recap'=> $recap, 'typeCmdTotal' => $typeCmdTotal, 'fournis' => FournisseurResource::collection($fournis), 'clientSup'=> json_encode($user->getClientSupervisor()), 'slug' => $slugEntite]);
     }
 
     /**

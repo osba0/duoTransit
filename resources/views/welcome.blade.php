@@ -1,8 +1,31 @@
 @php
-$config = [
-    'appName' => config('app.name')
-];
+    $config = [
+        'appName' => config('app.name')
+    ];
 @endphp
+
+@if(is_null(request()->route('currententite')))
+    @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))
+        @php $entite = $slug  ; @endphp
+    @else
+        @php $entite = auth()->user()->getEntite(auth()->user()->entites_id)[0]['slug'] @endphp
+    @endif
+@else 
+        @php $entite = request()->route('currententite') @endphp
+@endif
+
+@php $count = 0; @endphp
+
+@foreach(auth()->user()->unreadNotifications as $notification) 
+   
+    @if(isset($notification->data['entite']))
+        @if($entite == $notification->data['entite'])
+            @php $count++; @endphp
+        @endif
+    @endif
+
+@endforeach
+
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -12,7 +35,7 @@ $config = [
   <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/app/font-awesome.min.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/custom.css') }}">
-  <title>@if(auth()->user()->unreadNotifications->count() > 0) ● @endif {{ config('app.name') }}</title>
+  <title>@if($count > 0) ● @endif {{ config('app.name') }}</title>
   <style>
     .img-circle {
         border-radius: 50%;
@@ -90,8 +113,30 @@ $config = [
                     <div class="d-flex align-items-center justify-content-center">
                         <img src="{{ asset('images/itransit-logo.png') }}" style="height: 40px">
                         <h1 class="text-center h4 py-2 px-2 m-0" style="color: #0692cc;"><b>{{ config('app.name') }}</b></h1>
+                         @if((auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION)) && $slug !='')
+                            <div class="dropdown ml-3">
+                                  <button class="btn btn-default dropdown-toggle box-shadow-none" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    @foreach(auth()->user()->entiteList() as $enti)
+                                        @if($enti['slug'] == $slug)
+                                        <a><img src="/images/logo/{{ $enti['logo']}}" alt="{{$enti['nom']}}" width="100" class="bg-white inline-block"></a>
+                                        @endif
+                                    @endforeach
+                                  </button>
+                                  <div class="dropdown-menu px-2" aria-labelledby="dropdownMenu2">
+                                    @foreach(auth()->user()->entiteList() as $enti)
+                                        @if($enti['slug'] != $slug)
+                                        <a href="/transitaire/{{ $enti['slug'] }}">
+                                            <img src="/images/logo/{{ $enti['logo']}}" alt="{{$enti['nom']}}" width="100" class="bg-white inline-block" 
+                                                   >
+                                        </a>
+                                        @endif
+                                    @endforeach
+                                  </div>
+                            </div>
+                            
+                        @endif
                     </div>
-                    <div class="px-3 py-2" style="right:0">
+                    <div class="pl-3 py-2" style="right:0">
                         
                        @include('navUser')
 
@@ -101,10 +146,12 @@ $config = [
         </div>
     </header>
     <div class="container" id="app_run">
+    @php if (!isset($chooseEntite)) : @endphp
+    
         <div class="content">
-          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2">
-            <div class="flex-grow-1 mb-1 mb-md-0">
-              <h1 class="h3 fw-bold mb-2">
+          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-start py-2">
+            <div class="mb-1 mb-md-0 pr-3">
+              <h1 class="h3 fw-bold mb-2 white-space-nowrap ">
                 @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))
                     Tableau de bord
                 @else
@@ -116,8 +163,30 @@ $config = [
               </h2>
             </div>
             <div class="mt-3 mt-md-0 ms-md-3 space-x-1">
-                <img src="{{ asset('/images/logo/'.auth()->user()->entite->logo) }}" class="border rounded-lg" style="height: 70px">
-             
+                @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
+                @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                            <choose-entite :list-entite="{{ json_encode(auth()->user()->entiteList()) }}" config-mode='small' slug-entite="{{$slug}}"></choose-entite>
+                        </div>
+                        <!--img src="{{ asset('/images/logo/'.auth()->user()->getEntiteBySlug($slug)['logo']) }}" class="border rounded-lg ml-3" style="width: 200px"-->
+                    </div>
+                    
+                @else
+                <div class="row d-select">
+                    <div class="col cursor-pointer">
+                        <div class="mb-4 rounded-lg p-2 bg-light-blue">
+                            <div role="button" class="rounded-lg bg-white text-center p-1">
+                                <div class="h1 text-primary font-weight-bold text-center">
+                                     <img src="{{ asset('/images/logo/'.auth()->user()->getEntite(auth()->user()->entites_id)[0]['logo']) }}" class="" style="height: 50px">
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+                @endif
+             @endif 
             </div>
           </div>
         </div>
@@ -384,7 +453,7 @@ $config = [
             </div>
     @endUserCan
 
-  
+   @php endif @endphp
   
     @yield('content')  
       <changepassword id-client = {{$id_client?? ''}}></changepassword>

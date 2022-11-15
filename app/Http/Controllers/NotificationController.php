@@ -19,7 +19,7 @@ class NotificationController extends Controller
      public function index(){
         $user = Auth::user();
 
-        $entite = Entite::where('id', $user->entites_id)->get()->first();
+        $entite = Entite::where('slug', request('currententite'))->get()->first(); 
         
         $client = Client::get()->where('slug', request('client'))->first();
 
@@ -32,11 +32,13 @@ class NotificationController extends Controller
     public function listeNotification(){
         $user = Auth::user();
 
+        $entite = Entite::where('id', intval(request('entiteID')))->get()->first(); 
+
         $paginate = request('paginate');
 
         $slug = request('slug');
         
-        $notification = $user->notifications()->where('data', 'LIKE', '%"slug":"'.$slug.'"%')->paginate($paginate);
+        $notification = $user->notifications()->where('data', 'LIKE', '%"slug":"'.$slug.'"%')->where('data', 'LIKE', '%"entite":"'.$entite->slug.'"%')->paginate($paginate);
         
        return NotificationResource::collection($notification);
     }
@@ -75,7 +77,7 @@ class NotificationController extends Controller
 
         $user = Auth::user();
 
-        $entite = Entite::where('id', $user->entites_id)->get()->first();
+        $entite = Entite::where('slug', request('currententite'))->get()->first(); 
         
         $client = Client::get()->where('slug', request('client'))->first();
 

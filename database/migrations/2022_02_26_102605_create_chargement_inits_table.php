@@ -21,6 +21,7 @@ class CreateChargementInitsTable extends Migration
             $table->date('dateDebut');
             $table->date('dateCloture')->nullable();
             $table->foreignId('clients_id')->constrained();
+            $table->foreignId('entites_id')->constrained();
             $table->foreignId('users_id')->constrained();
             $table->boolean('reetat');  
             $table->boolean('is_empote');  

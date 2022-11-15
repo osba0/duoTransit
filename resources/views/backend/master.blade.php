@@ -2,7 +2,26 @@
 $config = [
     'appName' => config('app.name')
 ];
+$currentEntite = request()->route('currententite');
 @endphp
+
+@if(is_null($currentEntite))
+    @php $entite = auth()->user()->getEntite(auth()->user()->entites_id)[0]['slug'] @endphp
+@else 
+    @php $entite = request()->route('currententite') @endphp
+@endif
+
+@php $count = 0; @endphp
+
+@foreach(auth()->user()->unreadNotifications as $notification) 
+   
+    @if(isset($notification->data['entite']))
+        @if($entite == $notification->data['entite'])
+            @php $count++; @endphp
+        @endif
+    @endif
+
+@endforeach
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,7 +36,7 @@ $config = [
     <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/app/font-awesome.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('backend/css/custom.css') }}">
 
-    <title> @if(auth()->user()->unreadNotifications->count() > 0) ● @endif {{ $config['appName'] }}</title>
+    <title> @if($count > 0) ● @endif {{ $config['appName'] }}</title>
     @yield('styles')
 </head>
 
@@ -38,16 +57,48 @@ $config = [
                     </ul>
                      @if (\Request::is('configuration/*'))
                         @if (auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
-                            <div class="ml-3 d-flex align-items-center"><strong class="text-primary color-white px-2 fontAnton">Super Admin</strong></div>
+                            <div class="ml-3 d-flex align-items-center">
+                                <img src="/images/root.png" height="40">
+                                <strong class="text-primary color-white px-2 fontAnton">Super Admin</strong>
+                            </div>
                         @else
-                            <div class="ml-3 d-flex align-items-center"><strong class="text-primary color-white px-2 fontAnton">{{ auth()->user()->entite->nom }}</strong></div>
+                            <div class="ml-3 d-flex align-items-center">
+                                <strong class="text-primary color-white px-2 fontAnton">{{ auth()->user()->getEntiteBySlug(request()->route('currententite'))['nom'] }}</strong>
+
+                            </div>
                         @endif
                      @else
-                       <div class="ml-3 d-flex align-items-center">
-                            <img src="{{ url('/images/logo/'.$logo) }}" alt="" class="mr-3 pr-3 border-right" style="height: 40px;">
-                            <strong class="text-primary color-white px-2 fontAnton"><u>{{ auth()->user()->entite->nom }}</u></strong>
+                       <div class="d-flex align-items-center">
+                           <strong class="d-none text-primary color-white px-2 fontAnton"><u>{{ auth()->user()->getEntiteBySlug(request()->route('currententite'))['nom'] }}</u></strong>
+                           @if((auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION)))
+                            <div class="dropdown ml-3">
+                                  <button class="px-0 btn btn-default dropdown-toggle box-shadow-none" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    @foreach(auth()->user()->entiteList() as $enti)
+                                        @if($enti['slug'] == $currentEntite)
+                                        <a><img src="/images/logo/{{ $enti['logo']}}" alt="{{$enti['nom']}}" width="100" class="bg-white inline-block"></a>
+                                        @endif
+                                    @endforeach
+                                  </button>
+                                  <div class="dropdown-menu px-2" aria-labelledby="dropdownMenu2">
+                                    @foreach(auth()->user()->entiteList() as $enti)
+                                        @if($enti['slug'] != $currentEntite)
+                                        <a href="/transitaire/{{ $enti['slug'] }}">
+                                            <img src="/images/logo/{{ $enti['logo']}}" alt="{{$enti['nom']}}" width="100" class="bg-white inline-block" 
+                                                   >
+                                        </a>
+                                        @endif
+                                    @endforeach
+                                  </div>
+                            </div>
+                           @else
+                           <img src="{{ url('/images/logo/'.auth()->user()->getEntiteBySlug(request()->route('currententite'))['logo']) }}" alt="{{ auth()->user()->getEntiteBySlug(request()->route('currententite'))['nom'] }}" class="mr-0 pr-0 pl-2" style="height: 25px;"> 
+                           @endif
+                             
+                            <img src="{{ url('/images/logo/'.$logo) }}" alt="" class="ml-3 pl-3 border-left" style="height: 40px;">
+                           
                         </div>
                      @endif
+
                 </div>
                 
                 <div class="pr-3">@include('navUser')</div>
@@ -70,6 +121,7 @@ $config = [
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="">
+
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
                         @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))  
@@ -84,35 +136,35 @@ $config = [
                             </a>
                         </li>
                         @endif
-                        @if (\Request::is('reception/*') or \Request::is('activity/*') or \Request::is('precharger/*') or (\Request::is('incidents/*')) or 
-                        \Request::is('numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is('gerer/*') or \Request::is('historique-empotage/*') or \Request::is('historique-docim/*') or \Request::is('consultation/*') or \Request::is('historique-prechargement/*') or \Request::is('notifications/*'))  
+                        @if (\Request::is($currentEntite.'/reception/*') or \Request::is('activity/*') or \Request::is($currentEntite.'/precharger/*') or (\Request::is('incidents/*')) or 
+                        \Request::is($currentEntite.'/numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is($currentEntite.'/prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is($currentEntite.'/gerer/*') or \Request::is($currentEntite.'/historique-empotage/*') or \Request::is($currentEntite.'/historique-docim/*') or \Request::is('consultation/*') or \Request::is($currentEntite.'/historique-prechargement/*') or \Request::is($currentEntite.'/notifications/*'))  
                             @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
                             <li class="nav-item">
-                                <a href="/reception/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('reception/*') ? 'active' : '' }}"><i class="nav-icon fa fa-sign-in"></i> <p>Réceptionner</p></a>
+                                <a href="/{{$currentEntite}}/reception/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/reception/*') ? 'active' : '' }}"><i class="nav-icon fa fa-sign-in"></i> <p>Réceptionner</p></a>
                             </li>
                             @endif
 
                             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
                             <li class="nav-item">
-                                <a href="/precharger/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('precharger/*') ? 'active' : '' }}"><i class="nav-icon fa fa-asterisk"></i> <p>Préchargement</p></a>
+                                <a href="/{{$currentEntite}}/precharger/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/precharger/*') ? 'active' : '' }}"><i class="nav-icon fa fa-asterisk"></i> <p>Préchargement</p></a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('historique-prechargement', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-prechargement/*')) ? 'active' : '' }}">
+                                <a href="{{ route('historique-prechargement', ['id' => $client['slug']?? '', $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/historique-prechargement/*')) ? 'active' : '' }}">
                                   <i class="fa fa-clock-o nav-icon"></i>
                                   <p style="line-height: 18px; margin-top:3px">Historique <br> préchargement</p>
                                 </a>
                             </li>
                              <li class="nav-item">
-                                <a href="/numdocim/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('numdocim/*') ? 'active' : '' }}"><i class="nav-icon fa fa-tags"></i> <p>Gestion DOCIM</p></a>
+                                <a href="/{{$currentEntite}}/numdocim/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/numdocim/*') ? 'active' : '' }}"><i class="nav-icon fa fa-tags"></i> <p>Gestion DOCIM</p></a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('historique-docim', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-docim/*')) ? 'active' : '' }}">
+                                <a href="{{ route('historique-docim', ['id' => $client['slug']?? '', $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/historique-docim/*')) ? 'active' : '' }}">
                                   <i class="fa  fa-clock-o nav-icon"></i>
                                   <p>Histo DOCIM</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('listNotif', ['client' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('notifications/*')) ? 'active' : '' }}">
+                                <a href="{{ route('listNotif', ['client' => $client['slug']?? '', $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/notifications/*')) ? 'active' : '' }}">
                                   <i class="fa fa-bell-o nav-icon"></i>
                                   <p>Notifications</p>
                                 </a>
@@ -132,7 +184,7 @@ $config = [
 
                             @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                                 @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ADMIN || auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT)))  
-                                <li class="nav-item {{ request()->is('gerer/prechargement/*') || request()->is('gerer/empotage/*') ? 'menu-open' : '' }}">
+                                <li class="nav-item {{ request()->is($currentEntite.'/gerer/prechargement/*') || request()->is($currentEntite.'/gerer/empotage/*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link">
                                       <i class="nav-icon fa fa-download"></i>
                                       <p>
@@ -140,17 +192,17 @@ $config = [
                                         <i class="fa fa-angle-left right"></i>
                                       </p>
                                     </a>
-                                    <ul class="nav nav-treeview {{ request()->is('gerer/prechargement/*') ||  request()->is('gerer/empotage/*')  ? 'd-block' : '' }}" style="display: none">
+                                    <ul class="nav nav-treeview {{ request()->is($currentEntite.'/gerer/prechargement/*') ||  request()->is($currentEntite.'/gerer/empotage/*')  ? 'd-block' : '' }}" style="display: none">
                                       <li class="nav-item">
 
 
-                                        <a href="/gerer/prechargement/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('gerer/prechargement/*')   ? 'active' : '' }}">
+                                        <a href="/{{ $currentEntite }}/gerer/prechargement/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/gerer/prechargement/*')   ? 'active' : '' }}">
                                             <i class="fa fa-circle-o" aria-hidden="true"></i>
                                           <p>Prévision</p>
                                         </a>
                                       </li>
                                       <li class="nav-item">
-                                        <a href="{{ route('gerer_empotage', ['id' => $client['slug']?? '']) }}" class="nav-link {{ request()->is('gerer/empotage/*')   ? 'active' : '' }}">
+                                        <a href="{{ route('gerer_empotage', ['id' => $client['slug']?? '', 'currententite' => $currentEntite]) }}" class="nav-link {{ request()->is($currentEntite.'/gerer/empotage/*')   ? 'active' : '' }}">
                                             <i class="fa fa-circle-o" aria-hidden="true"></i>
                                           <p>Empotage</p>
                                         </a>
@@ -162,7 +214,7 @@ $config = [
                               @endif
                               @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER)) 
                                <li class="nav-item">
-                                <a href="{{ route('historique-empotage', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('historique-empotage/*')) ? 'active' : '' }}">
+                                <a href="{{ route('historique-empotage', ['id' => $client['slug']?? '', 'currententite' => $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/historique-empotage/*')) ? 'active' : '' }}">
                                   <i class="fa  fa-clock-o nav-icon"></i>
                                   <p>Histo empotage</p>
                                 </a>
@@ -208,7 +260,7 @@ $config = [
                         @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                             @if (!\Request::is('configuration/*'))
                                  <li class="nav-item">
-                                    <a href="{{ route('listNotif', ['client' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('notifications/*')) ? 'active' : '' }}">
+                                    <a href="{{ route('listNotif', ['client' => $client['slug']?? '', $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/notifications/*')) ? 'active' : '' }}">
                                       <i class="fa fa-bell-o nav-icon"></i>
                                       <p>Notifications</p>
                                     </a>

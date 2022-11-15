@@ -543,6 +543,7 @@
 	export default {
 		props: [
           'idClient',
+          'idEntite',
           'listFournisseurs',
           'typeCmd',
           'listEntrepots'
@@ -715,7 +716,8 @@
                 data.append('objet', this.incidentForm.objet);
                 data.append('commentaires', this.incidentForm.commentaires);
                 data.append('commandes', this.incidentForm.commande);
-                data.append('idClient', this.idClient);
+                data.append('idClient', this.idClient); 
+                data.append('IDentite', this.idEntite);
                 data.append('file[]', this.attachments);
 
                 for (let i = 0; i < this.attachments.length; i++) {
@@ -905,7 +907,7 @@
 				data.append('numCommande', this.reception.numCommande);
 				data.append('commentaire', this.reception.commentaire);
 				data.append('client', this.idClient);
-				data.append('user', 1);
+                data.append('IDentite', this.idEntite);
 
 				let action = "createReception";
 				let msgSuc = "Enregistré avec succés!";
@@ -965,14 +967,14 @@
             },
 
 	        getDries(page = 1){
-                if(this.search==''){
+                if(this.search==''){ 
                     this.isLoading=true;
                 }
                 
                 const requestOne = 
-	        	axios.get('/dries/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&column="+this.sortedColumn+"&order="+this.order);
+	        	axios.get('/dries/'+this.idClient+'/'+this.idEntite+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&column="+this.sortedColumn+"&order="+this.order);
 
-                const requestTwo =  axios.get('/driesState/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search);
+                const requestTwo =  axios.get('/driesState/'+this.idClient+'/'+this.idEntite+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search);
 
                 axios.all([requestOne, requestTwo]).then(responses => {
 
@@ -1136,7 +1138,7 @@
 				  }
 				})
         	},
-            getIncident(page = 1, cmd){
+            getIncident(page = 1, cmd){ 
                 this.incidents = {};
                 axios.get('/incidents/getIncident/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate+"&cmd="+cmd).then(response => {
                     this.incidents = response.data;

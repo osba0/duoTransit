@@ -46,6 +46,7 @@ class IncidentController extends Controller
      */
     public function store(Request $request)
     {
+
         $user = Auth::user();
         
         try{   
@@ -75,7 +76,7 @@ class IncidentController extends Controller
                 "commentaire"     => request('commentaires'), 
                 "clients_id" => request('idClient'), 
                 "users_id" => $user->id,    
-                "entites_id" => $user->entites_id,    
+                "entites_id" => request('IDentite'),    
                 "photos" => json_encode($allFileName),
             ]);
 

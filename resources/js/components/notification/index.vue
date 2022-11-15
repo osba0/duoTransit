@@ -44,12 +44,12 @@
                                     <span v-else class="badge badge-warning">Non</span>
                                 </td>
                                 <td class="p-2 text-left align-middle">{{ notif.user }}</td>
-                                <td class="p-2 align-middle"> Il y'a {{ notif.date }}</td>
+                                <td class="p-2 align-middle"> Il y'a {{ notif.date }} </td> 
                                 <td class="text-right align-middle">
                                     <div class="d-flex w-100 justify-content-end">
                                         <a v-if="!notif.read" @click="marquerLu(notif)" title="Marquer comme lu" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white"><i aria-hidden="true" class="fa fa-check"></i></a>
                                         <a v-if="notif.read" title="Lu" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-info"><i v-if="notif.read" class="fa fa-check-square-o text-white" aria-hidden="true"></i></a>
-                                        <a title="Voir les détails" :href="'/notifications/mark-as-read/'+notif.data['slug']+'/'+notif.id" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white"><i aria-hidden="true" class="fa fa-eye"></i></a>
+                                        <a title="Voir les détails" :href="'/'+slugEntite+'/notifications/mark-as-read/'+notif.data['slug']+'/'+notif.id" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white"><i aria-hidden="true" class="fa fa-eye"></i></a>
                                     </div>
                                    
                                   </td>
@@ -100,7 +100,9 @@
     export default {
          props: [
             'totalUnread',
-            'clientCurrent'
+            'clientCurrent',
+            'idEntite',
+            'slugEntite'
         ],
          components: {
             Multiselect
@@ -123,7 +125,7 @@
         },
         methods : { 
             getNotification(page = 1){
-                axios.get('/notif/list?page=' + page + "&paginate=" + this.paginate+"&slug="+this.clientCurrent['slug']).then(response => {
+                axios.get('/notif/list?page=' + page + "&paginate=" + this.paginate+"&slug="+this.clientCurrent['slug']+"&entiteID="+this.idEntite).then(response => {
                     this.notifications = response.data;
                 });
             },

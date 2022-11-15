@@ -588,7 +588,8 @@ export default {
             'clientCurrent',
             'listEntrepots',
             'userRole',
-            'gestionDocim'
+            'gestionDocim',
+            'idEntite'
     ],
      components: {
         modalDetailsCommande
@@ -977,7 +978,7 @@ export default {
             this.isloading = true;
             this.currentPage = page;
             this.reinit();
-            axios.post('/search/histoEmpotage/'+this.clientCurrent.id+"?column="+this.sortedColumnSearch+"&order="+this.orderSearch+"&isDocim="+this.gestionDocim,{
+            axios.post('/search/histoEmpotage/'+this.clientCurrent.id+'/'+this.idEntite+"?column="+this.sortedColumnSearch+"&order="+this.orderSearch+"&isDocim="+this.gestionDocim,{
                 page: page,
                 paginate: this.paginate,
                 filtre: this.filtre

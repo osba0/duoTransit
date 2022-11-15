@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReceptionController;
-use App\Http\Controllers\ChargementController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\UserController;
@@ -17,6 +16,9 @@ use App\Models\Contenaire;
 use App\Models\Entrepot;
 use App\Models\UserRole;
 use App\Models\Client;
+use App\Models\TypeCommande;
+use App\Models\Fournisseur;
+use App\Models\Entite;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -32,35 +34,28 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/', [IndexController::class, 'index'])->middleware(['auth'])->name('home');
 
+Route::get('/transitaire/{entite}', [IndexController::class, 'index'])->middleware(['auth']);
+
 Route::get('/dries/{id}', function () {
     return view('backend.dies');
 })->middleware(['auth']);
 
-Route::get('/reception/{slug}', [ReceptionController::class, 'index'])->name('reception')->middleware(['auth']);
-
-Route::get('/prechargement/{id}', [ChargementController::class, 'preCharge'])->name('prechargement')->middleware(['auth']);
+Route::get('/{currententite}/reception/{slug}', [ReceptionController::class, 'index'])->name('reception')->middleware(['auth']);
 
 Route::post('/checkDoublon', [ReceptionController::class, 'check'])->middleware(['auth']);
 
 Route::post('/setRate/{id}', [ReceptionController::class, 'setRate'])->middleware(['auth']); 
-Route::get('/dries/{id}', [ReceptionController::class, 'listeDries'])->middleware('auth');
+Route::get('/dries/{id}/{entite}', [ReceptionController::class, 'listeDries'])->middleware('auth');
 Route::post('/createReception', [ReceptionController::class, 'create'])->middleware(['auth']);
 Route::post('/modifyReception', [ReceptionController::class, 'modify'])->middleware(['auth']);
-Route::get('/driesState/{id}', [ReceptionController::class, 'stateDries'])->middleware(['auth']);
+Route::get('/driesState/{id}/{entite}', [ReceptionController::class, 'stateDries'])->middleware(['auth']);
 
 Route::post('/incidents/createIncident', [IncidentController::class, 'store'])->middleware(['auth']);
 Route::get('/incidents/getIncident/{id}', [IncidentController::class, 'list'])->middleware(['auth']);
- Route::delete('/incidents/deleteIncident/{id}', [IncidentController::class, 'delete'])->middleware(['auth']);
+Route::delete('/incidents/deleteIncident/{id}', [IncidentController::class, 'delete'])->middleware(['auth']);
 
- Route::get('/livesearchCmd', [IncidentController::class, 'filterCommande']);
+Route::get('/livesearchCmd', [IncidentController::class, 'filterCommande']);
 
-Route::get('/empotage/{id}', [ChargementController::class, 'empotage'])->name('empotage')->middleware(['auth']);
-
-Route::get('/prechargement/{id}/{numero}/{typeCmd}', [ChargementController::class, 'listePreCharge'])->name('listprechargement')->middleware(['auth']);
-
-Route::get('/chargement-list/{id}', [ChargementController::class, 'index'])->name('chargement-list')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
-
-Route::get('/chargement/{id}/{numero}', [ChargementController::class, 'getChargmement'])->middleware(['auth']);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -71,7 +66,10 @@ Route::group(['prefix' => 'configuration'], function () {
     //Route::get('/clients', [ConfigurationController::class, 'listeClient'])->name('clients')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
     
     Route::get('/clients', function () {
-        return view('backend.configuration.clients');
+        $typeCmd = TypeCommande::get(); 
+        $fournis = Fournisseur::get(); 
+        $entites = Entite::get(); 
+        return view('backend.configuration.clients', ['listTypeCmds' => $typeCmd, 'listFournisseurs' => $fournis, 'listTransitaire' => $entites]);
     })->name('clients')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
     
     Route::get('/fournisseurs', function () {
@@ -109,14 +107,13 @@ Route::group(['prefix' => 'configuration'], function () {
     
 });
 
-Route::get('/empotage/{id}/{numero}/{typeCmd}/{idSelected}', [ChargementController::class, 'empotageData'])->middleware(['auth']);
 
 Route::get('/incidents/{id}', [IncidentController::class, 'index'])->name('index')->middleware(['auth']);
 
-Route::get('/historique-empotage/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-empotage')->middleware(['auth'])->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
+Route::get('/{currententite}/historique-empotage/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-empotage')->middleware(['auth'])->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
 
 Route::middleware(['role:' . UserRole::ROLE_CLIENT])->group(function () {
-    Route::get('/historique-docim/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-docim');
+    Route::get('/{currententite}/historique-docim/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-docim');
  });
 
 Route::middleware(['role:' . UserRole::ROLE_CONSULTATION])->group(function () {
@@ -131,7 +128,7 @@ Route::middleware(['role:' . UserRole::ROLE_CONSULTATION])->group(function () {
 
 //Route::get('/historique-docim/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-docim')->middleware(['auth', 'role:' . UserRole::ROLE_CLIENT, 'role:' . UserRole::ROLE_CONSULTATION]);
 
-Route::get('/historique-prechargement/{id}', [HistoActionController::class, 'historiquePrechargement'])->name('historique-prechargement')->middleware(['auth']);
+Route::get('/{currententite}/historique-prechargement/{id}', [HistoActionController::class, 'historiquePrechargement'])->name('historique-prechargement')->middleware(['auth']);
 
 
 Route::get('/activity/{id}', [ActivityController::class, 'index'])->name('journal')->middleware(['auth']);
@@ -150,43 +147,43 @@ Route::middleware(['web','auth'])->group(function () {
     
 
     // Gestion
-    Route::group(['prefix' => 'gerer'], function () {
-        Route::get('/prechargement/{id}', [GestionController::class, 'index'])->name('gerer_prechargement');
-        Route::post('/createDossier', [GestionController::class, 'create'])->middleware(['auth']);
-        Route::post('/createDossier/valider/{id}', [GestionController::class, 'valider'])->middleware(['auth']);
-        Route::post('/createDossier/notification/{id}', [GestionController::class, 'notifier'])->middleware(['auth']);
-        Route::get('/dossier/list/{id}', [GestionController::class, 'listing'])->middleware(['auth']);
-        Route::get('/dossier/pre/reception/{id}/{typecmd}', [GestionController::class, 'listingReception'])->middleware(['auth']);
-        Route::post('/dossier/setPrechargement', [GestionController::class, 'precharger'])->middleware(['auth']);
-        Route::get('/getCmd/{id}/{typecommande}', [GestionController::class, 'getCommande'])->middleware(['auth']);
-        Route::delete('/deletePre/{id}', [GestionController::class, 'deletePre']);
-        Route::post('/reactiver/{id}', [GestionController::class, 'reactiver'])->name('reactiverPrechargement');
+    //Route::group(['prefix' => '/{currententite}/gerer'], function () {
+        Route::get('/{currententite}/gerer/prechargement/{id}', [GestionController::class, 'index'])->name('gerer_prechargement');
+        Route::post('/gerer/createDossier', [GestionController::class, 'create'])->middleware(['auth']);
+        Route::post('/gerer/createDossier/valider/{id}/{entite}', [GestionController::class, 'valider'])->middleware(['auth']);
+        Route::post('/gerer/createDossier/notification/{id}/{entite}', [GestionController::class, 'notifier'])->middleware(['auth']);
+        Route::get('/gerer/dossier/list/{id}/{entite}', [GestionController::class, 'listing'])->middleware(['auth']);
+        Route::get('/gerer/dossier/pre/reception/{id}/{entite}/{typecmd}', [GestionController::class, 'listingReception'])->middleware(['auth']);
+        Route::post('/gerer/dossier/setPrechargement/{entite}', [GestionController::class, 'precharger'])->middleware(['auth']);
+        Route::get('/gerer/getCmd/{id}/{typecommande}', [GestionController::class, 'getCommande'])->middleware(['auth']);
+        Route::delete('/gerer/deletePre/{id}/{entite}', [GestionController::class, 'deletePre']);
+        Route::post('/gerer/reactiver/{id}/{entite}', [GestionController::class, 'reactiver'])->name('reactiverPrechargement');
 
-        Route::get('/prechargement/{id}/{dossier}', [GestionController::class, 'index'])->name('details_prechargement');
+        Route::get('/gerer/prechargement/{id}/{dossier}', [GestionController::class, 'index'])->name('details_prechargement');
 
-        Route::get('/empotage/{id}', [GestionController::class, 'indexEmpotage'])->name('gerer_empotage');
+        Route::get('/{currententite}/gerer/empotage/{id}', [GestionController::class, 'indexEmpotage'])->name('gerer_empotage');
 
-        Route::post('/empotage/notification/{id}', [EmpotageController::class, 'notifier'])->middleware(['auth']);
-        Route::post('/empotage/createEmpotage', [EmpotageController::class, 'createEmpotage']);
-        Route::post('/empotage/modifyEmpotage', [EmpotageController::class, 'modifyEmpotage']);
-        Route::delete('/deleteEmpotage/{id}', [EmpotageController::class, 'deleteEmpotage']); 
-        Route::get('/livesearch', [EmpotageController::class, 'filterDossier']);
-        Route::get('/empotage/getContenaire/{idEmpotage}', [EmpotageController::class, 'getContenaire']); 
-        Route::post('/empotage/reactiver/{id}', [EmpotageController::class, 'reactiver']); 
-        Route::post('/empotage/contenaire/suppression/{id}', [EmpotageController::class, 'deleteContenaire']);
+        Route::post('/gerer/empotage/notification/{id}/{entite}', [EmpotageController::class, 'notifier'])->middleware(['auth']);
+        Route::post('/gerer/empotage/createEmpotage', [EmpotageController::class, 'createEmpotage']);
+        Route::post('/gerer/empotage/modifyEmpotage', [EmpotageController::class, 'modifyEmpotage']);
+        Route::delete('/gerer/deleteEmpotage/{id}/{entite}', [EmpotageController::class, 'deleteEmpotage']); 
+        Route::get('/gerer/livesearch', [EmpotageController::class, 'filterDossier']);
+        Route::get('/gerer/empotage/getContenaire/{idEmpotage}', [EmpotageController::class, 'getContenaire']); 
+        Route::post('/gerer/empotage/reactiver/{id}', [EmpotageController::class, 'reactiver']); 
+        Route::post('/gerer/empotage/contenaire/suppression/{id}', [EmpotageController::class, 'deleteContenaire']);
          
-        Route::post('/empotage/createContenaireEmpotage', [EmpotageController::class, 'createContenaireEmpo'])->middleware(['auth']);
+        Route::post('/gerer/empotage/createContenaireEmpotage', [EmpotageController::class, 'createContenaireEmpo'])->middleware(['auth']);
 
-        Route::get('/dossier/empotage/reception/{id}/{typecmd}', [EmpotageController::class, 'listingReceptionEmpotage'])->middleware(['auth']); 
-        Route::post('/updateDouane', [EmpotageController::class, 'updateDouane']);
-        Route::post('/updateDepalettisation', [EmpotageController::class, 'updateDepalettisation']);
+        Route::get('/gerer/dossier/empotage/reception/{id}/{typecmd}', [EmpotageController::class, 'listingReceptionEmpotage'])->middleware(['auth']); 
+        Route::post('/gerer/updateDouane', [EmpotageController::class, 'updateDouane']);
+        Route::post('/gerer/updateDepalettisation', [EmpotageController::class, 'updateDepalettisation']);
         
-        Route::post('/dossier/setEmpotage', [EmpotageController::class, 'empoter'])->middleware(['auth']);
-        Route::get('/getCmd/empoter/{id}/{typecommande}', [EmpotageController::class, 'getCommandeEmpoter'])->middleware(['auth']);
-        Route::post('/validationEmpotage/valider/{id}', [EmpotageController::class, 'valider'])->middleware(['auth']);
-        Route::post('/empotage/cloturer/{id}', [EmpotageController::class, 'cloturer']);
-        Route::post('/empotage/savepdf', [EmpotageController::class, 'savepdf']);
-    });
+        Route::post('/gerer/dossier/setEmpotage', [EmpotageController::class, 'empoter'])->middleware(['auth']);
+        Route::get('/gerer/getCmd/empoter/{id}/{typecommande}', [EmpotageController::class, 'getCommandeEmpoter'])->middleware(['auth']);
+        Route::post('/gerer/validationEmpotage/valider/{id}/{entite}', [EmpotageController::class, 'valider'])->middleware(['auth']);
+        Route::post('/gerer/empotage/cloturer/{id}', [EmpotageController::class, 'cloturer']);
+        Route::post('/gerer/empotage/savepdf', [EmpotageController::class, 'savepdf']);
+  //  });
 
 });
 
@@ -202,23 +199,20 @@ Route::post('/removeDocs/{idEmpotage}', [EmpotageController::class, 'removeDoc']
 Route::post('/removeDocsdouane/{idEmpotage}', [EmpotageController::class, 'removeDeclarationDouane'])->middleware(['auth']);
 
 
+Route::get('{currententite}/precharger/{id}', [PrechargementController::class, 'index'])->name('precharger')->middleware(['auth']);
 
-Route::post('/chargement/save', [ChargementController::class, 'create'])->middleware(['auth']);
 
-Route::get('/precharger/{id}', [PrechargementController::class, 'index'])->name('precharger')->middleware(['auth']);
-
-Route::get('/getPreChargmement', [ChargementController::class, 'getPreChargmement'])->middleware(['auth']);
 
 Route::post('/createDossierPre', [PrechargementController::class, 'create'])->middleware(['auth']);
 
-Route::post('/setPrechargement', [PrechargementController::class, 'precharger'])->middleware(['auth']);
+Route::post('/setPrechargement/{entite}', [PrechargementController::class, 'precharger'])->middleware(['auth']);
 
-Route::get('/prechargement/getreception/{id}', [PrechargementController::class, 'listingReception'])->middleware(['auth']);
-Route::get('/prechargement/list/{id}', [PrechargementController::class, 'listing'])->middleware(['auth']);
-Route::get('/empotage/list/{id}', [EmpotageController::class, 'listing'])->middleware(['auth']);
+Route::get('/prechargement/getreception/{id}/{entite}', [PrechargementController::class, 'listingReception'])->middleware(['auth']);
+Route::get('/prechargement/list/{id}/{entite}', [PrechargementController::class, 'listing'])->middleware(['auth']);
+Route::get('/empotage/list/{id}/{entite}', [EmpotageController::class, 'listing'])->middleware(['auth']);
 
-Route::post('/search/histoEmpotage/{id}', [HistoActionController::class, 'searchHisto'])->middleware(['auth']);
-Route::post('/search/histoPrechargement/{id}', [HistoActionController::class, 'searchHistoPre'])->middleware(['auth']);
+Route::post('/search/histoEmpotage/{id}/{entite}', [HistoActionController::class, 'searchHisto'])->middleware(['auth']);
+Route::post('/search/histoPrechargement/{id}/{entite}', [HistoActionController::class, 'searchHistoPre'])->middleware(['auth']);
 
 
 Route::get('/histoEmpotage/reception/{id}/{typecmd}', [HistoActionController::class, 'searchCmdReception'])->middleware(['auth']);
@@ -268,13 +262,13 @@ Route::get('/configuration/getUser', [UserController::class, 'list'])->middlewar
 Route::delete('/deleteReception/{id}/{idClient}', [ReceptionController::class, 'delete'])->middleware(['auth']);
 
 
-Route::post('/prechargementClient/valider/{id}', [PrechargementController::class, 'valider'])->middleware(['auth']); 
+Route::post('/prechargementClient/valider/{id}/{entite}', [PrechargementController::class, 'valider'])->middleware(['auth']);    
 Route::get('/prechargementClient/getCmdChoisi/{id}', [PrechargementController::class, 'getCommande'])->middleware(['auth']); 
 
 
-Route::post('/prechargementClient/notification/{id}', [PrechargementController::class, 'notifier'])->middleware(['auth']); 
+Route::post('/prechargementClient/notification/{id}/{entite}', [PrechargementController::class, 'notifier'])->middleware(['auth']); 
 
-Route::delete('/prechargementClient/delete/{id}', [PrechargementController::class, 'deletePre']);
+Route::delete('/prechargementClient/delete/{id}/{entite}', [PrechargementController::class, 'deletePre']);
 
 Route::post('/prechargementClient/cloturer/{id}', [PrechargementController::class, 'cloturer']);
 
@@ -285,8 +279,8 @@ Route::get('/qrcode', function () {
     })->name('qrcode');
 
 
-Route::get('/notifications/mark-as-read/{client}/{notification_id}', [NotificationController::class, 'show'])->middleware(['auth']);
-Route::get('/notifications/{client}', [NotificationController::class, 'index'])->middleware(['auth'])->name('listNotif');
+Route::get('/{currententite}/notifications/mark-as-read/{client}/{notification_id}', [NotificationController::class, 'show'])->middleware(['auth']);
+Route::get('/{currententite}/notifications/{client}', [NotificationController::class, 'index'])->middleware(['auth'])->name('listNotif');
 Route::get('/notif/list', [NotificationController::class, 'listeNotification'])->middleware(['auth']);
 
 Route::post('/notif/marquerLu/{id}', [NotificationController::class, 'marquerLu'])->middleware(['auth']); 
@@ -299,7 +293,7 @@ Route::get('/checksession', [IndexController::class, 'checksession']);
 Route::post('/sendNotificationReception', [ReceptionController::class, 'sendNotificationReception']); 
 Route::post('/addNumDocim/{id}', [EmpotageController::class, 'setNumEmpotage']); 
 
-Route::get('/numdocim/{id}', [HistoActionController::class, 'indexDocim'])->name('gestion-docim')->middleware(['auth']);
+Route::get('/{currententite}/numdocim/{id}', [HistoActionController::class, 'indexDocim'])->name('gestion-docim')->middleware(['auth']);
 Route::post('/numdocum/cloturer/{id}', [HistoActionController::class, 'cloturer'])->middleware(['auth']);
 
 

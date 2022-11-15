@@ -835,13 +835,13 @@ body.sidebar-collapse .main-sidebar:hover .nav-item a p{
 }
 .notif .badge{
     display: inline-flex;
-    height: 25px;
-    min-width: 20px;
+    height: 23px;
+    width: 23px !important;
     border-radius: 100%;
     font-size: 12px;
     align-items: center;
     justify-content: center;
-    border: 2px solid #f9f9f9;
+    border: 0px solid #f9f9f9;
     font-weight: bold !important;
     position: absolute;
     top: -5px;
@@ -1158,4 +1158,19 @@ table .bgStripe .rowActif{
 }
 .opacity-7{
     opacity: .7;
+}
+
+.d-select .bg-light-blue:hover, .d-select .actionBox{
+    background: var(--primary) !important;
+}
+.d-select .bg-light-blue:hover a, 
+.d-select .bg-light-blue:hover span{
+    opacity: 1;
+}
+.d-select .inactifBox a, .d-select .inactifBox span{
+    opacity: .8;
+}
+.box-shadow-none{
+    box-shadow: none !important;
+    background: transparent !important;
 }

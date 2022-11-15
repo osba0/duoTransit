@@ -71,7 +71,8 @@ class prechargementCommandesClient extends Notification
             'description' => '',
             'fichier' => '/' .$this->pathFile,
             'user' => Auth::user(),
-            'slug' => $this->societe['slug']   
+            'slug' => $this->societe['slug'],
+            'entite' => $this->transitaire['slug'] 
         ];
     }
 }

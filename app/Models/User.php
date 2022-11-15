@@ -8,6 +8,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
+use App\Models\Entite;
+
+use Auth;
+
 //use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * App\Models\User
@@ -19,6 +23,7 @@ use Laravel\Passport\HasApiTokens;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens/*, LogsActivity*/;
+
 
     /**
      * The attributes that are mass assignable.
@@ -54,11 +59,11 @@ class User extends Authenticatable
 
     //protected static $logOnlyDirty = true;
 
-     public function entite()
+   /*  public function entite()
     {
         return $this->belongsTo(Entite::class, 'entites_id'); 
     }
-
+*/
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -78,6 +83,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'roles'             => 'array',
         'client_supervisor' => 'array',
+        'entites_id' => 'array'
     ];
 
      /**
@@ -93,6 +99,35 @@ class User extends Authenticatable
         $this->setRoles($roles);
 
         return $this;
+    }
+
+    public function entiteList()
+    {
+        return Entite::whereIn("id",  Auth::user()->entites_id)->get()->toArray(); 
+    }
+
+    public function getEntite($entite)
+    {
+        return Entite::whereIn("id",  $entite)->get()->toArray(); 
+    }
+
+    public function getEntiteBySlug($slug)
+    {
+        return Entite::where("slug",  $slug)->first()->toArray(); 
+    }
+
+    public function getSlugEnite(){
+         return Entite::whereIn("id",  Auth::user()->entites_id)->first()->toArray()["slug"];
+    }
+
+    public function getIDEntite($slug){
+         return Entite::where("slug", $slug)->first()->toArray()["id"];
+    }
+
+
+    public function entite()
+    {
+        return $this->belongsToMany(Entite::class); 
     }
 
     /**

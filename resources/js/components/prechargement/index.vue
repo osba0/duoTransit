@@ -31,14 +31,14 @@
                             </ul>
                             <div>
                                 <fieldset class="border rounded-lg border-success bg-white p-3">
-                                    <legend class="bg-success font-weight-bold rounded-lg text-center">Nouveau dossier de préchargement</legend>
+                                    <legend class="bg-success px-2 font-weight-bold rounded-lg text-center">Nouveau dossier de préchargement</legend>
                                     <form @submit.prevent="save" enctype="multipart/form-data"  key=1 class="d-flex">
                                         <select class="form-control mr-2" v-model="typeCommande" :class="{ 'border-danger': submitted_add && !$v.typeCommande.required }">
                                             <option value="">Type commande</option>
                                             <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
                                       
                                         </select>
-                                        <select class="form-control mr-2" v-model="entite" :class="{ 'border-danger': submitted_add && !$v.entite.required }">
+                                        <select class="form-control mr-2 d-none" v-model="entite" :class="{ 'border-danger': submitted_add && !$v.entite.required }">
                                             <option value="">Choisir le transitaire</option>
                                             <option :value="currentEntite['id']">{{currentEntite['nom']}}</option>
                                       
@@ -472,7 +472,8 @@
             'currentClient',
             'currentEntite',
             'listEntrepots',
-            'cmdAPrecharger'
+            'cmdAPrecharger',
+            'idEntite'
         ],  
         components: {
             /*PageLoader*/
@@ -621,7 +622,7 @@
             data.append('idreception', cmd.reidre);
             data.append('ischecked', ischecked);
 
-            axios.post("/setPrechargement", data).then(response => {
+            axios.post("/setPrechargement/"+this.idEntite, data).then(response => {
                 let res = response.data.result;
                  
                 this.selected.nbrCmd   = res[0].total_cmd;
@@ -656,7 +657,7 @@
         },
         getPrechargement(page = 1){
             this.isLoading=true;
-            axios.get('/prechargement/list/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.searchPre+"&etatFiltre="+this.etatFiltre).then(response => {
+            axios.get('/prechargement/list/'+this.idClient+'/'+this.idEntite+'?page=' + page + "&paginate=" + this.paginate + "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.searchPre+"&etatFiltre="+this.etatFiltre).then(response => {
                 this.prechargement = response.data;
                  var that = this;
                 setTimeout(function(){
@@ -666,7 +667,7 @@
         },
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/prechargement/getreception/'+this.idClient+'?page=' + page + "&paginate=" + this.paginateRecep+"&etatSelected="+this.selected.etat+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID+"&entiteID="+this.selected.entiteID+"&keysearch="+this.search+"&rate="+this.filtreRate+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
+            axios.get('/prechargement/getreception/'+this.idClient+'/'+this.idEntite+'?page=' + page + "&paginate=" + this.paginateRecep+"&etatSelected="+this.selected.etat+"&idPre="+this.selected.id+"&typecmd="+this.selected.typeCommandeID/*+"&entiteID="+this.selected.entiteID*/+"&keysearch="+this.search+"&rate="+this.filtreRate+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
                
                 this.dries = response.data;
 
@@ -675,15 +676,10 @@
         },
         save(){ 
             this.submitted_add = true;
-             // stop here if form is invalid
-            this.$v.typeCommande.$touch();
-            if (this.$v.typeCommande.$invalid || this.$v.entite.$invalid) {  
-                return;
-            }
 
             const data = new FormData();
             data.append('typeCmd', this.typeCommande);
-            data.append('entite', this.entite);
+            data.append('entite', this.idEntite);
             data.append('clientID', this.idClient);
 
             axios.post("/createDossierPre", data).then(response => {
@@ -763,7 +759,7 @@
                         }).then((result) => {});
 
 
-                        axios.post("/prechargementClient/valider/"+this.currentClient['id'], {
+                        axios.post("/prechargementClient/valider/"+this.currentClient['id']+"/"+this.idEntite, {
                             'idsCmd': this.commandeSelected,
                             'ignored': this.commandeNoSelected,
                             'id_prechargement' : this.selected.id,
@@ -789,9 +785,9 @@
                                 }, 5000);
 
 
-                                // Envoi notification avec le fichier PDF
+                                // Envoi notification avec le fichier PDF 
 
-                                this.getCmdSelected(this.selected.id, true);
+                                this.getCmdSelected(this.selected.id);
                                 
                                 /*Vue.swal.fire(
                                   'succés!',
@@ -1021,7 +1017,7 @@
                    var self = that; 
                    pdf.create().getDataUrl(function(url) { 
                     
-                        axios.post("/prechargementClient/notification/"+self.currentClient['id'], {
+                        axios.post("/prechargementClient/notification/"+self.currentClient['id']+"/"+self.idEntite, {
                             'idsCmd': self.commandeSelected,
                             'id_prechargement' : self.selected.id,
                             'typeCmd': self.selected.typeCmd.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase(), 
@@ -1127,7 +1123,7 @@
                   confirmButtonText: 'Oui, supprimer!'
                 }).then((result) => {
                   if (result.isConfirmed) {
-                        axios.delete('/prechargementClient/delete/'+pre.id+'?clientID='+this.idClient+"&typeCmd="+pre.typecmdID).then(response => {
+                        axios.delete('/prechargementClient/delete/'+pre.id+'/'+this.idEntite+'?clientID='+this.idClient+"&typeCmd="+pre.typecmdID).then(response => {
                             console.log(response);
                              Vue.swal.fire(
                               'Supprimé!',
@@ -1170,6 +1166,7 @@
                                         // redirection   
                                         location.reload();
                                     }); 
+                                    
                                  }else{
                                     Vue.swal.fire(
                                       'Warning!',

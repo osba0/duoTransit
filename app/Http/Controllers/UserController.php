@@ -8,6 +8,7 @@ use App\Models\UserRole;
 use App\Http\Resources\UserResource; 
 use App\Http\Resources\ClientResource; 
 use App\Models\Client;
+use App\Models\Entite;
 use App\Models\TypActivity;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +35,7 @@ class UserController extends Controller
         }
         
         $client = Client::get();
+        $entites = Entite::get();
 
         $isAdmin = 0;
         
@@ -46,7 +48,7 @@ class UserController extends Controller
 
         activity(TypActivity::LISTER)->log('Affichage page utilisateur');
 
-        return  view('backend.user.index', ['clients' => $client, 'roles' => $roles, 'isAdmin' => $isAdmin]);
+        return  view('backend.user.index', ['clients' => $client, 'roles' => $roles, 'isAdmin' => $isAdmin, 'entites' => $entites]);
     }
 
     /**
@@ -84,6 +86,8 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+
+
         $user = Auth::user();
         $check = User::where('username', request('login'))->get();
         
@@ -94,16 +98,26 @@ class UserController extends Controller
             ]);
         }
 
+        $profilSelected='';
+
+        if(request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION){
+            $profilSelected = json_decode(request('entiteClients'));
+        }else{
+            $profilSelected = array((int) request('entite'));
+        }
+
+
+
         try{            
             
             $store = User::create([
                 "firstname" => request('nom'),
                 "lastname"  => request('prenom'),
-                "username"     => request('login'),
+                "username"  => request('login'),
                 "email"     => request('email'),
-                "roles"    => array(request('profil')),
+                "roles"     => array(request('profil')),
                 "password"  => Hash::make(request('password')),
-                "entites_id" => $user->entites_id,
+                "entites_id"=> $profilSelected, //$user->entites_id,
                 "client_supervisor" => ((request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION)?json_decode(request('clientsAuth')):'')    
             ]);
         }catch(\Exceptions $e){
@@ -160,17 +174,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -180,24 +183,24 @@ class UserController extends Controller
     public function update(Request $request)
     {
         $user =  User::findOrFail(request('id'));
+
+        $profilSelected='';
+
+        if(request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION){
+            $profilSelected = json_decode(request('entiteClients'));
+        }else{
+            $profilSelected = array((int) request('entite'));
+        }
+
         $user->update([
-                "firstname" => request('nom'),
-                "lastname"  => request('prenom'),
-                "email"     => request('email'),
-                "roles"    => array(request('profil')),
-                "client_supervisor" => (request('profil')==UserRole::ROLE_CLIENT?json_decode(request('clientsAuth')):'')  
+                "firstname"  => request('nom'),
+                "lastname"   => request('prenom'),
+                "email"      => request('email'),
+                "roles"      => array(request('profil')),
+                "entites_id" => $profilSelected,
+                "client_supervisor" => ((request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION)?json_decode(request('clientsAuth')):'')    
 
           ]);
-
-        /* User::where('id', request('id'))
-              ->update([
-                "firstname" => request('nom'),
-                "lastname"  => request('prenom'),
-                "email"     => request('email'),
-                "roles"    => array(request('profil')),
-                "client_supervisor" => (request('profil')==UserRole::ROLE_CLIENT?json_decode(request('clientsAuth')):'')  
-
-          ]);*/
 
         return response([
             "code" => 0,

@@ -224,269 +224,278 @@
                     </div>
                 </div>
             </div>
-            <template v-if="!contenaires.data || !contenaires.data.length">
-                <hr>
-                <div class="text-center">Aucun contenaire crée.</div>
-            </template>
-            <template v-else>
-                <div class="d-flex mb-2">
-                    <div class="h5 mb-0 rounded bg-white py-2 px-3 border">N°TC: <b>{{ selected.numtc }}</b></div>
-                    <div class="h5 mb-0 rounded bg-white py-2 px-3 border mx-3">Type TC: <b>{{ selected.typetc }}</b></div>
-                    <div class="h5 mb-0 rounded bg-white py-2 px-3 border">Plomb: <b>{{ selected.plomb }}</b></div>
-                    <div class="h5 mb-0 rounded bg-white py-2 px-3 border mx-3 position-relative">
-                        <a @click="showPhoto( selected.photos )" data-toggle="modal" data-target="#openPhotoChargment" class="cursor-pointer ">
-                            <span>Photos chargement: </span>
-                            
-                                 <template v-if="selected.photos.length > 0">
-                                    <p class="position-relative d-inline-block pr-4">
-                                    <span v-for="(photo, index) in selected.photos" class="border mr-1 mb-2 position-absolute shadow-sm " :style="{top:0.5*index-5+ 'px', left: 2*index+ 'px'}">  
-                                        <a class="badge badge-primary position-absolute rounded-circle border-0 text-white" style="top: -5px;right: -13px;"><i class="fa fa-eye"></i></a> 
-                                        <img :src="'/assets/photos_chargement/'+photo" width="30" height="30" class="">  
-                                    </span></p>
-                                  
-                                </template>
-                                 <template v-else> 
-                                   <span class="position-absolute d-inline-block m-0" style="top: 2px; right: -40px;">
-                                    <img src="/images/icone-photo.png" height="30" >
-                                   </span>
-                                   <a class="badge badge-success position-absolute rounded-circle border-0 text-white" style="top: -5px;right: -50px;"><i class="fa fa-plus"></i></a> 
-                                </template>
-                            
-                        </a>
+            <div :class="[isLoadingContenaire ? 'loader-line' : '']"></div>
+                <template v-if="!contenaires.data || !contenaires.data.length">
+                    <hr>
+                    <div class="text-center mt-5">
+                        <div class="d-inline-block position-relative cursor-pointer" data-toggle="modal" data-target="#creerContenaire">
+                            <img src="/images/contenaire.png" alt="Contenaire" class="text-center">
+                            <label class="badge badge-success position-absolute rounded-circle p-2 border-0 text-white" style="top: -5px;right: -20px;"><i class="fa fa-plus" style="font-size: 20px;"></i></label> 
+                        </div>
+                        
+                        <br>Créer un contenaire 
                     </div>
-                </div>
-                <div class="mb-3 mb-3 d-block">
-                    <VueScrollFixedNavbar>
-                    <table class="table table-bordered bg-white"> 
-                    <tr>
-                        <th class="text-uppercase thead-blue py-1 w-60">Total
-                        <span class="ml-2 py-0 px-2 rounded text-lowercase bg-warning" v-if="selected.etat==0">En cours</span>
-                        <span class="ml-2 py-0 px-2 rounded text-lowercase bg-success" v-if="selected.etat==1">Validé</span>
-                        </th>
-                        <th class="text-uppercase thead-blue py-1">Etat contenaire</th>
-                    </tr>
-                    <tr>
-                        <td class="align-middle">
-                            <div class="d-flex justify-content-between detailPrecharge position-relative">
-                                <ul class="w-100 legend m-0 p-0 position-absolute" style="top:-10px">
-                                    <li class="w-100 text-center font-weight-bold">
-                                        <span class="float-none d-inline-block etat_T m-0 mr-1 border-0" :style="{'background': getColorTypeCmd(selected.idCmd)}"></span> 
-                                        {{ selected.typeCmd}}
-                                    </li>
-                                </ul>
-                                <table class="table m-0 mt-3 table-striped">
-                                    <tbody> 
-                                         <tr>
-                                            <th>Nbre Commande: {{ format_nbr(selected.nbrCmd) }}</th>
-                                            <th>Nbre de colis empoté: {{ format_nbr(selected.nbrColis) }}</th>
-                                            <th>Poids empoté: {{ format_nbr(selected.poids) }} KG</th>
-                                            <th>Volume empoté: {{ format_dec(selected.volume) }} m<sup>3</sup></th>
-                                        </tr>
-                                  
-                                    </tbody>
-
-                                </table>
-                            </div>
-                         
-                        </td>
-                        <td class="pt-1 pb-4">
-                            <div class="d-flex m-0 customRadio justify-content-center">
-
-
-                                <p class="pr-3 m-0" v-for="contenaire in listContenaire" >
-
-                                    <input type="radio" disabled :value="contenaire.volume" v-model="capacite" @change="switchContenaire(contenaire.id, contenaire.volume)" :id="'cont_'+contenaire.volume" name="radio-group">
-                                    <label :for="'cont_'+contenaire.volume"><span v-if="defaultContenaire.id==contenaire.id">{{ nbrContenaire }}</span> x {{contenaire.nom}}</label>
-                                </p>
-            
-                            </div>
-                            
-                            <div class="conteneurState">
-                               <div id="currentState" v-bind:style="{left: volumePercent+'%'}"></div> 
-                                <div class="valuePercent" v-bind:style="{left: volumePercent+'%'}">{{volumePercent}}%</div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                </VueScrollFixedNavbar>
-                </div>
-                <div v-if="selected.etat==0" class="d-flex justify-content-end align-items-center mr-3  mb-3 sucesss"> 
-                    <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
-        
-                    <div>
-                         <!--button class="btn btn-lg btn-secondary text-white mr-3  mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button-->
-                        <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
-                    </div>
-                   
-                </div>
-                <hr>
-
-            <!--div class="d-flex justify-content-between align-content-center mb-2">
-                <div class="d-flex align-items-end">
-                    <div>
-                        <div class="d-flex align-items-center">
-                            <label for="paginateRecep" class="text-nowrap mr-2 mb-0"
-                                >Nbre de ligne par Page</label> 
-                            <select
-                                v-model="paginate"
-                                class="form-control form-control-sm">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="30">30</option>
-                            </select>
+                </template>
+                <template v-else>
+                    <div class="d-flex mb-2">
+                        <div class="h5 mb-0 rounded bg-white py-2 px-3 border">N°TC: <b>{{ selected.numtc }}</b></div>
+                        <div class="h5 mb-0 rounded bg-white py-2 px-3 border mx-3">Type TC: <b>{{ selected.typetc }}</b></div>
+                        <div class="h5 mb-0 rounded bg-white py-2 px-3 border">Plomb: <b>{{ selected.plomb }}</b></div>
+                        <div class="h5 mb-0 rounded bg-white py-2 px-3 border mx-3 position-relative">
+                            <a @click="showPhoto( selected.photos )" data-toggle="modal" data-target="#openPhotoChargment" class="cursor-pointer ">
+                                <span>Photos chargement: </span>
+                                
+                                     <template v-if="selected.photos.length > 0">
+                                        <p class="position-relative d-inline-block pr-4">
+                                        <span v-for="(photo, index) in selected.photos" class="border mr-1 mb-2 position-absolute shadow-sm " :style="{top:0.5*index-5+ 'px', left: 2*index+ 'px'}">  
+                                            <a class="badge badge-primary position-absolute rounded-circle border-0 text-white" style="top: -5px;right: -13px;"><i class="fa fa-eye"></i></a> 
+                                            <img :src="'/assets/photos_chargement/'+photo" width="30" height="30" class="">  
+                                        </span></p>
+                                      
+                                    </template>
+                                     <template v-else> 
+                                       <span class="position-absolute d-inline-block m-0" style="top: 2px; right: -40px;">
+                                        <img src="/images/icone-photo.png" height="30" >
+                                       </span>
+                                       <a class="badge badge-success position-absolute rounded-circle border-0 text-white" style="top: -5px;right: -50px;"><i class="fa fa-plus"></i></a> 
+                                    </template>
+                                
+                            </a>
                         </div>
                     </div>
-            
-                </div>
-                
-                <div class="d-flex px-0 align-items-end col-md-4">
-                    <input
-                        v-model.lazy="searchRecep"
-                        type="search"
-                        class="form-control"
-                        placeholder="Rechercher par n°cmd, n°fe, n°ecv,n°fact, utilisateur, fournisseur..."
-                    />
-                </div>
-               
-            </div-->  
-            <div :class="[selected.etat==1? 'position-relative bgValid':'']" >
-                <table class="table">
-                    <thead class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
-                         <tr>
-                            <!--th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th-->
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6">Fournisseur</th>
-                            <th class="p-2 border-right border-white h6">Emballage</th>
-                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
-                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])"><i class="fa fa-calendar" aria-hidden="true"></i> Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <!--th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th-->
-                            <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->
-                            <th class="text-nowrap p-2 border-right border-white h6">Dépalettisation</th>
-                            <th class="text-nowrap p-2 border-right border-white h6">Douane</th>
-                            <th class="text-right p-2 border-right border-white h6">Action</th>
+                    <div class="mb-3 mb-3 d-block">
+                        <VueScrollFixedNavbar>
+                        <table class="table table-bordered bg-white"> 
+                        <tr>
+                            <th class="text-uppercase thead-blue py-1 w-60">Total
+                            <span class="ml-2 py-0 px-2 rounded text-lowercase bg-warning" v-if="selected.etat==0">En cours</span>
+                            <span class="ml-2 py-0 px-2 rounded text-lowercase bg-success" v-if="selected.etat==1">Validé</span>
+                            </th>
+                            <th class="text-uppercase thead-blue py-1">Etat contenaire</th>
                         </tr>
-                    </thead>
-                    <tbody class="bgStripe">
-                    <template v-if="!reception.data || !reception.data.length">
-                        <tr><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
-                    </template>
-                    <template v-else>
-                        <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white">
-                        <!--td class="p-2 align-middle">{{ dry.rencmd }}</td>
-                        <td class="p-2 align-middle">{{ dry.refere }}</td-->
-                        <td class="p-2 align-middle">{{ dry.reecvr }}</td>
-                        <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
-                        <td class="p-2 align-middle white-space-nowrap">
-                                <template v-if="dry.renbcl > 0">
-                                        <label class="badge badge-secondary mr-1">{{dry.renbcl}} Colis</label>
-                                  </template>
-                                  <template v-if="dry.renbpl > 0">
-                                     <label class="badge badge-info mr-1">{{dry.renbpl}} Pal</label>
-                                  </template>
-                        
-                        </td>
-                        <td class="p-2 align-middle text-right">{{ dry.repoid }}</td>
-                        <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
-                        
-                        <td class="p-2 align-middle">{{ dry.renufa }}</td>
-                        <td class="p-2 align-middle">{{ format_nbr(dry.revafa) }}</td>
-                        <td class="p-2 align-middle white-space-nowrape">{{ dry.redali }}</td>
-                        <!--td class="p-2 align-middle text-nowrap white-space-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td-->
-                        <!--td class="p-2 align-middle">
-                            
-                            <template v-if="dry.idPre > 0">
-                                 <span class="badge badge-success">oui</span> {{dry.prechargeur}}
-                            </template>
-                            <template v-else>
-                                  <span class="badge badge-warning">non</span>
-                            </template>
-                           
-                        </td-->
-                         <td class="p-2 align-middle">
-                            <img :class="'loaderDepal_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
-                            <div v-if="dry.depalettisation!='' && dry.depalettisation != null" :id="'labelDepal_'+dry.reidre">
-                                <span>{{ dry.depalettisation }}</span>
-                                <i class="fa fa-edit" v-on:click="editDepaletissation(dry)"></i>
-                            </div>
-                            <form v-on:submit.prevent="saveDepalettisation(dry)"><input :data-id="dry.reidre" :class="[dry.depalettisation!='' && dry.depalettisation != null? 'd-none':'d-block']" type="text" :id="'depal_'+dry.reidre" v-model="depaletissation[dry.reidre]" style="width:90px" @blur="saveDepalettisation(dry)" @onfocusout="saveDepalettisation(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
-                            
-                           
-                         </td>
-                         <td class="p-2 align-middle">
-                            <img :class="'loader_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
-                            <div v-if="dry.douane!='' && dry.douane != null" :id="'label_'+dry.reidre">
-                                <span>{{dry.douane}}</span>
-                                <i class="fa fa-edit" v-on:click="editDouane(dry)"></i>
-                            </div>
-                            <form v-on:submit.prevent="saveDouane(dry)"><input :data-id="dry.reidre" :class="[dry.douane!='' && dry.douane != null? 'd-none':'d-block']" type="text" :id="dry.reidre" v-model="douane[dry.reidre]" style="width:90px" @blur="saveDouane(dry)" @onfocusout="saveDouane(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
-                            
-                            <!--input v-else class="text-center val-douane" style="width:80px" :disabled="(dry.douane!='' && dry.douane != null)" type="text" :data-id="dry.reidre" v-model="douane[dry.reidre]" @focus="focusDoune(dry)" @blur="saveDouane(dry)" :placeholder="dry.douane"-->   
-                         </td>
-                        <td class="p-2 text-right">
-                            <div class="d-flex justify-content-end align-items-center">
-                                <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3 position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
-                                    <i class="fa fa-eye" aria-hidden="true"></i>
-                                    <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
-                                </a>
-                                <span v-if="dry.dossier_empotage_id > 0" class="d-none"><i class="fa fa-check-circle"></i></span>
-                                <label class="switch d-none">
-                                    <template v-if="selected.etat==0">
-                                        <input class="switch-input inputCmd" :checked="(selected.dossier == dry.dossier_id || dry.dossier_empotage_id > 0)" type="checkbox" :value="dry.reidre" v-on:change="empoter($event,dry)" /> 
-                                        <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
-                                        <span class="switch-handle"></span> 
-                                    </template>
-                                    <template v-else>
-                                        <input class="switch-input inputCmd" :checked="(selected.identifiant == dry.dossier_empotage_id)" type="checkbox" :value="dry.reidre" v-on:change="empoter($event,dry)" /> 
-                                        <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
-                                        <span class="switch-handle"></span> 
-                                    </template>
-                                    
-                                </label>
-                            </div>
-                        </td>
-                    </tr>
-                    </template>
+                        <tr>
+                            <td class="align-middle">
+                                <div class="d-flex justify-content-between detailPrecharge position-relative">
+                                    <ul class="w-100 legend m-0 p-0 position-absolute" style="top:-10px">
+                                        <li class="w-100 text-center font-weight-bold">
+                                            <span class="float-none d-inline-block etat_T m-0 mr-1 border-0" :style="{'background': getColorTypeCmd(selected.idCmd)}"></span> 
+                                            {{ selected.typeCmd}}
+                                        </li>
+                                    </ul>
+                                    <table class="table m-0 mt-3 table-striped">
+                                        <tbody> 
+                                             <tr>
+                                                <th>Nbre Commande: {{ format_nbr(selected.nbrCmd) }}</th>
+                                                <th>Nbre de colis empoté: {{ format_nbr(selected.nbrColis) }}</th>
+                                                <th>Poids empoté: {{ format_nbr(selected.poids) }} KG</th>
+                                                <th>Volume empoté: {{ format_dec(selected.volume) }} m<sup>3</sup></th>
+                                            </tr>
+                                      
+                                        </tbody>
 
-                    </tbody>
-                    <tfoot class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
-                         <tr>
-                            <!--th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th-->
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6">Fournisseur</th>
-                            <th class="p-2 border-right border-white h6">Emballage</th>
-                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
-                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])"><i class="fa fa-calendar" aria-hidden="true"></i> Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <!--th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th-->
-                            <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->
-                            <th class="text-nowrap p-2 border-right border-white h6">Dépalettisation</th>
-                            <th class="text-nowrap p-2 border-right border-white h6">Douane</th>
-                            <th class="text-right p-2 border-right border-white h6">Action</th>
+                                    </table>
+                                </div>
+                             
+                            </td>
+                            <td class="pt-1 pb-4">
+                                <div class="d-flex m-0 customRadio justify-content-center">
+
+
+                                    <p class="pr-3 m-0" v-for="contenaire in listContenaire" >
+
+                                        <input type="radio" disabled :value="contenaire.volume" v-model="capacite" @change="switchContenaire(contenaire.id, contenaire.volume)" :id="'cont_'+contenaire.volume" name="radio-group">
+                                        <label :for="'cont_'+contenaire.volume"><span v-if="defaultContenaire.id==contenaire.id">{{ nbrContenaire }}</span> x {{contenaire.nom}}</label>
+                                    </p>
+                
+                                </div>
+                                
+                                <div class="conteneurState">
+                                   <div id="currentState" v-bind:style="{left: volumePercent+'%'}"></div> 
+                                    <div class="valuePercent" v-bind:style="{left: volumePercent+'%'}">{{volumePercent}}%</div>
+                                </div>
+                            </td>
                         </tr>
-                    </tfoot>
-                </table>
-                <div class="d-flex mt-4 justify-content-center">
-                    <pagination
-                        :data="reception"
-                        @pagination-change-page="getReception"
-                    ></pagination>
+                    </table>
+                    </VueScrollFixedNavbar>
+                    </div>
+                    <div v-if="selected.etat==0" class="d-flex justify-content-end align-items-center mr-3  mb-3 sucesss"> 
+                        <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
+            
+                        <div>
+                             <!--button class="btn btn-lg btn-secondary text-white mr-3  mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button-->
+                            <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
+                        </div>
+                       
+                    </div>
+                    <hr>
+
+                <!--div class="d-flex justify-content-between align-content-center mb-2">
+                    <div class="d-flex align-items-end">
+                        <div>
+                            <div class="d-flex align-items-center">
+                                <label for="paginateRecep" class="text-nowrap mr-2 mb-0"
+                                    >Nbre de ligne par Page</label> 
+                                <select
+                                    v-model="paginate"
+                                    class="form-control form-control-sm">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                </select>
+                            </div>
+                        </div>
+                
+                    </div>
                     
-                </div>
-                </div>
-                <hr>
-                <div v-if="selected.etat==0" class="d-flex justify-content-end mr-3  mb-5 sucesss"> 
-                    <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
-                    <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
-                </div>
-            </template>
+                    <div class="d-flex px-0 align-items-end col-md-4">
+                        <input
+                            v-model.lazy="searchRecep"
+                            type="search"
+                            class="form-control"
+                            placeholder="Rechercher par n°cmd, n°fe, n°ecv,n°fact, utilisateur, fournisseur..."
+                        />
+                    </div>
+                   
+                </div-->  
+                <div :class="[selected.etat==1? 'position-relative bgValid':'']" >
+                    <table class="table">
+                        <thead class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
+                             <tr>
+                                <!--th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th-->
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6">Fournisseur</th>
+                                <th class="p-2 border-right border-white h6">Emballage</th>
+                                <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
+                                <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])"><i class="fa fa-calendar" aria-hidden="true"></i> Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <!--th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th-->
+                                <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->
+                                <th class="text-nowrap p-2 border-right border-white h6">Dépalettisation</th>
+                                <th class="text-nowrap p-2 border-right border-white h6">Douane</th>
+                                <th class="text-right p-2 border-right border-white h6">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bgStripe">
+                        <template v-if="!reception.data || !reception.data.length">
+                            <tr><td colspan="14" class="bg-white text-center">Aucune donnée!</td></tr>
+                        </template>
+                        <template v-else>
+                            <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white">
+                            <!--td class="p-2 align-middle">{{ dry.rencmd }}</td>
+                            <td class="p-2 align-middle">{{ dry.refere }}</td-->
+                            <td class="p-2 align-middle">{{ dry.reecvr }}</td>
+                            <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
+                            <td class="p-2 align-middle white-space-nowrap">
+                                    <template v-if="dry.renbcl > 0">
+                                            <label class="badge badge-secondary mr-1">{{dry.renbcl}} Colis</label>
+                                      </template>
+                                      <template v-if="dry.renbpl > 0">
+                                         <label class="badge badge-info mr-1">{{dry.renbpl}} Pal</label>
+                                      </template>
+                            
+                            </td>
+                            <td class="p-2 align-middle text-right">{{ dry.repoid }}</td>
+                            <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
+                            
+                            <td class="p-2 align-middle">{{ dry.renufa }}</td>
+                            <td class="p-2 align-middle">{{ format_nbr(dry.revafa) }}</td>
+                            <td class="p-2 align-middle white-space-nowrape">{{ dry.redali }}</td>
+                            <!--td class="p-2 align-middle text-nowrap white-space-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td-->
+                            <!--td class="p-2 align-middle">
+                                
+                                <template v-if="dry.idPre > 0">
+                                     <span class="badge badge-success">oui</span> {{dry.prechargeur}}
+                                </template>
+                                <template v-else>
+                                      <span class="badge badge-warning">non</span>
+                                </template>
+                               
+                            </td-->
+                             <td class="p-2 align-middle">
+                                <img :class="'loaderDepal_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
+                                <div v-if="dry.depalettisation!='' && dry.depalettisation != null" :id="'labelDepal_'+dry.reidre">
+                                    <span>{{ dry.depalettisation }}</span>
+                                    <i class="fa fa-edit" v-on:click="editDepaletissation(dry)"></i>
+                                </div>
+                                <form v-on:submit.prevent="saveDepalettisation(dry)"><input :data-id="dry.reidre" :class="[dry.depalettisation!='' && dry.depalettisation != null? 'd-none':'d-block']" type="text" :id="'depal_'+dry.reidre" v-model="depaletissation[dry.reidre]" style="width:90px" @blur="saveDepalettisation(dry)" @onfocusout="saveDepalettisation(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
+                                
+                               
+                             </td>
+                             <td class="p-2 align-middle">
+                                <img :class="'loader_'+dry.reidre" style="display:none" src="/images/in-progress.gif"/>
+                                <div v-if="dry.douane!='' && dry.douane != null" :id="'label_'+dry.reidre">
+                                    <span>{{dry.douane}}</span>
+                                    <i class="fa fa-edit" v-on:click="editDouane(dry)"></i>
+                                </div>
+                                <form v-on:submit.prevent="saveDouane(dry)"><input :data-id="dry.reidre" :class="[dry.douane!='' && dry.douane != null? 'd-none':'d-block']" type="text" :id="dry.reidre" v-model="douane[dry.reidre]" style="width:90px" @blur="saveDouane(dry)" @onfocusout="saveDouane(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
+                                
+                                <!--input v-else class="text-center val-douane" style="width:80px" :disabled="(dry.douane!='' && dry.douane != null)" type="text" :data-id="dry.reidre" v-model="douane[dry.reidre]" @focus="focusDoune(dry)" @blur="saveDouane(dry)" :placeholder="dry.douane"-->   
+                             </td>
+                            <td class="p-2 text-right">
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3 position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                        <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
+                                    </a>
+                                    <span v-if="dry.dossier_empotage_id > 0" class="d-none"><i class="fa fa-check-circle"></i></span>
+                                    <label class="switch d-none">
+                                        <template v-if="selected.etat==0">
+                                            <input class="switch-input inputCmd" :checked="(selected.dossier == dry.dossier_id || dry.dossier_empotage_id > 0)" type="checkbox" :value="dry.reidre" v-on:change="empoter($event,dry)" /> 
+                                            <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
+                                            <span class="switch-handle"></span> 
+                                        </template>
+                                        <template v-else>
+                                            <input class="switch-input inputCmd" :checked="(selected.identifiant == dry.dossier_empotage_id)" type="checkbox" :value="dry.reidre" v-on:change="empoter($event,dry)" /> 
+                                            <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
+                                            <span class="switch-handle"></span> 
+                                        </template>
+                                        
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        </template>
+
+                        </tbody>
+                        <tfoot class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
+                             <tr>
+                                <!--th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th-->
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6">Fournisseur</th>
+                                <th class="p-2 border-right border-white h6">Emballage</th>
+                                <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
+                                <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])"><i class="fa fa-calendar" aria-hidden="true"></i> Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <!--th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th-->
+                                <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->
+                                <th class="text-nowrap p-2 border-right border-white h6">Dépalettisation</th>
+                                <th class="text-nowrap p-2 border-right border-white h6">Douane</th>
+                                <th class="text-right p-2 border-right border-white h6">Action</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="d-flex mt-4 justify-content-center">
+                        <pagination
+                            :data="reception"
+                            @pagination-change-page="getReception"
+                        ></pagination>
+                        
+                    </div>
+                    </div>
+                    <hr>
+                    <div v-if="selected.etat==0" class="d-flex justify-content-end mr-3  mb-5 sucesss"> 
+                        <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
+                        <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
+                    </div>
+                </template>
+            
         </template>
         <!-- Modal Empotage-->
         <div class="modal fade" id="newEmpotage" tabindex="-1" role="dialog" aria-labelledby="myModalEmpotage"
@@ -817,7 +826,8 @@
             'clientCurrent',
             'currentEntite',
             'listEntrepots',
-            'listeDossier'
+            'listeDossier',
+            'idEntite'
         ],  
         components: {
             PageLoader,
@@ -919,7 +929,8 @@
                 currentIndexPhoto: 0,
                 attachmentsPhoto: [],
                 tabPhoto: [],
-                depaletissation: []
+                depaletissation: [],
+                isLoadingContenaire: false 
             }
 
         },
@@ -1037,7 +1048,7 @@
             },
             getEmpotage(page = 1){
                 this.isLoading=true;    
-                axios.get('/empotage/list/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate+ "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&etatFiltre="+this.etatFiltre).then(response => {
+                axios.get('/empotage/list/'+this.idClient+"/"+this.idEntite+'?page=' + page + "&paginate=" + this.paginate+ "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&etatFiltre="+this.etatFiltre).then(response => {
                     this.empotage = response.data;
                     var self = this;
                     setTimeout(function(){
@@ -1167,7 +1178,7 @@
                                 }
                             }).then((result) => {});
 
-                           axios.post("/gerer/validationEmpotage/valider/"+this.idClient, {
+                           axios.post("/gerer/validationEmpotage/valider/"+this.idClient+"/"+this.idEntite, {
                                 'idsCmd': this.commandeSelected,
                                 'ignored': this.commandeNoSelected,
                                 'idEmpotage' : this.selected.identifiant,
@@ -1418,7 +1429,7 @@
                         console.log(url, "File PDF"); 
 
 
-                        axios.post("/gerer/empotage/notification/"+self.clientCurrent['id'], {
+                        axios.post("/gerer/empotage/notification/"+self.clientCurrent['id']+"/"+self.idEntite, {
                             'idsCmd': self.commandeSelected,
                             'id_dossier' : self.selected.dossier,
                             'numtc': self.selected.numtc,
@@ -1487,6 +1498,7 @@
                },
                showContenaire(empo){
                     this.isDetail = true;
+                    this.isLoadingContenaire = true;
                     this.selected.identifiant = empo.id;
                     this.selected.dossier     = empo.reference;
                     this.selected.typeCmd     = empo.typeCommande;
@@ -1501,6 +1513,7 @@
                               this.contenaireSelectionner(0);
 
                             }
+                            this.isLoadingContenaire = false;
                     }).catch(error => {});
                },
                contenaireSelectionner(index){
@@ -1564,6 +1577,7 @@
                back(){
                 this.getEmpotage(this.selected.currentPage);
                 this.isDetail = false;
+                this.isLoadingContenaire = false;
                 this.commandeSelected = [];
                 this.commandeNoSelected = [];
                 this.eventCmdSelected.ischecked = -1;
@@ -1731,10 +1745,8 @@
                     const data = new FormData();
                     data.append('reference', this.empotageForm.reference);
                     data.append('typeCmd', this.empotageForm.typeCmd);
-                    /*data.append('tc', this.empotageForm.tc);
-                    data.append('typetc', this.empotageForm.typetc);
-                    data.append('plomb', this.empotageForm.plomb);*/
                     data.append('idClient', this.idClient);
+                    data.append('idEntite', this.idEntite);
                     data.append('idEntrepot', this.empotageForm.idEntrepot);
                     data.append('date_depart', this.empotageForm.dateDepart);
                     data.append('date_arrivee', this.empotageForm.dateArrivee);
@@ -1833,26 +1845,7 @@
                         $(".loader_"+id).hide(); 
                     });*/
 
-                    var douane = $("#"+cmd.reidre).val(); //this.douane[cmd.reidre];
-
-
-
-
-                    /*var placeholder = $(".val-douane[data-id='"+cmd.reidre+"']").attr("placeholder");
-
-
-                    if(!(typeof(douane) !== 'undefined') || !(douane !== null)){
-                        douane='';                    
-                    }    
-
-                    if(douane==''){
-                        if(!(typeof(placeholder) !== 'undefined') || !(placeholder !== null)){
-                            
-                        }else{
-                            douane = placeholder;
-                            this.douane[cmd.reidre] = douane;
-                        }
-                    } */         
+                    var douane = $("#"+cmd.reidre).val(); //this.douane[cmd.reidre];   
 
                    
                     const data = new FormData();
@@ -1997,16 +1990,15 @@
                       confirmButtonText: 'Oui, supprimer!'
                     }).then((result) => {
                       if (result.isConfirmed) {
-                            axios.delete('/gerer/deleteEmpotage/'+empotage.id+"?idClient="+this.idClient).then(response => {
-                                 Vue.swal.fire(
-                                  'Supprimé!',
-                                  'Dossier supprimé avec succés.',
-                                  'success'
-                                );
-                                /* this.modeModify = false;
-                                 this.getEmpotage();*/
-
-                                  location.reload();
+                            axios.delete('/gerer/deleteEmpotage/'+empotage.id+'/'+this.idEntite+"?idClient="+this.idClient).then(response => {
+                                Vue.swal.fire(
+                                    'Supprimé!',
+                                    'Dossier supprimé avec succés.',
+                                    'success'
+                                ).then((result) => {
+                                    // redirection   
+                                    location.reload();
+                                });   
                             });
                       
                       }
@@ -2034,8 +2026,8 @@
                     var labelCmd = empo.typeCommande.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase();
                 
                     this.pdfFileModal = 'dossier-'+this.formatage(empo.reference)+'_'+labelCmd+"_numtc-"+this.formatage(empo.numContenaire)+"_plomb-"+this.formatage(empo.plomb)+".pdf";
-               },
-                 closeModalPdf(){
+                },
+                closeModalPdf(){
                      this.$refs.closePoupPdf.click();
                 },
                 getCountDoc(doc){

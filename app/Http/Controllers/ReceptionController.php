@@ -89,7 +89,7 @@ class ReceptionController extends Controller
             $dries = $dries->search($keyword); 
         }
 
-        $dries = $dries->where('receptions.clients_id', request('id'))->where('receptions.entites_id', $user->entites_id)->where(function($query){
+        $dries = $dries->where('receptions.clients_id', request('id'))->where('receptions.entites_id', request('entite'))->where(function($query){
                 $query->orWhere('dossier_id', NULL)->orWhere('dossier_id', 0);
             })->where(function($query){
                 $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', 0);
@@ -116,7 +116,7 @@ class ReceptionController extends Controller
 
     public function stateDries()
     {
-        $recep = Reception::receptionsQuery()->where('clients_id', request('id'));
+        $recep = Reception::receptionsQuery()->where('clients_id', request('id'))->where('receptions.entites_id', request('entite'));
 
         $keyword = request('keysearch');
 
@@ -217,12 +217,12 @@ class ReceptionController extends Controller
                 'renbpl' => request('nbrpalette'),
                 'recomt' => request('commentaire'),
                 'refasc' => $filename,
-                "entites_id" => $user->entites_id,
+                "entites_id" => request('IDentite'),
                 //"recmds" => json_encode(request('commandes')),
                 "reetat" => true
             ];
             
-            Reception::setIDClient(request('client'), $user->entites_id);  
+            Reception::setIDClient(request('client'), request('IDentite'));  
           
             $store = Reception::create($params);
 
@@ -330,7 +330,7 @@ class ReceptionController extends Controller
         //Reception::setIDClient(request('client'), $user->entites_id);
 
         $cmd =  Reception::where('reidre','=',request('reidre'))->firstOrFail(); 
-        Reception::setIDClient(request('client'), $user->entites_id);    
+        Reception::setIDClient(request('client'), request('IDentite'));     
         $cmd->update([
                 "refere" => request('fe'),
                 "reecvr" => request('ecv'),

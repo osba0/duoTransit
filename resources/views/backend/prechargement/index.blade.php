@@ -18,7 +18,8 @@
                 :current-client="{{ json_encode($client) }}"
                 :current-entite="{{ json_encode($entite) }}"
                 :list-entrepots="{{ json_encode($entrepots) }}"
-                :cmd-a-precharger="{{ json_encode($nbrCmdACharger) }}"></prechargement-client>
+                :cmd-a-precharger="{{ json_encode($nbrCmdACharger) }}"
+                :id-entite={{  auth()->user()->getIDEntite(request()->route('currententite')) }}></prechargement-client>
             @else
                 <div class="badge badge-warning p-3">Client non autorisé ou inexistant!</div>
             @endif

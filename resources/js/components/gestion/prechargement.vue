@@ -542,7 +542,8 @@
             'currentClient',
             'currentEntite',
             'listEntrepots',
-            'cmdAPrecharger'
+            'cmdAPrecharger',
+            'idEntite'
             
         ],  
         components: {
@@ -724,7 +725,7 @@
                 data.append('ischecked', ischecked);
                 data.append('listCmd',  JSON.stringify(this.commandeSelected))*/
 
-                axios.post("/gerer/dossier/setPrechargement", {
+                axios.post("/gerer/dossier/setPrechargement/"+this.idEntite, {
                             'idPrehargement' :  this.selected.id,
                             'idreception' :  cmd.reidre,
                             'ischecked' :  ischecked,
@@ -774,7 +775,7 @@
         getPrechargement(page = 1){
             this.isLoading=true;
             this.selected.currentPage=page;
-            axios.get('/gerer/dossier/list/'+this.idClient+'?page=' + page + "&paginate=" + this.paginate+ "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&etatFiltre="+this.etatFiltre).then(response => {
+            axios.get('/gerer/dossier/list/'+this.idClient+"/"+this.idEntite+'?page=' + page + "&paginate=" + this.paginate+ "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&etatFiltre="+this.etatFiltre).then(response => {
                 this.prechargement = response.data;
                 var that = this;
                 setTimeout(function(){
@@ -795,7 +796,7 @@
                   confirmButtonText: 'Oui, supprimer!'
                 }).then((result) => {
                   if (result.isConfirmed) {
-                        axios.delete('/gerer/deletePre/'+pre.id+'?clientID='+this.idClient+"&typeCmd="+pre.typecmdId).then(response => {
+                        axios.delete('/gerer/deletePre/'+pre.id+"/"+this.idEntite+'?clientID='+this.idClient+"&typeCmd="+pre.typecmdId).then(response => {
                             console.log(response);
                              Vue.swal.fire(
                               'Supprimé!',
@@ -816,7 +817,7 @@
             },
         getReception(page = 1){
             this.isLoading=true;
-            axios.get('/gerer/dossier/pre/reception/'+this.idClient+"/"+this.selected.typeCommande+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&idPre="+this.selected.id+"&etat="+this.selected.etat+"&filtreRate="+this.filtreRate+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
+            axios.get('/gerer/dossier/pre/reception/'+this.idClient+"/"+this.idEntite+"/"+this.selected.typeCommande+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&idPre="+this.selected.id+"&etat="+this.selected.etat+"&filtreRate="+this.filtreRate+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order).then(response => {
                 this.reception = response.data;
 
                 console.log(this.reception, "reception");
@@ -896,7 +897,8 @@
                 'datecloture' : this.initChargement.dateCloture, 
                 'typeCmd'     : this.initChargement.typeCommande,
                 'entrepot'    : this.initChargement.entrepot,
-                'clientID'    : this.idClient
+                'clientID'    : this.idClient,
+                'entiteID'    : this.idEntite
 
             }).then(response => {
               
@@ -989,7 +991,7 @@
                         }).then((result) => {});
 
 
-                        axios.post("/gerer/createDossier/valider/"+this.currentClient['id'], {
+                        axios.post("/gerer/createDossier/valider/"+this.currentClient['id']+"/"+this.idEntite, {
                             'idsCmd': this.commandeSelected,
                             'ignored': this.commandeNoSelected,
                             'id_dossier' : this.selected.id,
@@ -1242,7 +1244,7 @@
                     pdf.create().getDataUrl(function(url) { 
 
                         console.log(url, "File PDF"); 
-                        axios.post("/gerer/createDossier/notification/"+self.currentClient['id'], {
+                        axios.post("/gerer/createDossier/notification/"+self.currentClient['id']+"/"+self.idEntite, {
                             'idsCmd': self.commandeSelected,
                             'id_dossier' : self.selected.id,
                             'entrepot' : self.selected.idEntrepot,
@@ -1331,7 +1333,7 @@
                   confirmButtonText: 'Oui, réactivé!'
                 }).then((result) => {
                   if (result.isConfirmed) {
-                        axios.post('/gerer/reactiver/'+pre.id+'?identifiant='+pre.identifiant).then(response => {
+                        axios.post('/gerer/reactiver/'+pre.id+"/"+this.idEntite+'?identifiant='+pre.identifiant).then(response => {
                             
                             if(response.data.code != 0){
                                 Vue.swal.fire(

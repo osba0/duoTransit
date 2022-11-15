@@ -79,7 +79,8 @@ class empotageCommandesTransitaire extends Notification
             'description' => 'TC: '.$this->numtc.' TypeTC: '.$this->typetc.' Plomb:'.$this->plomb,
             'fichier' => '/' .$this->pathFile,
             'user' => Auth::user(),
-            'slug' => $this->societe['slug']   
+            'slug' => $this->societe['slug'],
+            'entite' => $this->transitaire['slug'] 
         ];
     }
 }

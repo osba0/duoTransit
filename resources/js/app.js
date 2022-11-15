@@ -80,6 +80,8 @@ Vue.component('activity-index', require('./components/activity/index.vue').defau
 Vue.component('activity-journal', require('./components/configuration/journal.vue').default); 
 
 Vue.component('notification-list', require('./components/notification/index.vue').default); 
+
+Vue.component('choose-entite', require('./components/chooseEntite.vue').default);  
    
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -121,5 +123,7 @@ window.axios.interceptors.response.use(
         }
     }
 );
+
+
 
 

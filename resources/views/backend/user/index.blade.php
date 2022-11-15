@@ -11,7 +11,7 @@
                 </a>
             </div>
             
-            <userlist list-roles='{{json_encode($roles)}}' list-clients='{{$clients}}' is-admin='{{$isAdmin}}'></userlist>
+            <userlist list-roles='{{json_encode($roles)}}' list-clients='{{$clients}}' list-entites='{{$entites}}' is-admin='{{$isAdmin}}'></userlist>
            
         </div>
     </div>

@@ -31,7 +31,7 @@ class HistoActionController extends Controller
 
         $user = Auth::user();
 
-        $entite = Entite::where('id', $user->entites_id)->get()->first();
+        $entite = Entite::where('slug', request('currententite'))->get()->first(); 
         
         $client = Client::get()->where('slug', request('id'))->first();
 
@@ -57,7 +57,7 @@ class HistoActionController extends Controller
             abort(401);
         }
 
-        $entite = Entite::where('id', $user->entites_id)->get()->first();
+        $entite = Entite::where('slug', request('currententite'))->get()->first(); 
         
         $client = Client::get()->where('slug', request('id'))->first();
 
@@ -172,12 +172,17 @@ class HistoActionController extends Controller
                 $req = $req->where('empotages.reference', 'like', $term);
             }
 
+            $req = $req->where('empotages.entites_id', intval(request('entite')));
+
             if($sort!=''){
                 $order = request('order');
                 $req = $req->orderBy(strval($sort), $order);
             }else{
                  $req = $req->orderBy("created_at", "DESC"); 
             }
+
+
+
 
             $req = $req->paginate($paginate); 
 
@@ -241,7 +246,7 @@ class HistoActionController extends Controller
              abort(401);
         }
 
-        $entite = Entite::where('id', $user->entites_id)->get()->first();
+        $entite = Entite::where('slug', request('currententite'))->get()->first(); 
         
         $client = Client::get()->where('slug', request('id'))->first();
 
@@ -315,6 +320,8 @@ class HistoActionController extends Controller
                 $term = "$cmd%";
                 $req = $req->where('receptions.rencmd', 'like', $term);
             }
+
+            $req = $req->where('dossier_prechargements.entites_id', intval(request('entite')));
 
 
             $req = $req->orderBy("dossier_prechargements.updated_at", 'DESC')->paginate($paginate); 

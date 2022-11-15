@@ -19,6 +19,7 @@
                 :current-entite="{{ json_encode($entite) }}"
                 :list-entrepots="{{ json_encode($entrepots) }}"
                 :cmd-a-precharger="{{ json_encode($nbrCmdACharger) }}"
+                :id-entite="{{  auth()->user()->getIDEntite(request()->route('currententite')) }}"
                >
                 
                 </prechargement-entite>

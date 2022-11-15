@@ -28,7 +28,7 @@
                             <h4 class="text-center w-100">{{ client.nom }}</h4>
                             <template v-if="clientsAuth.length > 0">
                                 <template v-if="roleUser == 'client'">
-                                    <a :href="'/precharger/'+client.slug" class="btn text-white">
+                                    <a :href="'/'+slugEntite+'/precharger/'+client.slug" class="btn text-white">
                                         <i class="fa fa-folder-open-o" aria-hidden="true"></i> Ourvir
                                     </a>
                                 </template>
@@ -39,7 +39,7 @@
                                 </template>
                             </template>
                             <template v-else>
-                                <a :href="'/reception/'+client.slug" class="btn text-white">
+                                <a :href="'/'+slugEntite+'/reception/'+client.slug" class="btn text-white">
                                     <i class="fa fa-folder-open-o" aria-hidden="true"></i> Ouvrir le dossier
                                 </a>
                             </template>
@@ -57,7 +57,8 @@
     export default { 
         props: [ 
           'clientSup',
-          'roleUser'
+          'roleUser',
+          'slugEntite'
         ],
         data() { 
             return {

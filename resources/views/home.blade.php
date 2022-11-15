@@ -4,7 +4,17 @@
 <div id="app">
   
   @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
-    <client-list client-sup="{{$clientSup}}" role-user="{{$roles}}"></client-list> 
+    @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))
+      
+      @php $currentEntite = auth()->user()->getEntiteBySlug($slug)['slug']; @endphp
+
+    @else
+
+      @php $currentEntite = auth()->user()->getSlugEnite();  @endphp
+
+    @endif
+
+    <client-list client-sup="{{$clientSup}}" role-user="{{$roles}}" slug-entite="{{ $currentEntite }}"></client-list> 
   @endif
 
   @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT) ||
