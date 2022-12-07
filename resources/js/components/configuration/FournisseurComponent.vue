@@ -46,22 +46,32 @@
                           
                         </td>
                         <td> 
-                            <template v-for="client in listClient">
-                                <template v-if="client.clfocl.includes(fournisseur.id)">
-                                    <a title="Retirer la société" v-on:click="retirerSocieteFour(client, fournisseur)" class="badge badge-success text-white position-relative mr-2 p-2 mb-2 cursor-pointer">
-                                    {{client.clnmcl}}
-                                    <span class="badge badge-danger position-icone position-absolute"><i class="fa fa-minus"></i></span>
-                                   
-                                    </a>  
-                                </template>
-                                <template v-else>
-                                    <a title="Ajouter la société" class="badge badge-secondary text-white position-relative mr-2 p-2 mb-2 cursor-pointer" v-on:click="addSocieteFour(client, fournisseur)">
-                                    {{client.clnmcl}}
-                                     <span class="badge badge-success position-icone position-absolute"><i class="fa fa-plus"></i></span>
-                                    </a>
+                            <template v-if="slugClient!=''">
+                                <template v-for="client in listClient">
+                                     <template v-if="client.clfocl.includes(fournisseur.id) && slugClient==client.slug">
+                                        <a class="badge badge-success text-white position-relative mr-2 p-2 mb-2 cursor-pointer">
+                                        {{client.clnmcl}}
+                                        </a>  
+                                    </template>
                                 </template>
                             </template>
-                                      
+                            <template v-else>
+                                <template v-for="client in listClient">
+                                    <template v-if="client.clfocl.includes(fournisseur.id)">
+                                        <a title="Retirer la société" v-on:click="retirerSocieteFour(client, fournisseur)" class="badge badge-success text-white position-relative mr-2 p-2 mb-2 cursor-pointer">
+                                        {{client.clnmcl}}
+                                        <span class="badge badge-danger position-icone position-absolute"><i class="fa fa-minus"></i></span>
+                                       
+                                        </a>  
+                                    </template>
+                                    <template v-else>
+                                        <a title="Ajouter la société" class="badge badge-secondary text-white position-relative mr-2 p-2 mb-2 cursor-pointer" v-on:click="addSocieteFour(client, fournisseur)">
+                                        {{client.clnmcl}}
+                                         <span class="badge badge-success position-icone position-absolute"><i class="fa fa-plus"></i></span>
+                                        </a>
+                                    </template>
+                                </template>
+                            </template>          
                         </td>
                          <td>  
                             <label class="switch">
@@ -212,7 +222,9 @@
     import Multiselect from 'vue-multiselect';
     export default {
          props: [
-            'listClient'
+            'listClient',
+            'idEntite',
+            'slugClient'
         ],
          components: {
             Multiselect
@@ -355,7 +367,7 @@
             },
             getFournisseur(page = 1){
                  this.isLoading=true;
-                axios.get('/configuration/getFournisseur?page=' + page + "&paginate=" + this.paginate).then(response => {
+                axios.get('/configuration/getFournisseur?slug='+this.slugClient+'&page=' + page + "&paginate=" + this.paginate).then(response => {
                     this.fournisseurs = response.data;
                      if(this.fournisseurs.length > 0){
                            

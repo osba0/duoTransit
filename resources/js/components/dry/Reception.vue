@@ -968,7 +968,7 @@
 
 	        getDries(page = 1){
                 if(this.search==''){ 
-                    this.isLoading=true;
+                    this.isLoading=true; 
                 }
                 
                 const requestOne = 

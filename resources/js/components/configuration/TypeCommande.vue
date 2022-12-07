@@ -7,6 +7,7 @@
                         <th class="p-2 border-right border-white h6">ID</th>
                         <th class="p-2 border-right border-white h6">Type commande</th>
                         <th class="p-2 border-right border-white h6">Couleur</th>
+                        <th class="p-2 border-right border-white h6">Société</th>
                         <th class="p-2 border-right border-white h6">Etat</th>
                         <th class="text-right p-2 border-right border-white h6" v-if="isRoot">Action</th>
                     </tr>
@@ -25,6 +26,37 @@
                         <td class="p-2 align-middle">
                             <span class="badge badge-default px-2" :style="{background: typecommande.color}">&nbsp;</span>
                             
+                        </td>
+                        <td>
+                            <template v-if="slugClient!=''">
+                                <template v-for="client in listClient">
+                                     <template v-if="client.cltyco.includes(typecommande.id) && slugClient==client.slug">
+                                        <a class="badge badge-success text-white position-relative mr-2 p-2 mb-2 cursor-pointer">
+                                        {{client.clnmcl}}
+                                        </a>  
+                                    </template>
+                                  
+                                </template>
+                            </template>
+                            <template v-else>
+                                <template v-for="client in listClient">
+                                    <template v-if="client.cltyco.includes(typecommande.id)">
+                                        <a title="Retirer la société" v-on:click="retirerSocieteTypeCmd(client, typecommande)" class="badge badge-success text-white position-relative mr-2 p-2 mb-2 cursor-pointer">
+                                        {{client.clnmcl}}
+                                        <span class="badge badge-danger position-icone position-absolute"><i class="fa fa-minus"></i></span>
+                                       
+                                        </a>  
+                                    </template>
+                                    <template v-else>
+                                        <a title="Ajouter la société" class="badge badge-secondary text-white position-relative mr-2 p-2 mb-2 cursor-pointer" v-on:click="addSocieteTypeCmd(client, typecommande)">
+                                        {{client.clnmcl}}
+                                         <span class="badge badge-success position-icone position-absolute"><i class="fa fa-plus"></i></span>
+                                        </a>
+                                    </template>
+                                </template>
+                            </template>
+
+                             
                         </td>
                         <td>  
                             <label class="switch">
@@ -119,7 +151,10 @@
     import { required, minLength, between } from 'vuelidate/lib/validators'
     export default {
         props: [
-            'isRoot'
+            'isRoot',
+            'idEntite',
+            'listClient',
+            'slugClient'
         ],
         data() { 
             return {
@@ -201,7 +236,7 @@
                 this.typecommandesForm.color = "";
             },
             getTypeCommande(page = 1){
-                axios.get('/configuration/getTypeCommande?page=' + page + "&paginate=" + this.paginate).then(response => {
+                axios.get('/configuration/getTypeCommande?slug='+this.slugClient+'&page=' + page + "&paginate=" + this.paginate).then(response => {
                     this.typecommandes = response.data;
                 });
             },
@@ -249,6 +284,78 @@
                 this.submitted = false;
                 this.modeModify = false;
 
+            },
+            addSocieteTypeCmd(client, typecommande){
+                Vue.swal.fire({
+                  title: typecommande.type,
+                  text: "Confirmer l'ajout de "+client.clnmcl,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#38c172',
+                  cancelButtonColor: '#545b62',
+                  confirmButtonText: 'Oui, ajouter!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                        axios.post('/configuration/clientTypeCmd/'+typecommande.id+"/"+client.id).then(response => {
+                            if(response.data.code==0){
+                                this.modeModify = false;
+                                Vue.swal.fire(
+                                  'Ajouté!',
+                                  'Société ajouté avec succés', 
+                                  'success'
+                                ).then((result) => {
+                                    window.location.reload();
+                                });
+                            }else{
+                                 Vue.swal.fire(
+                                  'Warning!',
+                                  'Erreur',
+                                  'warning'
+                                ).then((result) => {
+                                   
+                                });
+                            }
+                            
+                        });
+                  
+                  }
+                });
+            },
+            retirerSocieteTypeCmd(client, typecommande){
+                Vue.swal.fire({
+                  title: typecommande.type,
+                  text: "Confirmer le retrait de "+client.clnmcl,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#38c172',
+                  cancelButtonColor: '#545b62',
+                  confirmButtonText: 'Oui, retirer!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                        axios.post('/configuration/retirerclientTypeCmd/'+typecommande.id+"/"+client.id).then(response => {
+                            if(response.data.code==0){
+                                this.modeModify = false;
+                                Vue.swal.fire(
+                                  'Retiré!',
+                                  'Société retiré avec succés', 
+                                  'success'
+                                ).then((result) => {
+                                    window.location.reload();
+                                });
+                            }else{
+                                 Vue.swal.fire(
+                                  'Warning!',
+                                  'Erreur',
+                                  'warning'
+                                ).then((result) => {
+                                   
+                                });
+                            }
+                            
+                        });
+                  
+                  }
+                });
             },
             preselectionner(event, type){
 

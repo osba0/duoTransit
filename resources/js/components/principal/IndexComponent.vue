@@ -33,7 +33,7 @@
                                     </a>
                                 </template>
                                 <template v-if="roleUser == 'consultation'">
-                                     <a :href="'/consultation/'+client.slug" class="btn text-white">
+                                     <a :href="'/'+slugEntite+'/consultation/'+client.slug" class="btn text-white">
                                         <i class="fa fa-folder-open-o" aria-hidden="true"></i> Ourvir
                                     </a>
                                 </template>

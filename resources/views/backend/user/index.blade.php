@@ -10,8 +10,12 @@
                     <i class="fa fa-plus" aria-hidden="true"></i> Nouveau utilisateur
                 </a>
             </div>
-            
-            <userlist list-roles='{{json_encode($roles)}}' list-clients='{{$clients}}' list-entites='{{$entites}}' is-admin='{{$isAdmin}}'></userlist>
+             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
+              <userlist list-roles='{{json_encode($roles)}}' list-clients='{{$clients}}' list-entites='{{$entites}}' is-admin='{{$isAdmin}}' slug-client='' ></userlist>
+            @else
+                 <userlist list-roles='{{json_encode($roles)}}' list-clients='{{$clients}}' list-entites='{{$entites}}' is-admin='{{$isAdmin}}'  slug-client="{{request()->route('currententite')}}" :id-entite="{{  auth()->user()->getIDEntite(request()->route('currententite')) }}"></userlist>
+            @endif
+           
            
         </div>
     </div>

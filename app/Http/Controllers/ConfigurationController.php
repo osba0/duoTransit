@@ -226,13 +226,30 @@ class ConfigurationController extends Controller
     */
     public function getFournisseur()
     {
+        if(request('slug')!=''){
+            $client = Client::where('slug', request('slug'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+
+            if(!$client){
+                abort(404);
+            }
+        }
 
         $paginate = request('paginate');
 
         if (isset($paginate)) {
-            $fournisseurs = Fournisseur::orderBy('created_at', 'desc')->paginate($paginate);
+            if(request('slug')==''){
+                $fournisseurs = Fournisseur::orderBy('id', 'desc')->paginate($paginate);
+            }else{
+                $fournisseurs = Fournisseur::whereIn('id',$client->clfocl)->orderBy('id', 'desc')->paginate($paginate);
+            }
+            
         }else{
-            $fournisseurs = Fournisseur::get();
+            if(request('slug')==''){
+                $fournisseurs = Fournisseur::get();
+            }else{
+               $fournisseurs = Fournisseur::whereIn('id',$client->clfocl)->get();
+            }
+            
         }
 
         return FournisseurResource::collection($fournisseurs);
@@ -752,16 +769,35 @@ class ConfigurationController extends Controller
     */
     public function getTypeCommande()
     {
-
+       
         $paginate = request('paginate');
+        
+        if(request('slug')!=''){
+            $client = Client::where('slug', request('slug'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+
+            if(!$client){
+                abort(404);
+            }
+        }
+        
 
         if (isset($paginate)) {
-            $fournisseurs = TypeCommande::orderBy('id', 'desc')->paginate($paginate);
+            if(request('slug')==''){
+                $typeCmd = TypeCommande::orderBy('id', 'desc')->paginate($paginate);
+            }else{
+                $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->orderBy('id', 'desc')->paginate($paginate);
+            }
+            
         }else{
-            $fournisseurs = TypeCommande::get();
+             if(request('slug')==''){
+                $typeCmd = TypeCommande::get();
+            }else{
+               $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->get();
+            }
+            
         }
 
-        return TypeCommandeResource::collection($fournisseurs);
+        return TypeCommandeResource::collection($typeCmd);
     }
 
     public function typeCommandeDelete(Request $request)
@@ -830,6 +866,64 @@ class ConfigurationController extends Controller
         ]);
     }
 
+    public function ajoutClientTypeCmd()
+    {
+       $client = Client::where('id',request('client'))->first(); 
+
+       $listtypecmd = $client['cltyco'];
+
+       if(!is_array($listtypecmd)){
+            $listtypecmd=[];    
+       }
+
+       array_push($listtypecmd, intval(request('typecommande')));
+
+       // update
+
+       Client::where('id', request('client'))
+          ->update([
+            "cltyco" => array_unique($listtypecmd)
+        ]);
+
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+      
+    }
+
+
+     public function retirerClientTypeCmd()
+    {
+       $client = Client::where('id',request('client'))->first(); 
+
+       $listtypecmd = $client['cltyco'];
+
+       $newlist = [];
+
+
+       for($i=0; $i<sizeof($listtypecmd); $i++){
+            if($listtypecmd[$i] != request('typecommande')){
+                $newlist[] = $listtypecmd[$i];
+            }
+       }
+
+       // update
+
+       Client::where('id', request('client'))
+          ->update([
+            "cltyco" => array_unique($newlist)
+        ]);
+
+
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+      
+    }
+
      public function etatFournisseur(){
         Fournisseur::where('id', request('id'))
               ->update([
@@ -841,6 +935,8 @@ class ConfigurationController extends Controller
             "message" => "OK"
         ]);
     }
+
+
   
    
 }

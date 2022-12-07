@@ -22,6 +22,8 @@ $currentEntite = request()->route('currententite');
     @endif
 
 @endforeach
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -137,7 +139,7 @@ $currentEntite = request()->route('currententite');
                         </li>
                         @endif
                         @if (\Request::is($currentEntite.'/reception/*') or \Request::is('activity/*') or \Request::is($currentEntite.'/precharger/*') or (\Request::is('incidents/*')) or 
-                        \Request::is($currentEntite.'/numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is($currentEntite.'/prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is($currentEntite.'/gerer/*') or \Request::is($currentEntite.'/historique-empotage/*') or \Request::is($currentEntite.'/historique-docim/*') or \Request::is('consultation/*') or \Request::is($currentEntite.'/historique-prechargement/*') or \Request::is($currentEntite.'/notifications/*'))  
+                        \Request::is($currentEntite.'/numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is($currentEntite.'/prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is($currentEntite.'/gerer/*') or \Request::is($currentEntite.'/historique-empotage/*') or \Request::is($currentEntite.'/historique-docim/*') or \Request::is($currentEntite.'/consultation/*') or \Request::is($currentEntite.'/historique-prechargement/*') or \Request::is($currentEntite.'/notifications/*'))  
                             @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
                             <li class="nav-item">
                                 <a href="/{{$currentEntite}}/reception/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/reception/*') ? 'active' : '' }}"><i class="nav-icon fa fa-sign-in"></i> <p>Réceptionner</p></a>
@@ -175,7 +177,7 @@ $currentEntite = request()->route('currententite');
                             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
 
                             <li class="nav-item">
-                                <a href="{{ route('consultation', ['id' => $client['slug']?? '']) }}" class="nav-link {{ (request()->is('consultation/*')) ? 'active' : '' }}">
+                                <a href="{{ route('consultation', ['id' => $client['slug']?? '', $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/consultation/*')) ? 'active' : '' }}">
                                   <i class="fa  fa-clock-o nav-icon"></i>
                                   <p>Histo DOCIM</p>
                                 </a>
@@ -269,6 +271,8 @@ $currentEntite = request()->route('currententite');
                              @endif  
                         
                         @endif
+
+
                        
                         @if (\Request::is('configuration/*'))
                             @userCan(\App\Models\UserRole::ROLE_ROOT)
@@ -299,8 +303,11 @@ $currentEntite = request()->route('currententite');
                             </li>
                            
                             @endUserCan
+                               
                             @userCan(\App\Models\UserRole::ROLE_ADMIN)
-                             <li class="nav-item">
+                            @php if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT)) : @endphp
+
+                            <li class="nav-item">
                                 <a href="{{route('typecommande')}}" class="nav-link {{ request()->is('configuration/typecommande') ? 'active' : '' }}">
                                     <i class="fa fa-arrows nav-icon"></i>
                                     <p>Type Commandes</p>
@@ -321,6 +328,33 @@ $currentEntite = request()->route('currententite');
                                     
                                 </a>
                             </li>
+                               
+                            @php else:  @endphp
+
+                            <li class="nav-item">
+                                <a href="{{route('typecommandeAdmin', $currentEntite)}}" class="nav-link {{ request()->is('configuration/typecommande') ? 'active' : '' }}">
+                                    <i class="fa fa-arrows nav-icon"></i>
+                                    <p>Type Commandes</p>
+                                    
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{route('utilisateursAdmin', $currentEntite)}}" class="nav-link {{ request()->is('configuration/utilisateurs') ? 'active' : '' }}">
+                                    <i class="fa fa-users nav-icon"></i>
+                                    <p>Utilisateurs</p>
+                                    
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{route('fournisseursAdmin', $currentEntite)}}" class="nav-link {{ request()->is('configuration/fournisseurs') ? 'active' : '' }}">
+                                    <i class="fa fa-handshake-o nav-icon"></i>
+                                    <p>Fournisseurs</p>
+                                    
+                                </a>
+                            </li>
+                               
+                            @php endif @endphp
+                             
                            
                             @endUserCan
                             @userCan(\App\Models\UserRole::ROLE_ROOT)

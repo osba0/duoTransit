@@ -34,7 +34,7 @@ class UserController extends Controller
              abort(401);
         }
         
-        $client = Client::get();
+        $client =  Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
         $entites = Entite::get();
 
         $isAdmin = 0;
@@ -63,8 +63,9 @@ class UserController extends Controller
         $paginate = request('paginate');
 
         if (isset($paginate)) {
+           
             if($user->hasRole(UserRole::ROLE_ADMIN)){
-                  $users = User::where("entites_id", $user->entites_id)->where(function($query){
+                  $users = User::whereJsonContains("entites_id", $user->entites_id)->where(function($query){
                     $query->orWhereJsonContains("roles", UserRole::ROLE_ADMIN)->orWhereJsonContains('roles', UserRole::ROLE_USER);
                 })->orderBy('id', 'desc')->paginate($paginate);
             }else{

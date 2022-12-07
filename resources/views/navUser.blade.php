@@ -36,7 +36,7 @@
                     @if($entite == $notification->data['entite'])
                       @php $diff = floor((strtotime(date('Y-m-d H:i:s')) - strtotime($notification->created_at))) @endphp
                        <div class="dropdown-divider"></div>
-                        <a href="/notifications/mark-as-read/{{ $notification->data['slug'] }}/{{$notification->id}}" title="" class="dropdown-item d-flex justify-content-between align-items-top"> 
+                        <a href="/{{$entite}}/notifications/mark-as-read/{{ $notification->data['slug'] }}/{{$notification->id}}" title="" class="dropdown-item d-flex justify-content-between align-items-top"> 
                             <!--i class="fa fa-info mr-2 pt-2"></i--> 
                             <label class="flex-1 m-0" style="white-space: break-spaces;">{{ $notification->data['title'] }}<br><em class="text-sm userNotif badge badge-info">by {{ $notification->data['user']['username'] }}</em></label><span class="float-right text-muted text-sm">
                                 @if(($diff / 60) < 60)

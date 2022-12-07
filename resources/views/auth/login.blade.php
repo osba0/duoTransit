@@ -77,14 +77,25 @@
 </x-guest-layout>
 <style type="text/css">
     body{
-        background: url(../../images/bgApp.png) !important;
+        background: url(../../images/bg-contenaire.jpg) !important;/*bgApp.png*/
         background-position-x: 0%;
         background-position-y: 0%;
         background-repeat: repeat;
         background-repeat: no-repeat !important;
         background-position: center 50% !important;
+        background-size: cover !important;
     }
     .bg-gray-100{
         background: none !important;
+    }
+    .bg-login{
+        position: absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        opacity: 0.6;
+        background: white;
+        z-index:-1;
     }
 </style>

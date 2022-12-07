@@ -270,7 +270,8 @@
           'listRoles',
           'listClients',
           'listEntites',
-          'isAdmin'
+          'isAdmin',
+          'slugClient'
         ],
          components: {
             Multiselect   
@@ -459,7 +460,7 @@
                 this.userForm.confirmPassword="";
             },
             getUser(page = 1){
-                axios.get('/configuration/getUser?page=' + page + "&paginate=" + this.paginate).then(response => {
+                axios.get('/configuration/getUser?slug='+this.slugClient+'&page=' + page + "&paginate=" + this.paginate).then(response => {
                     this.users = response.data;
                 });
             },

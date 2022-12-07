@@ -273,7 +273,23 @@
                 @endif
 
                 <div class="col-md-3 mt-3">
-                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("typecommande") }}'">
+                    
+                    @php if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT)) : @endphp
+                        @php 
+                            $link = route("typecommande"); 
+                            $link_four = route("fournisseurs"); 
+                            $link_user = route("utilisateurs"); 
+                        @endphp
+                    @php else:  @endphp
+                        @php 
+                            $link = route("typecommandeAdmin", ["currententite" => $slug]);
+                            $link_four = route("fournisseursAdmin", ["currententite" => $slug]);
+                            $link_user = route("utilisateursAdmin", ["currententite" => $slug]);
+                        @endphp
+                   
+                    @php endif  @endphp
+
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ $link }}'">
                         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                           <dl class="mb-0">
                             <dt class="fs-3 fw-bold">{{$typeCmdNbr}}</dt>
@@ -284,7 +300,7 @@
                           </div>
                         </div>
                         <div class="bg-body-light mt-3 rounded-bottom">
-                          <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ route('typecommande') }}">
+                          <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ $link }}">
                             <span>Afficher</span>
                             <i class="fa fa-arrow-circle-right h3 m-0 ms-1 opacity-25 fs-base"></i>
                           </a>
@@ -293,7 +309,7 @@
                 </div>
                 
                  <div class="col-md-3 mt-3">
-                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("utilisateurs") }}'">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ $link_user }}'">
                         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                           <dl class="mb-0">
                             <dt class="fs-3 fw-bold">{{ $totalUser}}</dt>
@@ -303,8 +319,8 @@
                             <i class="fa fa-users text-white h2 m-0" aria-hidden="true"></i>
                           </div>
                         </div>
-                        <div class="bg-body-light mt-3 rounded-bottom">
-                           <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ route('utilisateurs') }}">
+                        <div class="bg-body-light mt-3 rounded-bottomz">
+                           <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ $link_user }}">
                             <span>Afficher</span>
                             <i class="fa fa-arrow-circle-right h3 m-0 ms-1 opacity-25 fs-base"></i>
                           </a>
@@ -312,7 +328,7 @@
                     </div>
                 </div> 
                 <div class="col-md-3 mt-3">
-                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ route("fournisseurs") }}'">
+                    <div class="bloc block-rounded d-flex flex-column h-100 mb-0 cursor-pointer" onclick="javascript:location.href='{{ $link_four }}'">
                         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                           <dl class="mb-0">
                             <dt class="fs-3 fw-bold">{{$fourNbr}}</dt>
@@ -323,7 +339,7 @@
                           </div>
                         </div>
                         <div class="bg-body-light mt-3 rounded-bottom">
-                          <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ route('fournisseurs') }}">
+                          <a class="text-primary block-content block-content-full p-2 text-center block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between" href="{{ $link_four }}">
                             <span>Afficher</span>
                             <i class="fa fa-arrow-circle-right h3 m-0 ms-1 opacity-25 fs-base"></i>
                           </a>

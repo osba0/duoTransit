@@ -51,8 +51,6 @@ class IndexController extends Controller
 
         // check multiEntité
 
-       
-        var_dump($user->entites_id); die();
         if(sizeof($user->entites_id) > 1 && is_null(request('entite')) ){ 
             return  view('chosseEntite', ['chooseEntite' => true, 'slug' => ""]);   
         }

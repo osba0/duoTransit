@@ -249,7 +249,7 @@
                                                         <p class="position-relative d-inline-block pr-4">
                                                              <template v-if="selected.photos.length > 0">
                                                                 <span v-for="(photo, index) in selected.photos" class="border mr-1 mb-2 position-absolute shadow-sm rounded-circle" :style="{top:0.2*index-15+ 'px', left: 2*index+ 'px'}">             
-                                                                        <img :src="'/assets/photos_chargement/'+photo" width="50" height="50" class="rounded-circle">  
+                                                                        <img :src="'/assets/photos_chargement/'+photo" width="50" height="50" class="rounded">  
                                                                 </span>
                                                               
                                                             </template>

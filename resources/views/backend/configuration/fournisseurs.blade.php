@@ -11,7 +11,13 @@
                 </a>
             </div>
             
-            <fournisseur :list-client="{{ json_encode($listClient) }}"></fournisseur>
+            
+
+             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
+               <fournisseur :list-client="{{ json_encode($listClient) }}" :id-entite=-1 slug-client=''></fournisseur>
+            @else
+                <fournisseur :list-client="{{ json_encode($listClient) }}" slug-client="{{request()->route('currententite')}}" :id-entite="{{  auth()->user()->getIDEntite(request()->route('currententite')) }}"></fournisseur>
+            @endif
         </div>
     </div>
 </div>

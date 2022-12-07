@@ -31,7 +31,9 @@ class HistoActionController extends Controller
 
         $user = Auth::user();
 
-        $entite = Entite::where('slug', request('currententite'))->get()->first(); 
+        $slugEntite = is_null(request('entite'))? Entite::whereIn("id", $user->entites_id)->first()->toArray()['slug'] : request('entite');
+
+        $entite = Entite::where('slug', $slugEntite)->get()->first(); 
         
         $client = Client::get()->where('slug', request('id'))->first();
 
@@ -46,7 +48,7 @@ class HistoActionController extends Controller
         $entrepots = Entrepot::get();  
 
         
-        return  view('backend.historique_empotage.index', ['logo' => $client->cllogo, 'id_client' => $client->id, 'typeCmd' => $typeCmd, 'client' => $client, 'fournisseurs' => $fournis, 'listContenaire' => $contenaires, "entrepots" => $entrepots]);
+        return  view('backend.historique_empotage.index', ['logo' => $client->cllogo, 'id_client' => $client->id, 'typeCmd' => $typeCmd, 'client' => $client, 'fournisseurs' => $fournis, 'listContenaire' => $contenaires, "entrepots" => $entrepots, 'slug' => $slugEntite]);
     }
 
     public function indexDocim(Request $request){

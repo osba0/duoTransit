@@ -76,9 +76,16 @@ Route::group(['prefix' => 'configuration'], function () {
        
         $listClient = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
         return view('backend.configuration.fournisseurs', ['listClient' => $listClient]);
-    })->name('fournisseurs')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
+    })->name('fournisseurs')->middleware(['auth', 'role:' . UserRole::ROLE_ROOT]);
 
-    Route::get('/utilisateurs', [UserController::class, 'index'])->name('utilisateurs')->middleware(['auth']);
+    Route::get('/fournisseurs/{currententite}', function () {
+         $listClient = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get();
+        return view('backend.configuration.fournisseurs', ['listClient' => $listClient]);
+    })->name('fournisseursAdmin')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
+
+    Route::get('/utilisateurs', [UserController::class, 'index'])->name('utilisateurs')->middleware(['auth', 'role:' . UserRole::ROLE_ROOT]);
+
+    Route::get('/utilisateurs/{currententite}', [UserController::class, 'index'])->name('utilisateursAdmin')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
 
     Route::post('/statusCompte', [UserController::class, 'statusCompte'])->middleware(['auth']);;
 
@@ -91,8 +98,15 @@ Route::group(['prefix' => 'configuration'], function () {
     })->name('contenaires')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
 
     Route::get('/typecommande', function () {
-        return view('backend.configuration.typecommande');
-    })->name('typecommande')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
+         $listClient = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
+        return view('backend.configuration.typecommande', ['listClient' => $listClient]);
+
+    })->name('typecommande')->middleware(['auth', 'role:' . UserRole::ROLE_ROOT]);
+
+    Route::get('/typecommande/{currententite}', function () {
+         $listClient = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get();
+        return view('backend.configuration.typecommande', ['listClient' => $listClient]);
+    })->name('typecommandeAdmin')->middleware(['auth', 'role:' . UserRole::ROLE_ADMIN]);
 
     Route::get('/entite', function () {
         $contenaires = Contenaire::get(); 
@@ -117,7 +131,7 @@ Route::middleware(['role:' . UserRole::ROLE_CLIENT])->group(function () {
  });
 
 Route::middleware(['role:' . UserRole::ROLE_CONSULTATION])->group(function () {
-    Route::get('/consultation/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('consultation');
+    Route::get('/{currententite}/consultation/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('consultation');
  });
 
 /* Route::middleware(['auth'])->group(function () {
@@ -233,6 +247,11 @@ Route::post('/configuration/modifyEntite', [ConfigurationController::class, 'mod
 Route::post('/configuration/clientFournisseur/{fournisseur}/{client}', [ConfigurationController::class, 'ajoutClientFour']);
 
 Route::post('/configuration/retirerclientFournisseur/{fournisseur}/{client}', [ConfigurationController::class, 'retirerClientFour']);
+
+
+Route::post('/configuration/clientTypeCmd/{typecommande}/{client}', [ConfigurationController::class, 'ajoutClientTypeCmd']);
+
+Route::post('/configuration/retirerclientTypeCmd/{typecommande}/{client}', [ConfigurationController::class, 'retirerClientTypeCmd']);
 
 
 Route::get('/configuration/getTypeCommande', [ConfigurationController::class, 'getTypeCommande']);

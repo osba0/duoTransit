@@ -18,6 +18,7 @@
         <script src="{{ asset('js/app.js') }}" defer></script>
     </head>
     <body>
+        <div class="{{ \Request::is('login') ? 'bg-login' : ''}}"></div>
         <div id="pageGuest" class="font-sans text-gray-900 antialiased">
             {{ $slot }}
         </div>

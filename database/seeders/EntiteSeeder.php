@@ -24,7 +24,7 @@ class EntiteSeeder extends Seeder
 
         $entite = Entite::create([
             'nom' => 'Marine Plus',
-            'slug' => \Str::slug(request('Marine Plus')),
+            'slug' => 'marineplus',
             'adresse' => '29 AVENUE DE GENEVE, France',
             'telephone' => '00 00 00 00',
             'fax' => '00 00 00 00',
