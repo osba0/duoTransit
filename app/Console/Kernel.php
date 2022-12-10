@@ -27,9 +27,11 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
 
-        $schedule
+      /*  $schedule
             ->command(JournalCommandes::class)
-            ->everyTwoMinutes();
+            ->everyTwoMinutes(); */
+
+         $schedule->exec("php artisan log:orders");
     }
 
     /**
