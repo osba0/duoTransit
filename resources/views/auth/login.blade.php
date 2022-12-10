@@ -94,8 +94,8 @@
         left:0;
         width:100%;
         height:100%;
-        opacity: 0.4;
-        background: #b5b5b559;
+       opacity: 0.6;
+        background: #fbfbfb;
         z-index:-1;
     }
 </style>
