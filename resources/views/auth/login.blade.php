@@ -57,13 +57,13 @@
             </div-->
 
             <!-- Mot de passe oublié -->
-            <div class="block mt-4">
+            <!--div class="block mt-4">
                 @if (Route::has('password.request'))
                     <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
                         {{ __('Mot de passe oublié?') }}
                     </a>
                 @endif
-            </div>
+            </div-->
 
             <div class="flex items-center justify-end mt-4">
                
@@ -94,8 +94,8 @@
         left:0;
         width:100%;
         height:100%;
-        opacity: 0.6;
-        background: white;
+        opacity: 0.4;
+        background: #b5b5b559;
         z-index:-1;
     }
 </style>
