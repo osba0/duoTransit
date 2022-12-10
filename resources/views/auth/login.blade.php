@@ -6,7 +6,7 @@
                     <!--x-application-logo class="w-20 h-20 fill-current text-gray-500" /-->
                     <img src="{{ asset('images/itransit-logo.png') }}" class="text-center" style="display:inline-block;">
                 </a>
-                <h1 class="text-center" style="font-size: 40px; color: #3498db; font-weight:bold;">{{ env('APP_NAME') }}</h1>
+                <h1 class="text-center" style="font-size: 40px; color: #3498db; font-weight:bold;">{{ config('app.name', 'Laravel') }}</h1>
             </div>
         </x-slot>
         <div class="pb-1 mt-2 mb-0 h3 font-weight-bold" style="color: #3e5267 !important;">Connexion</div>
