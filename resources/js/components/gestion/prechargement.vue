@@ -835,13 +835,13 @@
                         if(obj.idPre > 0 || obj.dossier_id > 0){
                             if(this.eventCmdSelected.idcmd!=obj.reidre || (this.eventCmdSelected.ischecked > 0 && this.eventCmdSelected.idcmd==obj.reidre)){
                                 nbCommande++;
-                                nbColis +=  (obj.renbcl + obj.renbpl);
+                                nbColis +=  (parseInt(obj.renbcl) + parseInt(obj.renbpl));
                     
                                 this.selected.poids    += obj.repoid;
                                 this.selected.volume   += obj.revolu;
                             }else if(this.eventCmdSelected.ischecked == 0 && this.eventCmdSelected.idcmd==obj.reidre){
                                 nbCommande--;
-                                nbColis -=  (obj.renbcl + obj.renbpl);
+                                nbColis -=  (parseInt(obj.renbcl) + parseInt(obj.renbpl));
                     
                                 this.selected.poids    -= obj.repoid;
                                 this.selected.volume   -= obj.revolu;
