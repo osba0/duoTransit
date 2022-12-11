@@ -1113,8 +1113,8 @@
 
         	deleteDry(dry){
         		Vue.swal.fire({
-				  title: 'Confirmez la suppression',
-				  text: "Commande n° "+dry.rencmd+", Attention!!! cette opération est irréversible.",
+				  title:"Suppression Commande n° "+dry.rencmd,
+				  text: "Attention!!! cette opération est irréversible.",
 				  icon: 'warning',
 				  showCancelButton: true,
 				  confirmButtonColor: '#d33',
