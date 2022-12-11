@@ -25,6 +25,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command(JournalCommandes::class)->everyMinute();
         // $schedule->command('inspire')->hourly();
 
       /*  $schedule
@@ -33,7 +34,7 @@ class Kernel extends ConsoleKernel
 
            // $schedule->command(JournalCommandes::class)->daily();
 
-            $schedule->command(JournalCommandes::class)->hourly();
+          //  $schedule->command(JournalCommandes::class)->hourly();
 
         // $schedule->exec("php artisan log:orders");
     }
