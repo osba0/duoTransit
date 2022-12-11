@@ -31,7 +31,9 @@ class Kernel extends ConsoleKernel
             ->command(JournalCommandes::class)
             ->everyTwoMinutes(); */
 
-         $schedule->exec("php artisan log:orders");
+            $schedule->command(JournalCommandes::class)->daily();
+
+        // $schedule->exec("php artisan log:orders");
     }
 
     /**
