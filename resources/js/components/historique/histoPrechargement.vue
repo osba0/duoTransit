@@ -246,7 +246,7 @@
              <div class="modal-content">
                 
                     <div class="modal-header text-left">
-                        <h4 class="modal-title w-100 font-weight-bold">Facture</h4>
+                        <h4 class="modal-title w-100 font-weight-bold">Détails</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
                           <span aria-hidden="true">&times;</span>
                         </button>
