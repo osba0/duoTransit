@@ -976,12 +976,14 @@
                 this.setProgressCont(this.selected.volume);
             },
             getTypeCommande(id){
+                var name=id;
                 for(var i=0; i<this.typeCmd.length;i++){
+                    console.log(this.typeCmd[i].id,'__',id);
                     if(this.typeCmd[i].id === id){
-                        return this.typeCmd[i].typcmd;
+                        name = this.typeCmd[i].typcmd;
                     }
                 }
-                return id;
+                return name;
             },
             getColorTypeCmd(id){
                  for(var i=0; i<this.typeCmd.length;i++){
