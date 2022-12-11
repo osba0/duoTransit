@@ -33,7 +33,7 @@
                                             <option value="">Tout</option> 
                                             <option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option>
                                             
-                                        </select>
+                                        </select> 
                                     </div>
                                     <div class="mr-3 text-left" style="width: 180px">
                                         <label class="text-left w-100 mb-0">N° Dossier</label>
@@ -304,16 +304,16 @@
                 <table class="table">
                     <thead class="thead-blue hasborder">
                          <tr>
-                            <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[2])">N°ECV / BBE<i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[2])"><div class='d-flex align-items-center'><span>N°ECV / BBE</span><i class="fa fa-sort" aria-hidden="true" ></i></div></th> 
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
-                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[5])">Poids <i class="fa fa-sort" aria-hidden="true" ></i></th>
-                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[6])">Volume <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[5])"><div class='d-flex align-items-center'><span>Poids</span> <i class="fa fa-sort" aria-hidden="true" ></i></div></th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[6])"><div class='d-flex align-items-center'><span>Volume</span> <i class="fa fa-sort" aria-hidden="true" ></i></div></th>
                             <th class="text-nowrap p-2 border-right border-white h6">Factures</th>
                             <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
                             <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Dépalettisation</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Douanes</th>
-                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                            <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[4])"><div class='d-flex align-items-center'><span>Date livraison</span> <i class="fa fa-sort" aria-hidden="true" ></i></div></th>
                             <th class="text-nowrap p-2 border-right border-white h6">Crée par?</th>
                             <th class="p-2 border-right border-white text-left h6">Validé par?</th>
                             
@@ -351,22 +351,24 @@
                         <td class="p-2 align-middle">
                              {{dry.douane}}
                         </td>
-                        <td class="p-2 align-middle"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
-                        <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.user_created}}</td>
+                        <td class="p-2 align-middle">{{ dry.redali }}</td>
+                        <td class="p-2 align-middle text-nowrap">{{ dry.user_created}}</td>
                         <td class="p-2 align-middle">
                             <i class="fa fa-user" aria-hidden="true"></i>
                             {{dry.prechargeur}}
                            
                         </td>
                         <td class="p-2 text-right">
-                             <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
-                                <i class="fa fa-eye" aria-hidden="true"></i>
-                                 <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
-                            </a>
-                            <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
-                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
-                                <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
-                            </button>
+                            <div class='d-flex align-items-center'>
+                                <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                     <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
+                                </a>
+                                <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
+                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                    <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     </template>
