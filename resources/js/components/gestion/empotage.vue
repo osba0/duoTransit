@@ -1083,14 +1083,14 @@
                                     nbCommande++;
                                     nbColis +=  (parseInt(obj.renbcl) + parseInt(obj.renbpl));
                         
-                                    this.selected.poids    += parseFloat(obj.repoid);
-                                    this.selected.volume   += parseFloat(obj.revolu);
+                                    this.selected.poids    += parseFloat(obj.repoid).toFixed(2);
+                                    this.selected.volume   += parseFloat(obj.revolu).toFixed(2);
                                 }else if(this.eventCmdSelected.ischecked == 0 && this.eventCmdSelected.idcmd==obj.reidre){
                                     nbCommande--;
                                     nbColis -=  (obj.renbcl + obj.renbpl);
                         
-                                    this.selected.poids    -= parseFloat(obj.repoid);
-                                    this.selected.volume   -= parseFloat(obj.revolu);
+                                    this.selected.poids    -= parseFloat(obj.repoid).toFixed(2);
+                                    this.selected.volume   -= parseFloat(obj.revolu).toFixed(2);
 
                                     if(nbCommande < 0){
                                         nbCommande=0;
