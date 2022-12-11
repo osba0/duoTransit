@@ -2158,7 +2158,7 @@
                 this.currentIndexDoc = index;
             },
             format_dec(mnt){
-                return mnt.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             },
             editDepaletissation(dry){
                 $("#labelDepal_"+dry.reidre).hide();
