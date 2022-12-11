@@ -1114,7 +1114,7 @@
         	deleteDry(dry){
         		Vue.swal.fire({
 				  title: 'Confirmez la suppression',
-				  text: "Commande n° "+dry.rencmd,
+				  text: "Commande n° "+dry.rencmd+", Attention!!! cette opération est irréversible.",
 				  icon: 'warning',
 				  showCancelButton: true,
 				  confirmButtonColor: '#d33',
@@ -1125,8 +1125,8 @@
 					  	axios.delete('/deleteReception/'+dry.reidre+'/'+dry.clients_id).then(response => {
 			                console.log(response);
 			             	 Vue.swal.fire(
-						      'Deleted!',
-						      'Your file has been deleted.',
+						      'Suppression commande',
+						      'Commande supprimé avec succés',
 						      'success'
 						    );
 			             	 this.modeModify = false;
