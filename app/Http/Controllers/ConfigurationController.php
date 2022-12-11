@@ -774,7 +774,7 @@ class ConfigurationController extends Controller
         
         if(request('slug')!=''){
             $client = Client::where('slug', request('slug'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
-
+var_dump($client); die();
             if(!$client){
                 abort(404);
             }
