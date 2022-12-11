@@ -1083,14 +1083,14 @@
                                     nbCommande++;
                                     nbColis +=  (parseInt(obj.renbcl) + parseInt(obj.renbpl));
                         
-                                    this.selected.poids    += parseFloat(obj.repoid).toFixed(2);
-                                    this.selected.volume   += parseFloat(obj.revolu).toFixed(2);
+                                    this.selected.poids    += parseFloat(obj.repoid);
+                                    this.selected.volume   += parseFloat(obj.revolu);
                                 }else if(this.eventCmdSelected.ischecked == 0 && this.eventCmdSelected.idcmd==obj.reidre){
                                     nbCommande--;
                                     nbColis -=  (obj.renbcl + obj.renbpl);
                         
-                                    this.selected.poids    -= parseFloat(obj.repoid).toFixed(2);
-                                    this.selected.volume   -= parseFloat(obj.revolu).toFixed(2);
+                                    this.selected.poids    -= parseFloat(obj.repoid);
+                                    this.selected.volume   -= parseFloat(obj.revolu);
 
                                     if(nbCommande < 0){
                                         nbCommande=0;
@@ -1108,6 +1108,8 @@
                         }
                         this.selected.nbrColis = nbColis;
                         this.selected.nbrCmd = nbCommande;
+                        this.selected.volume = this.selected.volume.toFixed(2);
+                        this.selected.poids = this.selected.poids.toFixed(2);
                         this.setProgressCont(this.selected.volume);
                    // }
                    
