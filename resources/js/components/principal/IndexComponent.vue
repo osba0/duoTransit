@@ -4,7 +4,7 @@
        <div class="row">
             <div class="col-md-12 pt-5">
                 <div class="text-left pb-2 border-bottom  h4 mb-2">
-                    {{ clientsAuth.length > 0 ? 'Société(s) supervisés(s) ' : 'Choisir une société' }} 
+                    {{ clientsAuth.length > 0 ? 'Société(s) supervisée(s) ' : 'Choisir une société' }} 
                 </div>
             </div>
         </div>

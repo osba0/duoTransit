@@ -354,9 +354,7 @@
                         <td class="p-2 align-middle">{{ dry.redali }}</td>
                         <td class="p-2 align-middle text-nowrap">{{ dry.user_created}}</td>
                         <td class="p-2 align-middle">
-                            <i class="fa fa-user" aria-hidden="true"></i>
                             {{dry.prechargeur}}
-                           
                         </td>
                         <td class="p-2 text-right">
                             <div class='d-flex align-items-center'>
