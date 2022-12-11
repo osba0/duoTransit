@@ -1081,16 +1081,16 @@
 
                                 if(this.eventCmdSelected.idcmd!=obj.reidre || (this.eventCmdSelected.ischecked > 0 && this.eventCmdSelected.idcmd==obj.reidre)){
                                     nbCommande++;
-                                    nbColis +=  (obj.renbcl + obj.renbpl);
+                                    nbColis +=  (parseInt(obj.renbcl) + parseInt(obj.renbpl));
                         
-                                    this.selected.poids    += obj.repoid;
-                                    this.selected.volume   += obj.revolu;
+                                    this.selected.poids    += parseFloat(obj.repoid);
+                                    this.selected.volume   += parseFloat(obj.revolu);
                                 }else if(this.eventCmdSelected.ischecked == 0 && this.eventCmdSelected.idcmd==obj.reidre){
                                     nbCommande--;
                                     nbColis -=  (obj.renbcl + obj.renbpl);
                         
-                                    this.selected.poids    -= obj.repoid;
-                                    this.selected.volume   -= obj.revolu;
+                                    this.selected.poids    -= parseFloat(obj.repoid);
+                                    this.selected.volume   -= parseFloat(obj.revolu);
 
                                     if(nbCommande < 0){
                                         nbCommande=0;
