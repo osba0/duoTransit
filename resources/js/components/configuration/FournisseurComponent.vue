@@ -45,7 +45,7 @@
                           </template>
                           
                         </td>
-                        <td> 
+                        <td> {{slugClient}}--{{listClient}}
                             <template v-if="slugClient!=''">
                                 <template v-for="client in listClient">
                                      <template v-if="client.clfocl.includes(fournisseur.id) && slugClient==client.slug">
