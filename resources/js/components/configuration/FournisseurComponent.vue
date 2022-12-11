@@ -45,13 +45,21 @@
                           </template>
                           
                         </td>
-                        <td> {{slugClient}}--{{listClient}}
+                        <td>
                             <template v-if="slugClient!=''">
                                 <template v-for="client in listClient">
-                                     <template v-if="client.clfocl.includes(fournisseur.id) && slugClient==client.slug">
-                                        <a class="badge badge-success text-white position-relative mr-2 p-2 mb-2 cursor-pointer">
+                                    <template v-if="client.clfocl.includes(fournisseur.id)">
+                                        <a title="Retirer la société" v-on:click="retirerSocieteFour(client, fournisseur)" class="badge badge-success text-white position-relative mr-2 p-2 mb-2 cursor-pointer">
                                         {{client.clnmcl}}
+                                        <span class="badge badge-danger position-icone position-absolute"><i class="fa fa-minus"></i></span>
+                                       
                                         </a>  
+                                    </template>
+                                    <template v-else>
+                                        <a title="Ajouter la société" class="badge badge-secondary text-white position-relative mr-2 p-2 mb-2 cursor-pointer" v-on:click="addSocieteFour(client, fournisseur)">
+                                        {{client.clnmcl}}
+                                         <span class="badge badge-success position-icone position-absolute"><i class="fa fa-plus"></i></span>
+                                        </a>
                                     </template>
                                 </template>
                             </template>
