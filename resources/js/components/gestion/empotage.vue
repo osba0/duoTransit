@@ -978,8 +978,7 @@
             getTypeCommande(id){
                 var name=id;
                 for(var i=0; i<this.typeCmd.length;i++){
-                    console.log(this.typeCmd[i].id,'__',id);
-                    if(this.typeCmd[i].id === id){
+                    if(this.typeCmd[i].id === parseInt(id)){
                         name = this.typeCmd[i].typcmd;
                     }
                 }
