@@ -113,119 +113,125 @@
                     </div>
                     <div class="modal-body mx-3">
                          <form @submit.prevent="saveUser" enctype="multipart/form-data" key=1 >
-                            <div class="row">
-                                <div class="col-6 d-flex flex-column justify-content-start align-items-center">
-                                    <div class="w-100 d-flex my-2 align-items-center">
-                                     <label for="profil" class="d-block m-0 text-right w-35 pr-2" >Profil</label>
-                                      
-                                    <select v-model="userForm.profil" class="form-control form-control-sm w-65" :class="{ 'border-danger': submitted && !$v.userForm.profil.required }"  :disabled="userForm.profil == 'Root'" @change="onProfil()">
-                                        <option value="">Choisir</option>
-                                       <option v-for="role in roles" :value="role">{{role}}</option>
-                                    </select>
+                            <div class="d-flex">
+                                <div class="w-50">
+                                    <div class="row">
+                                        <div class="col-12 d-flex flex-column justify-content-start align-items-center">
+                                            <div class="w-100 d-flex my-2 align-items-center">
+                                             <label for="profil" class="d-block m-0 text-right w-35 pr-2" >Profil</label>
+                                              
+                                            <select v-model="userForm.profil" class="form-control form-control-sm w-65" :class="{ 'border-danger': submitted && !$v.userForm.profil.required }"  :disabled="userForm.profil == 'Root'" @change="onProfil()">
+                                                <option value="">Choisir</option>
+                                               <option v-for="role in roles" :value="role">{{role}}</option>
+                                            </select>
 
+                                            </div>
+                                        </div>
+                                        <div class="col-12 d-flex flex-wrap justify-content-end align-items-center">
+                                            <div class="w-100 d-flex align-items-center my-2" v-if="noClientRole">
+                                                <label  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                                    Transitaire
+                                                </label>
+                                                <select v-model="userForm.entite" class="form-control form-control-sm w-65">
+                                                    <option value="">Choisir</option>
+                                                    <option v-for="entite in list_entites" :value="entite.id">{{ entite.nom }}</option>
+                                                </select>
+                                            </div>
+
+                                            <div v-for="entite in list_entites" class="d-block mr-3" v-else>
+                                                <input :id="'entite_'+entite.id" :value="entite.id" name="entiteCl" type="checkbox" v-model="userForm.entiteClients">
+                                                <label :for="'entite_'+entite.id"  class="mb-0 cursor-pointer">{{ entite.nom }}</label>
+                                            </div>
+                                        </div>
                                     </div>
+                                     <div class="row">
+                                        <div class="col-12 my-2 d-flex flex-column justify-content-start align-items-center">
+                                            <div class="w-100 d-flex align-items-center my-2">
+                                               <label for="nom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                                Nom
+                                               </label>
+                                                <input class="w-65 form-control" id="nom" v-model="userForm.nom" 
+                                                :class="{ 'border-danger': submitted && !$v.userForm.nom.required }" />
+                                            </div>
+                                            
+                                         </div>
+                                          <div class="col-12 my-2 d-flex flex-column justify-content-start align-items-center">
+                                            <div class="w-100 d-flex align-items-center">
+                                                 <label for="prenom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                                Prenom
+                                               </label>
+                                                <input class="w-65 form-control" id="prenom" v-model="userForm.prenom" :class="{ 'border-danger': submitted && !$v.userForm.prenom.required }"/>
+                                            </div>
+                                         </div>
+                                        
+                                     </div>
                                 </div>
-                                <div class="col-6 d-flex flex-wrap justify-content-start align-items-center">
-                                    <div class="w-100 d-flex align-items-center my-2" v-if="noClientRole">
-                                        <label  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                            Transitaire
-                                        </label>
-                                        <select v-model="userForm.entite" class="form-control form-control-sm w-65">
-                                            <option value="">Choisir</option>
-                                            <option v-for="entite in list_entites" :value="entite.id">{{ entite.nom }}</option>
-                                        </select>
+                                <div class="w-50">
+                                    <div class="row">
+                                        <div class="col-12 d-flex justify-content-center">
+                                            <div v-if="this.submitted && $v.userForm.email.$error" class="text-center">
+                                              <span v-if="userForm.email && !$v.userForm.email.email" class="badge bg-danger mr-2">Enter valid email address</span>
+                                              <span v-if="userForm.email && $v.userForm.email.email && !$v.userForm.email.maxLength" class="badge bg-danger mr-2">Email is allowed only 30 characters</span>
+                                            </div> 
+                                            <div v-if="this.submitted && $v.userForm.password.$error" class="text-center">
+                                              <span v-if="userForm.password && !$v.userForm.password.minLength" class="badge bg-danger mr-2">Password must be minimum 6 characters</span>
+                                            </div> 
+                                            <div v-if="this.submitted && $v.userForm.confirmPassword.$error" class="text-center">
+                                              <span v-if="userForm.confirmPassword && !$v.userForm.confirmPassword.sameAsPassword" class="badge bg-danger mr-2">Password and Confirm Password should match</span>
+                                            </div>
+                                        </div>
                                     </div>
-
-                                    <div v-for="entite in list_entites" class="d-block mr-3" v-else>
-                                        <input :id="'entite_'+entite.id" :value="entite.id" name="entiteCl" type="checkbox" v-model="userForm.entiteClients">
-                                        <label :for="'entite_'+entite.id"  class="mb-0 cursor-pointer">{{ entite.nom }}</label>
-                                    </div>
+                                   
+                                      <div class="row">
+                                        <div class="col-12 my-2 d-flex flex-column align-items-center">
+                                             <div class="w-100 d-flex align-items-center">
+                                                        <div class="md-form w-100 d-flex justify-content-between align-items-center">
+                                                        <label for="email" class="d-block m-0 text-right w-35 pr-2" >Email</label>
+                                                        <input class="w-65 form-control"  v-model="userForm.email" type="text" id="email" :class="{ 'border-danger': submitted && !$v.userForm.email.required }"/>
+                                                    </div>
+                                             </div>
+                                         </div>
+                                         <div class="col-12 my-2 d-flex flex-column justify-content-start align-items-center">
+                                            
+                                            
+                                            <div class="w-100 d-flex align-items-center">
+                                                 <label for="prenom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                                Login
+                                               </label>
+                                                <input :disabled = "modeModify" class="w-65 form-control" id="username" v-model="userForm.username"  :class="{ 'border-danger': submitted && !$v.userForm.username.required }"/>
+                                            </div>
+                                         </div>
+                                         
+                                     </div>
+                                     <div class="row" :class="modeModify?'d-none':''">
+                                        <div class="col-12 d-flex flex-column align-items-center">
+                                         <div class="w-100 d-flex align-items-center my-2">
+                                                    <div class="md-form w-100 d-flex justify-content-between align-items-center">
+                                                    <label for="password" class="d-block m-0 text-right w-35 pr-2" >Mot de passe</label>
+                                                    <input class="w-65 form-control"  v-model="userForm.password" type="password" id="password" :class="{ 'border-danger': submitted && !$v.userForm.password.required }"/>
+                                                </div>
+                                         </div>
+                                            
+                                            <div class="w-100 d-flex align-items-center my-2"></div>
+                                         </div>
+                                         <div class="col-12  d-flex flex-column justify-content-start align-items-center">
+                                            
+                                            
+                                            <div class="w-100 d-flex align-items-center">
+                                                 <label for="confirmPassword"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;line-height: 18px;'>
+                                                Confirmer<br/> mot de passe
+                                               </label>
+                                                <input class="w-65 form-control" id="confirmPassword" type="password" v-model="userForm.confirmPassword" :class="{ 'border-danger': submitted && !$v.userForm.confirmPassword.required }"/>
+                                            </div>
+                                         </div>
+                                         
+                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-12 d-flex justify-content-center">
-                                    <div v-if="this.submitted && $v.userForm.email.$error" class="text-center">
-                                      <span v-if="userForm.email && !$v.userForm.email.email" class="badge bg-danger mr-2">Enter valid email address</span>
-                                      <span v-if="userForm.email && $v.userForm.email.email && !$v.userForm.email.maxLength" class="badge bg-danger mr-2">Email is allowed only 30 characters</span>
-                                    </div> 
-                                    <div v-if="this.submitted && $v.userForm.password.$error" class="text-center">
-                                      <span v-if="userForm.password && !$v.userForm.password.minLength" class="badge bg-danger mr-2">Password must be minimum 6 characters</span>
-                                    </div> 
-                                    <div v-if="this.submitted && $v.userForm.confirmPassword.$error" class="text-center">
-                                      <span v-if="userForm.confirmPassword && !$v.userForm.confirmPassword.sameAsPassword" class="badge bg-danger mr-2">Password and Confirm Password should match</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                       <label for="nom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Nom
-                                       </label>
-                                        <input class="w-65 form-control" id="nom" v-model="userForm.nom" 
-                                        :class="{ 'border-danger': submitted && !$v.userForm.nom.required }" />
-                                    </div>
-                                    
-                                 </div>
-                                  <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="prenom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Prenom
-                                       </label>
-                                        <input class="w-65 form-control" id="prenom" v-model="userForm.prenom" :class="{ 'border-danger': submitted && !$v.userForm.prenom.required }"/>
-                                    </div>
-                                 </div>
-                                
-                             </div>
-                              <div class="row">
-                                <div class="col-6 my-2 d-flex flex-column align-items-center">
-                                 <div class="w-100 d-flex align-items-center my-2">
-                                            <div class="md-form w-100 d-flex justify-content-between align-items-center">
-                                            <label for="email" class="d-block m-0 text-right w-35 pr-2" >Email</label>
-                                            <input class="w-65 form-control"  v-model="userForm.email" type="text" id="email" :class="{ 'border-danger': submitted && !$v.userForm.email.required }"/>
-                                        </div>
-                                 </div>
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2"></div>
-                                 </div>
-                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="prenom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Login
-                                       </label>
-                                        <input :disabled = "modeModify" class="w-65 form-control" id="username" v-model="userForm.username"  :class="{ 'border-danger': submitted && !$v.userForm.username.required }"/>
-                                    </div>
-                                 </div>
-                                 
-                             </div>
+                           
+                            
 
-                              <div class="row" :class="modeModify?'d-none':''">
-                                <div class="col-6 my-2 d-flex flex-column align-items-center">
-                                 <div class="w-100 d-flex align-items-center my-2">
-                                            <div class="md-form w-100 d-flex justify-content-between align-items-center">
-                                            <label for="password" class="d-block m-0 text-right w-35 pr-2" >Mot de passe</label>
-                                            <input class="w-65 form-control"  v-model="userForm.password" type="password" id="password" :class="{ 'border-danger': submitted && !$v.userForm.password.required }"/>
-                                        </div>
-                                 </div>
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2"></div>
-                                 </div>
-                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="confirmPassword"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Confirmer mot de passe
-                                       </label>
-                                        <input class="w-65 form-control" id="confirmPassword" type="password" v-model="userForm.confirmPassword" :class="{ 'border-danger': submitted && !$v.userForm.confirmPassword.required }"/>
-                                    </div>
-                                 </div>
-                                 
-                             </div>
+                              
                               <div class="row">
                                     
                                     <div class="col-6 my-2 d-flex flex-column">

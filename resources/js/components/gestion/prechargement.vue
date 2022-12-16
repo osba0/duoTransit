@@ -684,6 +684,7 @@
                         return this.typeCmd[i].tcolor;
                     }
                 }
+                console.log("tcolor", id);
                 return "#aaa";
             },
             format_nbr(mnt){

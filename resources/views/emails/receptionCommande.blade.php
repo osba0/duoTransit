@@ -7,7 +7,7 @@
    <div style="color:#0d3095; font-size: 18px;">
       Bonjour,
       <br/><br/>
-      Veuillez recevoir la liste des commandes receptionnés du {{ date("d/m/Y", strtotime( '-1 days' ) ) }}.
+      Veuillez recevoir la liste des commandes receptionnées du {{ date("d/m/Y", strtotime( '-1 days' ) ) }}.
       <br/><br/>
       <table class="table table-striped">  
          <thead style="width:100%; background: rgba(52,73,94,0.94); color: #ffffff;">

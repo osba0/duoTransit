@@ -404,6 +404,11 @@
                         </tfoot>
                 </table>
                 </div>
+                <div class="mb-2 w-100 d-flex justify-content-end align-items-end mt-2">
+                <div class="mr-3">
+                     <button class="btn btn-lg btn-primary" :disabled = "selected.etat == 1" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
+                </div>
+            </div>
             <div class="d-flex mt-4 justify-content-center">
                 <pagination
                     :data="dries"
@@ -588,6 +593,7 @@
                     return this.typeCmd[i].tcolor;
                 }
             }
+            console.log("tcolor", id);
             return "#aaa";
         },
         showDossier(pre){ 

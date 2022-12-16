@@ -73,15 +73,20 @@ class JournalCommandes extends Command
             
                 $emailSent[] = $user->email;
             }
-
-
-            Mail::to($emailSent)->send(new receptionCommandesMail($query));
+            
+            if(!$query->isEmpty()){
+                Mail::to($emailSent)->send(new receptionCommandesMail($query));
          
-            if (Mail::failures()) {
-                   \Log::info('Sending to '.$client->clnmcl.': Sorry! Please try again latter');
+                if (Mail::failures()) {
+                       \Log::info('Sending to '.$client->clnmcl.': Sorry! Please try again latter');
+                }else{
+                    \Log::info('Sending to '.$client->clnmcl.': Great! Successfully send in your mail');
+                }
             }else{
-                \Log::info('Sending to '.$client->clnmcl.': Great! Successfully send in your mail');
+                  \Log::info('Sending to '.$client->clnmcl.':  no orders'); 
             }
+
+            
         }
         
     }
