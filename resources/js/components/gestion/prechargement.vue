@@ -680,7 +680,7 @@
             },
             getColorTypeCmd(id){
                  for(var i=0; i<this.typeCmd.length;i++){
-                    if(this.typeCmd[i].id === id){
+                    if(this.typeCmd[i].id === parseInt(id)){
                         return this.typeCmd[i].tcolor;
                     }
                 }
