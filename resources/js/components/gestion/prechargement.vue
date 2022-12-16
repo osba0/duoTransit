@@ -684,7 +684,7 @@
                         return this.typeCmd[i].tcolor;
                     }
                 }
-                console.log("tcolor", id);
+                console.log("tcolor", id, 'array', this.typeCmd);
                 return "#aaa";
             },
             format_nbr(mnt){
