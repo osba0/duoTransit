@@ -342,7 +342,7 @@
                             </template>
                            
                         </td>
-                        <td>{{ dry.idPre }}</td>
+                        <td class="align-middle"><span class="border rounded bg-light text-center d-inline-block w-100">{{ dry.idPre }}</span></td>
                         <td class="p-2 align-middle rateCenter position-relative">
 
                             <rate :length="3" :value="dry.priorite" :ratedesc="['Pas urgente', 'Normale', 'Urgente']" :readonly="true"  />
