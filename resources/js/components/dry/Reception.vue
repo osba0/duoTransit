@@ -123,7 +123,7 @@
             </div>
         </div>
 
-        <div class="card-body table-responsive p-0">
+        <div class="card-body table-responsive p-0" style="overflow-x: hidden !important">
             <table class="table">
                 <thead class="thead-blue" :class="[isLoading ? '' : 'hasborder']"> 
                      <tr>
