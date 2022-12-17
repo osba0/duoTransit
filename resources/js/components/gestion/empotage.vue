@@ -525,7 +525,7 @@
                                             <input  class="w-65 form-control" type="text" readonly disabled v-model="numDossierEdit">
                                         </template>
                                         <template v-else>
-                                            <select  class="form-control w-65" @change="setData($event)">
+                                            <select  class="form-control w-65" @change="setData($event)" >
                                                 <option value="">Choisir</option>
                                                 <option v-for="dossier in listeDossier" :value="dossier.idpre">{{dossier.numDossier}} {{ getTypeCommande(dossier.type_commandes) }}</option>
                                             </select>
@@ -546,11 +546,11 @@
                                           Type Commande
                                         </label-->
                                         <div class="position-absolute w-100 h-100"></div>
-                                        <select readonly class="form-control mr-2" v-model="empotageForm.typeCmd">
+                                        <select readonly class="form-control mr-2" v-model="empotageForm.typeCmd" :class="{ 'border-danger': submitted && !$v.empotageForm.typeCmd.required }">
                                             <option value="">Type commande</option>
                                             <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
                                         </select>
-                                        <select readonly class="form-control ml-2" v-model="empotageForm.idEntrepot">
+                                        <select readonly class="form-control ml-2" v-model="empotageForm.idEntrepot" :class="{ 'border-danger': submitted && !$v.empotageForm.idEntrepot.required }">
                                             <option value="">Entrepot</option>
                                             <option v-for="entrepot in listEntrepots" :value="entrepot.id">{{entrepot.nomEntrepot}}</option>
                                         </select>
@@ -565,13 +565,13 @@
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2 dateW65">
                                         <label class="d-block m-0 text-right  w-35 pr-2" title="Date départ du bâteau">Date Départ</label>
-                                        <date-picker v-model="empotageForm.dateDepart" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                                        <date-picker v-model="empotageForm.dateDepart" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :input-class="{ 'border-danger form-control': submitted && !$v.empotageForm.dateDepart.required, 'form-control': true }"></date-picker>
                                     </div>
                                  </div>
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2 dateW65">
                                         <label class="d-block m-0 text-left pr-2" title="Date arrivée du bâteau">Date Arrivée</label>
-                                        <date-picker v-model="empotageForm.dateArrivee" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                                        <date-picker v-model="empotageForm.dateArrivee" required valueType="YYYY-MM-DD" input-class="form-control" :input-class="{ 'border-danger form-control': submitted && !$v.empotageForm.dateArrivee.required, 'form-control': true }"placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
                                     </div>
                                  </div>
                              </div>
@@ -930,13 +930,21 @@
                 attachmentsPhoto: [],
                 tabPhoto: [],
                 depaletissation: [],
-                isLoadingContenaire: false 
+                isLoadingContenaire: false,
+                submittedEmpo: false
             }
 
         },
         validations: {
             typeCommande: { required },
-            keyword: { required }
+            keyword: { required },
+            numDossierEdit: { required }, 
+            empotageForm: {
+                typeCmd: { required },
+                dateDepart: { required },
+                dateArrivee: { required },
+                idEntrepot: { required }
+            }
              
         },
         watch: {
@@ -1729,6 +1737,12 @@
                 },
                 saveEmpotage(){
                     this.submitted = true;
+
+                      // stop here if form is invalid
+                        this.$v.empotageForm.$touch();
+                        if (this.$v.empotageForm.$invalid) {
+                            return;
+                        }
                     
                     var date1 = new Date(this.empotageForm.dateDepart);
                     var date2 = new Date(this.empotageForm.dateArrivee);
