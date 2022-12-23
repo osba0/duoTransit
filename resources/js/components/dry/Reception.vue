@@ -185,7 +185,7 @@
                         <td class="p-2 align-middle text-right">{{ dry.renufa }}</td>
                         <!--td class="p-2 align-middle text-right">{{ dry.revafa }}</td-->
                         <td class="p-2 align-middle white-space-nowrap">{{ dry.nbreJour }}</td>
-                        <td class="p-2 align-middle white-space-nowrap"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
+                        <td class="p-2 align-middle white-space-nowrap">{{ dry.redali }}</td>
                         <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.reuser}}</td>
                         <td class="p-2 text-right align-middle">
                             <div class="d-flex justify-content-end">

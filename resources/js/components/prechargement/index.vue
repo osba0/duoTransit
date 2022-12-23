@@ -788,7 +788,7 @@
                                         location.reload();
                                     });   
                                   
-                                }, 5000);
+                                }, 3000);
 
 
                                 // Envoi notification avec le fichier PDF 

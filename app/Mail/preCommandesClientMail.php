@@ -21,12 +21,13 @@ class preCommandesClientMail extends Mailable
      *
      * @return void
      */
-    public function __construct($transitaire,$societe, $commandes, $numeroPre)
+    public function __construct($transitaire,$societe, $commandes, $numeroPre, $pathFile)
     {
         $this->commandes     = $commandes;
         $this->numeroPre     = $numeroPre;
         $this->transitaire   = $transitaire;
         $this->societe       = $societe;
+        $this->pathFile      = $pathFile;
     }
 
     /**
@@ -36,6 +37,6 @@ class preCommandesClientMail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.preChargmementClientMail', ["numeroPre"=>$this->numeroPre, "societe" => $this->societe, "transitaire" => $this->transitaire ]);
+        return $this->view('emails.preChargmementClientMail', ["numeroPre"=>$this->numeroPre, "societe" => $this->societe, "transitaire" => $this->transitaire, "pathFile" => $this->pathFile]);
     }
 }

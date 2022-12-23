@@ -7,7 +7,17 @@
          <div class="modal-content">
             
                 <div class="modal-header text-left">
-                    <h4 class="modal-title w-100 font-weight-bold">Commande N° #{{ viewReception.rencmd }}</h4>
+                    <h4 class="modal-title font-weight-bold">Commande N°{{ viewReception.rencmd }}</h4>
+                    <div class="d-flex align-items-center ml-5">
+                        <div class="d-flex align-items-center" title="Date création">
+                            <a class="btn btnAction mx-1 btn-circle border btn-circle-sm bg-white"><i class="fa fa-calendar-o"></i></a>
+                            <span>{{ viewReception.recrea}}</span>
+                        </div>
+                        <div class="ml-3 pl-3 border-left  d-flex align-items-center"  title="Date modification" v-if="viewReception.recrea!=viewReception.reupda">
+                            <a class="btn btnAction mx-1 btn-circle border btn-circle-sm bg-white"><i class="fa fa-history"></i></a>
+                            <span>{{ viewReception.reupda}}</span>
+                        </div>
+                    </div>
                     <button type="button" class="close" data-dismiss="modal" v-on:click="closeModalDetail()" aria-label="Close" ref="closePoupDetail">
                       <span aria-hidden="true">&times;</span>
                     </button>

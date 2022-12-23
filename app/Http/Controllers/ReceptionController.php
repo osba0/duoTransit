@@ -95,7 +95,8 @@ class ReceptionController extends Controller
                 $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', 0);
             })->where(function($query){
                 $query->orWhere('dossier_prechargements_id', NULL)->orWhere('dossier_prechargements_id', 0);
-            });
+            })->leftJoin('users', 'receptions.users_id', '=', 'users.id')
+            ->select('*','users.username as user_created');
 
         // Profil User lister que ses receptions
 
