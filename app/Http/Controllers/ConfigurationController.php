@@ -227,7 +227,7 @@ class ConfigurationController extends Controller
     public function getFournisseur()
     {
         if(request('slug')!=''){
-            $client = Client::where('slug', request('slug'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+            $client = Client::where('slug', request('slug'))/*->whereJsonContains('clenti', Auth::getUser()->entites_id)*/->get()->first();
 var_dump($client); die();
             if(!$client){
                 abort(404);
