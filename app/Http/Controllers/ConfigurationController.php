@@ -345,7 +345,7 @@ class ConfigurationController extends Controller
 
                     // update
 
-                    Client::where('slug', request('slug'))
+                    Client::/*where('slug', request('slug'))*/whereJsonContains('clenti', Auth::getUser()->entites_id)
                     ->update([
                         "clfocl" => array_unique($listfournisseur)
                     ]);
