@@ -103,8 +103,8 @@
                 
                     <div class="modal-header text-left">
                         <h4 class="modal-title w-100 font-weight-bold">
-                            <template v-if="modeModify">Modification User</template>
-                        <template v-else>Nouveau User</template>
+                            <template v-if="modeModify">Modification Utilisateur</template>
+                        <template v-else>Nouveau Utilisateur</template>
                         
                         </h4>
                         <button type="button" class="close" data-dismiss="modal" v-on:click="closeModal()" aria-label="Close" ref="closePoup">
