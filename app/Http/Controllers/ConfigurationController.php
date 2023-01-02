@@ -333,7 +333,7 @@ class ConfigurationController extends Controller
                 if(request('slug')!=''){
                     $lastIDFour = Fournisseur::latest('id')->first(); 
 
-                    $client = Client::where('slug',request('slug'))->first(); 
+                    $client = Client::/*where('slug',request('slug'))*/whereJsonContains('clenti', Auth::getUser()->entites_id)->first(); 
 
                     $listfournisseur = $client['clfocl'];
 
