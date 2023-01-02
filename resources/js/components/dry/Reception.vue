@@ -1257,7 +1257,7 @@
                 data.append('cmd', this.initRecep.numCommande);
                 data.append('idClient', this.idClient);
 
-                axios.post('/checkCommandeImport/', data).then(response => {
+                axios.post('/checkCommandeImport', data).then(response => {
                     var resp = response.data.commande;
                     if(resp!=null){
                         if(resp.etat_cmd==1){
