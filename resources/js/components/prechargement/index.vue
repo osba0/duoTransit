@@ -136,7 +136,9 @@
                                             <td class="position-relative p-2 align-middle">
                                                 <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': pre.typeCmd_color} : {'background': '#ccc'}]"></div>
                                             {{ pre.id }}</td>
-                                            <td class="p-2 align-middle">{{ pre.nbrCmd }}</td>
+                                            <td class="p-2 align-middle">
+                                            {{ pre.nbrCmd }}
+                                            </td>
                                             <td class="p-2 align-middle">{{ pre.total_colis }} {{pre.total_palette}}</td>
                                             <td class="p-2 align-middle">{{ pre.total_poids }}</td>
                                             <td class="p-2 align-middle">{{ pre.total_volume }}</td>
@@ -324,7 +326,14 @@
                             </td>
                             <td class="p-2 align-middle">
                                  <!--label class="badge badge-primary mr-1 numCmdLab w-100">{{ dry.rencmd }}</label-->
-                                 {{ dry.rencmd }}
+                               
+
+                                  <label class="badge badge-primary" v-if="!Array.isArray(dry.listgroup) || dry.listgroup.length==0">
+                                {{ dry.rencmd }}
+                            </label> 
+                            <label v-else v-for="c in dry.listgroup" class="badge badge-primary mr-2">
+                                {{ c }} 
+                            </label>
                             </td> 
                             <td class="p-2 align-middle">{{ dry.refere }}</td>
                             <td class="p-2 align-middle">{{ dry.reecvr }}</td>
@@ -903,7 +912,7 @@
                     var nbr = [];
                     var emballage = [];
                     var cmdCell=[];
-                    var prio = "";
+                    var prio = ""; 
 
 
                     if(obj.renbcl > 0){
@@ -927,8 +936,14 @@
                         legend2 = '(***) Urgente';
                     }
 
-
-                    cmdCell.push(obj.rencmd+" "+prio);
+                    if(!Array.isArray(obj.listgroup) || obj.listgroup.length==0){
+                        cmdCell.push(obj.rencmd+" "+prio);
+                    }else{
+                        for(var cm=0; cm< obj.listgroup.length; cm++){
+                            cmdCell.push(obj.listgroup[cm]+" "+prio);
+                        }
+                    }
+                    
                     
                     const item = [obj.refere,obj.reecvr, cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
                     

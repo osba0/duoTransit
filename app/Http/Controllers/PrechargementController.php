@@ -437,7 +437,8 @@ class PrechargementController extends Controller
                                   'revolu'         => $key->revolu,
                                   'renufa'         => $key->renufa,
                                   'fournisseurs'   => $key->fournisseur->fonmfo,
-                                  'priorite'       => $key->priorite];
+                                  'priorite'       => $key->priorite,
+                                  'listgroup'      => $key->regroup]; 
    
         }
         return response([

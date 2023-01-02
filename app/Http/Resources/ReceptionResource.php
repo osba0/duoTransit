@@ -53,7 +53,8 @@ class ReceptionResource extends JsonResource
             "dossier_empotage_id"     => $this->dossier_empotage_id,
             "hasIncident"    => $this->reinci,
             "priorite"       => isset($this->priorite)? $this->priorite:'',
-            "nbreJour"       =>  Carbon::now()->diffInDays(Carbon::parse($this->redali))
+            "nbreJour"       =>  Carbon::now()->diffInDays(Carbon::parse($this->redali)),
+            "listgroup"      => $this->regroup
             //"isPreLoaded"    => $this->dossier_prechargements_id 
 
         ];

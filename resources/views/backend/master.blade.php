@@ -139,7 +139,9 @@ $currentEntite = request()->route('currententite');
                         </li>
                         @endif
                         @if (\Request::is($currentEntite.'/reception/*') or \Request::is('activity/*') or \Request::is($currentEntite.'/precharger/*') or (\Request::is('incidents/*')) or 
-                        \Request::is($currentEntite.'/numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is($currentEntite.'/prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is($currentEntite.'/gerer/*') or \Request::is($currentEntite.'/historique-empotage/*') or \Request::is($currentEntite.'/historique-docim/*') or \Request::is($currentEntite.'/consultation/*') or \Request::is($currentEntite.'/historique-prechargement/*') or \Request::is($currentEntite.'/notifications/*'))  
+                        \Request::is($currentEntite.'/numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is($currentEntite.'/prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is($currentEntite.'/gerer/*') or \Request::is($currentEntite.'/historique-empotage/*') or \Request::is($currentEntite.'/historique-docim/*') or 
+                        \Request::is($currentEntite.'/importCommande/*') or 
+                        \Request::is($currentEntite.'/consultation/*') or \Request::is($currentEntite.'/historique-prechargement/*') or \Request::is($currentEntite.'/notifications/*'))  
                             @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
                             <li class="nav-item">
                                 <a href="/{{$currentEntite}}/reception/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/reception/*') ? 'active' : '' }}"><i class="nav-icon fa fa-sign-in"></i> <p>Réceptionner</p></a>
@@ -149,6 +151,9 @@ $currentEntite = request()->route('currententite');
                             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
                             <li class="nav-item">
                                 <a href="/{{$currentEntite}}/precharger/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/precharger/*') ? 'active' : '' }}"><i class="nav-icon fa fa-asterisk"></i> <p>Préchargement</p></a>
+                            </li>
+                            <li class="nav-item"> 
+                                <a href="/{{$currentEntite}}/importCommande/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/importCommande/*') ? 'active' : '' }}"><i class="nav-icon fa fa-cloud-download"></i> <p>Import</p></a> 
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('historique-prechargement', ['id' => $client['slug']?? '', $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/historique-prechargement/*')) ? 'active' : '' }}">

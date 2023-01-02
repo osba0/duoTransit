@@ -16,6 +16,7 @@ use App\Http\Resources\TypeCommandeResource;
 use App\Http\Resources\FournisseurResource;
 use Illuminate\Support\Facades\Auth;
 use App\Models\UserRole;
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -116,8 +117,28 @@ class IndexController extends Controller
             $fournis = Fournisseur::get();
             
         }
-
-        $fournis = Fournisseur::where("foetat",1)->get();
+        if($user->hasRole(UserRole::ROLE_ADMIN)){
+            $statF =  DB::table('clients')->select('clfocl')->whereJsonContains("clenti", $user->entites_id)->get()->toArray();
+            $arrayFournisseur=[];
+            foreach ($statF as $value){
+                $arrayFournisseur = array_merge($arrayFournisseur, json_decode($value->clfocl));
+            }
+            $tabFormate = array_unique($arrayFournisseur);
+            // eviter les id des fournisseurs supprimés
+            $result = DB::table('fournisseurs')->select('id')->get()->toArray();
+            $tampon=[];
+            foreach ($result as $fo){
+                if(in_array($fo->id, $tabFormate)){
+                    array_push($tampon, $fo->id); 
+                }
+                 
+            }
+            $fournisTotal = sizeof($tampon);
+        }else{
+            $fournis = Fournisseur::where("foetat",1)->get();
+            $fournisTotal = $fournis->count();
+        }
+        
 
         $typeCmd = TypeCommande::where("etat",1)->get();
 
@@ -141,8 +162,8 @@ class IndexController extends Controller
         $request->session()->put('idUser', $user->id);
         $request->session()->put('clientSup', $user->getClientSupervisor()); 
 
-       
-        return  view('home', ['roles' => $user->roles[0],'totalCmdAttente' => $receptions,'totalClient' => $client, 'totalEntite' => $entite,'totalContenaire' => $contenaire, 'totalJournal' => $journal, 'totalUser' => $users,'totalFournisseur' => $fournisseur, 'four'=>$four , 'totaEntrepot' => $entrepot,"typeCmdNbr" => $typeCmd->count(),"fourNbr" => $fournis->count(), 'totalCommande'=> $dry, 'recap'=> $recap, 'typeCmdTotal' => $typeCmdTotal, 'fournis' => FournisseurResource::collection($fournis), 'clientSup'=> json_encode($user->getClientSupervisor()), 'slug' => $slugEntite]);
+     
+        return  view('home', ['roles' => $user->roles[0],'totalCmdAttente' => $receptions,'totalClient' => $client, 'totalEntite' => $entite,'totalContenaire' => $contenaire, 'totalJournal' => $journal, 'totalUser' => $users,'totalFournisseur' => $fournisseur, 'four'=>$four , 'totaEntrepot' => $entrepot,"typeCmdNbr" => $typeCmd->count(),"fourNbr" => $fournisTotal, 'totalCommande'=> $dry, 'recap'=> $recap, 'typeCmdTotal' => $typeCmdTotal, 'fournis' => FournisseurResource::collection($fournis), 'clientSup'=> json_encode($user->getClientSupervisor()), 'slug' => $slugEntite]);
     }
 
     /**

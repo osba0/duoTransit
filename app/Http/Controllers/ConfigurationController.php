@@ -76,9 +76,9 @@ class ConfigurationController extends Controller
         $paginate = request('paginate');
 
         if(isset($paginate)) {
-            $clients = Client::whereJsonContains('clenti', $user->entites_id)->orderBy('id', 'desc')->paginate($paginate);
+            $clients = Client::/*whereJsonContains('clenti', $user->entites_id)->*/orderBy('id', 'desc')->paginate($paginate);
         }else{
-            $clients = Client::get()->whereJsonContains('clenti', $user->entites_id);
+            $clients = Client::get()/*->whereJsonContains('clenti', $user->entites_id)*/;
         }
 
 
@@ -227,7 +227,7 @@ class ConfigurationController extends Controller
     public function getFournisseur()
     {
         if(request('slug')!=''){
-            $client = Client::/*where('slug', request('slug'))->*/whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
+            $client = Client::where('slug', request('slug'))->whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();
 
             if(!$client){
                 abort(404);
@@ -264,6 +264,19 @@ class ConfigurationController extends Controller
                 "message" => "Exist" 
             ]);
         }else{
+            // Supprimer les affectations
+            /*$statF =  DB::table('clients')->select('id', 'clfocl')->whereJsonContains("clenti", Auth::user()->entites_id)->get()->toArray();
+
+            foreach ($statF as $value){
+                $fo = json_decode($value->clfocl);
+                unset($fo[array_search(request('id'), $fo)]); 
+                Client::where('id', $value->id)
+                    ->update([
+                        "clfocl" => array_unique($fo)
+                    ]);
+            }*/
+
+
             Fournisseur::where('id', request('id'))->delete();
 
             if(!is_null(request('logo')) || !empty(request('logo'))) File::delete("images/logo/".request('logo'));
@@ -313,6 +326,33 @@ class ConfigurationController extends Controller
                 'fologo' => $filename,
                 "foetat" => 1
             ]);
+
+
+            // Pour le profil Admin ajouter directement le fournisseur au client
+            if($store){
+                if(request('slug')!=''){
+                    $lastIDFour = Fournisseur::latest('id')->first(); 
+
+                    $client = Client::where('slug',request('slug'))->first(); 
+
+                    $listfournisseur = $client['clfocl'];
+
+                    if(!is_array($listfournisseur)){
+                        $listfournisseur=[];    
+                    }
+
+                    array_push($listfournisseur, intval($lastIDFour['id']));
+
+                    // update
+
+                    Client::where('slug', request('slug'))
+                    ->update([
+                        "clfocl" => array_unique($listfournisseur)
+                    ]);
+                }
+            }
+
+                
 
             // get last ID 
             
@@ -817,6 +857,30 @@ class ConfigurationController extends Controller
                 "tcolor" => request('color'),
                 "etat" => 1
             ]);
+
+             // Pour le profil Admin ajouter directement le type au client
+
+             if($store){
+                if(request('slug')!=''){
+                   $lastID = TypeCommande::latest('id')->first(); 
+                   $client = Client::where('slug',request('slug'))->first(); 
+
+                   $listtypecmd = $client['cltyco'];
+
+                   if(!is_array($listtypecmd)){ 
+                        $listtypecmd=[];    
+                   }
+
+                   array_push($listtypecmd, intval($lastID['id']));
+
+                   // update
+
+                   Client::where('slug', request('slug'))
+                      ->update([
+                        "cltyco" => array_unique($listtypecmd)
+                    ]);
+                }
+            }
         }catch(\Exceptions $e){
               return response([
                 "code" => 1,

@@ -1354,6 +1354,14 @@
 
                         cmdCell.push(obj.refere+" "+prio);
 
+                        /*if(!Array.isArray(obj.listgroup) || obj.listgroup.length==0){
+                            cmdCell.push(obj.rencmd+" "+prio);
+                        }else{
+                            for(var cm=0; cm < obj.listgroup.length; cm++){
+                                cmdCell.push(obj.listgroup[cm]+" "+prio);
+                            }
+                        }*/
+
                         const item = [cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa, obj.depalettisation, obj.douane];
                         data.push(item);
                     }

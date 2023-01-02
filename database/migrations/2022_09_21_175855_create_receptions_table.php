@@ -38,6 +38,7 @@ class CreateReceptionsTable extends Migration
             $table->date('redali')->nullable();    // Date livraison
             $table->json('recmds')->nullable();    // liste des commandes receptionné 
             $table->string('rencmd'); // N° commande 
+            $table->text('regroup')->nullable(); // Group cmd
             $table->text('recomt')->nullable(); // Commentaires
             $table->string('douane')->nullable(); // N douane 
             $table->string('depalettisation')->nullable(); //Depaletisation 

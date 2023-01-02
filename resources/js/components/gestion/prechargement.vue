@@ -1148,7 +1148,15 @@
                     }
 
 
-                    cmdCell.push(obj.rencmd+" "+prio);
+                    //cmdCell.push(obj.rencmd+" "+prio);
+
+                    if(!Array.isArray(obj.listgroup) || obj.listgroup.length==0){
+                        cmdCell.push(obj.rencmd+" "+prio);
+                    }else{
+                        for(var cm=0; cm< obj.listgroup.length; cm++){
+                            cmdCell.push(obj.listgroup[cm]+" "+prio);
+                        }
+                    }
                     
                     const item = [obj.refere,obj.reecvr, cmdCell, emballage ,obj.fournisseurs, obj.repoid, obj.revolu, obj.renufa];
                     

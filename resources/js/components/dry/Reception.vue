@@ -165,7 +165,13 @@
                         <td class="p-2 align-middle position-relative ">
                              <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>
                         	 <!--label class="badge badge-primary mr-1 numCmdLab w-100">{{ dry.rencmd }}</label-->
-                             {{ dry.rencmd }}
+                            <label class="badge badge-primary" v-if="!Array.isArray(dry.listgroup) || dry.listgroup.length==0">
+                                {{ dry.rencmd }}
+                            </label> 
+                            <label v-else v-for="c in dry.listgroup" class="badge badge-primary mr-2">
+                                {{ c }} 
+                            </label>
+                             
                         </td>
                         <td class="p-2 align-middle">{{ dry.refere }}</td>
                         <td class="p-2 align-middle">{{ dry.reecvr }}</td>
@@ -249,29 +255,54 @@
 					
                   	<div class="row">
               			<div class="col-6 my-2 d-flex flex-column align-items-center">
-            		 	
-	                       <div class="w-100 d-flex align-items-center my-2">
-		                       <label for="formname"  class="d-block m-0 text-right w-35 pr-2" >
-		                       	Fournisseur
-		                       </label>
-		                       <div class="w-65" >
+            		 	    <div class="w-100 d-flex align-items-center my-2">
+                                <div class="md-form w-100 d-flex mb-2 justify-content-between align-items-center">
+                                    <label for="numfact" class="d-block m-0 text-right w-35 pr-2" >N° Facture</label>
+                                    <input autocomplete="off" class="w-65 form-control" v-model="initRecep.numfact" type="text" id="numfact" :class="{ 'border-danger': submitted && !$v.initRecep.numfact.required }" >
+                                </div>
+                             </div>
 
-			                       <select class="form-control" v-model="initRecep.fournisseur" :class="{ 'border-danger': submitted && !$v.initRecep.fournisseur.required }" >
-			                       	  <option value="">Choisir</option>
-			                       	  
-			                        	<option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option>
-			                          
-			                        	
-			                        </select>
-		                       </div>
-		                    </div>
-			                
-		                     <div class="w-100 d-flex align-items-center my-2">
-		                        <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
-			                        <label for="numfact" class="d-block m-0 text-right w-35 pr-2" >N° Facture</label>
-			                        <input autocomplete="off" class="w-65 form-control" v-model="initRecep.numfact" type="text" id="numfact" :class="{ 'border-danger': submitted && !$v.initRecep.numfact.required }" >
-			                    </div>
-		                     </div>
+                             <div class="w-100 d-flex align-items-center my-2 position-relative">
+                                     
+                                    <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
+                                        <label class="d-block m-0 text-right w-35 pr-2" for="numCommande">N°Commande</label>
+                                        <div class="d-flex w-65">
+                                            <div class="position-relative flex-1">
+                                                <div class="position-absolute" style="top: -18px;right: 0; font-size: 12px;">
+                                            <input type="checkbox" :checked="groupCmds" v-model="groupCmds" id="groupeCmd">
+                                            <label for="groupeCmd" class="text-primary cursor-pointer">Commandes groupées</label>
+                                        </div>
+                                             <input class="form-control" autocomplete="off" v-model="initRecep.numCommande" type="text" id="numCommande" :class="{ 'border-danger': submitted && !$v.initRecep.numCommande.required }" >
+                                         </div>
+                                         <template v-if="groupCmds">
+                                             <button type="button" class="btn btn-primary ml-1" @click="addCmd()"><i class="fa fa-plus"></i></button>
+                                         </template>
+                                          <button type="button" :disabled="initRecep.numCommande=='' || initRecep.numCommande==null" title="Check commande" class="btn btn-info ml-1" @click="checkCmd()"><i class="fa fa-refresh"></i></button>
+                                            
+                                        </div>
+                                       
+                                       
+                                    </div>
+                                     
+                                 </div>
+                                 <div class="w-100 d-flex align-items-center my-0 position-relative" v-if="groupCmds">
+                                     
+                                    <div class="md-form w-100 d-flex my-0 justify-content-between align-items-center">
+                                        <label class="d-block m-0 text-right w-35 pr-2" for="numCommande"></label>
+                                        <div class="d-flex w-65">
+                                             <div class="w-100">
+                                                <div v-for="g, index in group" class="mr-2 mb-1 position-relative d-inline-block">
+                                                    <label class="badge badge-primary mr-2">{{ g }}</label>
+                                                    <button type="button" title="Supprimer" class="btn text-danger btn-transparent p-0 closeCmd" @click="remCmd(g)"><i class="fa fa-close"></i></button>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                       
+                                       
+                                    </div>
+                                     
+                                 </div>   
 		                 </div>
 		                 <div class="col-6 my-2 d-flex flex-column align-items-center">
 		                 	   <div class="w-100 d-flex align-items-center my-2">
@@ -285,14 +316,21 @@
 				                        </select>
 				                    </div>
 			                    </div>
-			                    <div class="w-100 d-flex align-items-center my-2">
-			                        <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
-				                        <label class="d-block m-0 text-right w-35 pr-2" for="numCommande">N°Commande</label>
-				                        <input class="w-65 form-control" autocomplete="off" v-model="initRecep.numCommande" type="text" id="numCommande" :class="{ 'border-danger': submitted && !$v.initRecep.numCommande.required }" >
-				                       
-				                    </div>
-				                     
-			                     </div>
+
+			                    <div class="w-100 d-flex align-items-center my-2" style="margin-top: 23px !important;">
+                                   <label for="formname"  class="d-block m-0 my-2 text-right w-35 pr-2" >
+                                    Fournisseur
+                                   </label>
+                                    <div class="w-65">
+                                       <select class="form-control" v-model="initRecep.fournisseur" :class="{ 'border-danger': submitted && !$v.initRecep.fournisseur.required }" >
+                                          <option value="">Choisir</option>
+                                          
+                                            <option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option>
+                                          
+                                            
+                                        </select>
+                                    </div>
+                                </div>
 		                 	
 		                 </div>
 		             </div>
@@ -400,8 +438,13 @@
                                     </div>
                                 </div>
                                 <div class="w-100 my-2 d-flex justify-content-between align-items-center">
-                                    <label class="d-block m-0 text-right w-35 pr-2" for="numCommande">N°Commande</label>
-                                    <input autocomplete="off" class="w-65 form-control" v-model="reception.numCommande" readonly type="text" id="numCommande">
+                                    <label class="d-block m-0 text-right w-35 pr-2" for="numCommande">N°Commande(s) </label>
+                                    <input autocomplete="off" class="w-65 form-control" v-model="reception.numCommande" readonly type="text" id="numCommande" v-if="!Array.isArray(reception.groupList) || reception.groupList.length==0">
+                                    <div v-else class="w-65 bg-light rounded-lg pt-1 pl-2">
+                                        <label v-for="c in reception.groupList" class="badge badge-primary mr-2">
+                                            {{ c }} 
+                                        </label>
+                                    </div>
                                 </div>
                   		  	    <div class="w-100 d-flex my-2 justify-content-between align-items-center">
 			                        <label class="d-block m-0 text-right w-35 pr-2" for="nbrpalette">
@@ -570,6 +613,7 @@
             		numfact: null
 
             	},
+                groupCmds: false,
                 hasPdf: false,
                 nameFacture:'',
 				reception : {
@@ -592,7 +636,8 @@
 					commandeSaisies: [],
 					numCommande: null,
 					commentaire: "",
-					file: ''
+					file: '',
+                    groupList: []
 				},
 				dries: {},
 				paginate: 10,
@@ -622,7 +667,8 @@
                 // Sort column
                 columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis'],
                 sortedColumn: '',
-                order: 'asc'
+                order: 'asc',
+                group: []
             }
         },
 
@@ -667,6 +713,9 @@
            },
            order: function(value) {
                 this.getDries();
+           },
+           groupCmds: function(value){
+                //this.group = []
            }
 		},
 
@@ -836,6 +885,19 @@
 
         		this.submitted = true;
 
+                // Has group Cmd 
+                if(this.groupCmds){
+                    if(this.group.length<=1){
+                        Vue.swal.fire('Warning','Renseigner au moins 2 commandes', 'warning');
+                        return false;
+                    }
+                    this.initRecep.numCommande = this.group[0];
+                }
+
+                if(!this.groupCmds){
+                    this.group=[];
+                }
+
                 // stop here if form is invalid
                 this.$v.initRecep.$touch();
                 if (this.$v.initRecep.$invalid) {
@@ -881,6 +943,8 @@
                 	}
                 }
 
+
+
         		// stop here if form is invalid
                 this.$v.reception.$touch();
 
@@ -888,6 +952,8 @@
                     this.isRun = false;
                     return;
                 }
+
+
 
         	    const data = new FormData();
 				data.append('file', this.reception.file);
@@ -908,6 +974,8 @@
 				data.append('commentaire', this.reception.commentaire);
 				data.append('client', this.idClient);
                 data.append('IDentite', this.idEntite);
+
+                data.append('group', JSON.stringify(this.group)); 
 
 				let action = "createReception";
 				let msgSuc = "Enregistré avec succés!";
@@ -1020,6 +1088,7 @@
                 this.show = true;
                 this.submitted = false;
                 this.modeModify = false;
+                this.group=[];
 
             },
             closeModalDetail(){
@@ -1093,6 +1162,7 @@
 				this.reception.datalivr= dry.redalivraison;
 				this.reception.numCommande = dry.rencmd;
 				this.reception.commentaire = dry.recomt; 
+                this.reception.groupList = dry.listgroup;
                 if(dry.refasc==null || dry.refasc==''){
                    
                     this.hasPdf=false;
@@ -1164,6 +1234,64 @@
             },
             format_dec(mnt){
                 return mnt.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            },
+            addCmd(){
+                if(!this.group.includes(this.initRecep.numCommande) && this.initRecep.numCommande!=''){
+                    this.group.push(this.initRecep.numCommande);
+                    this.initRecep.numCommande='';   
+                }
+              
+            },
+            remCmd(cmd){
+                let tampon=[];
+                 for(var i=0; i < this.group.length; i++){
+                    if(this.group[i]!=cmd){
+                        tampon.push(this.group[i]);
+                    }
+                   
+                }
+                this.group = tampon;
+            },
+            checkCmd(){
+                const data = new FormData();
+                data.append('cmd', this.initRecep.numCommande);
+                data.append('idClient', this.idClient);
+
+                axios.post('/checkCommandeImport/', data).then(response => {
+                    var resp = response.data.commande;
+                    if(resp!=null){
+                        if(resp.etat_cmd==1){
+                            Vue.swal.fire(
+                              'Attention!',
+                              'Commande déja receptionnée',
+                              'warning'
+                            );
+                            return false;
+                        }
+                        // Set fournisseur
+                        this.setFournisseur(resp.fournisseur);
+                        // Set Commande
+                        this.setTypeCommande(resp.type_commande);
+                        // Set date reception
+                    }
+                    
+                });
+            },
+            setFournisseur(four){
+                for(var i=0; i < this.listFournisseurs.length; i++){
+                    var obj=this.listFournisseurs[i];
+                    if(obj.fonmfo == four || obj.fonmfo.normalize("NFD").replace(/[\u0300-\u036f]/g, "") == four){
+                        this.initRecep.fournisseur = obj.id;
+                    }
+                }
+            },
+            setTypeCommande(type){
+                for(var i=0; i < this.typeCmd.length; i++){
+                    var obj=this.typeCmd[i]; 
+                    if(obj.typcmd == type || obj.typcmd.normalize("NFD").replace(/[\u0300-\u036f]/g, "") == type){
+                        this.reception.typeCmd = obj.id; 
+                    }
+                }
             }
         },
         

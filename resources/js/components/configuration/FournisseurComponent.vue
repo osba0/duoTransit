@@ -10,10 +10,10 @@
                         <th class="p-2 border-right border-white h6">Email</th>
                         <th class="p-2 border-right border-white h6">Adresse</th>
                         <th class="p-2 border-right border-white h6">Logo</th>
-                        <th class="p-2 border-right border-white h6">Société</th>
+                        <th class="p-2 border-right border-white h6" v-if="slugClient==''">Société</th>
                         <th class="p-2 border-right border-white h6">Etat</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
-                    </tr>
+                    </tr> 
                 </thead>
              <tbody  class="bgStripe" :class="[isLoading ? 'loader-line' : '']">
                 <template v-if="!fournisseurs.data || !fournisseurs.data.length">
@@ -45,7 +45,7 @@
                           </template>
                           
                         </td>
-                        <td>
+                        <td v-if="slugClient==''">
                             <template v-if="slugClient!=''">
                                 <template v-for="client in listClient">
                                     <template v-if="client.clfocl.includes(fournisseur.id)">
@@ -314,6 +314,7 @@
                 data.append('adresse', this.fournisseurForm.adresse);
                 data.append('telephone', this.fournisseurForm.telephone);
                 data.append('email', this.fournisseurForm.email);
+                data.append('slug', this.slugClient);  
 
 
                 this.fournisseurForm.idClients = [];

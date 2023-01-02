@@ -1174,3 +1174,15 @@ table .bgStripe .rowActif{
     box-shadow: none !important;
     background: transparent !important;
 }
+.closeCmd{
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    line-height: 12px;
+    border-radius: 100% !important;
+    right: -3px;
+    text-align: center;
+    font-size: 12px;
+    top: -2px;
+    background: white;
+}

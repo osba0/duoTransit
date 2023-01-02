@@ -12,6 +12,7 @@ use App\Http\Controllers\GestionController;
 use App\Http\Controllers\EmpotageController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ManageExcelController;
 use App\Models\Contenaire;
 use App\Models\Entrepot;
 use App\Models\UserRole;
@@ -315,6 +316,13 @@ Route::post('/addNumDocim/{id}', [EmpotageController::class, 'setNumEmpotage']);
 Route::get('/{currententite}/numdocim/{id}', [HistoActionController::class, 'indexDocim'])->name('gestion-docim')->middleware(['auth']);
 Route::post('/numdocum/cloturer/{id}', [HistoActionController::class, 'cloturer'])->middleware(['auth']);
 
+Route::get('/{currententite}/importCommande/{slug}', [ManageExcelController::class, 'importExportView'])->middleware(['auth']);
 
+Route::get('export', [ManageExcelController::class, 'export'])->name('export')->middleware(['auth']);
+Route::post('import', [ManageExcelController::class, 'import'])->name('import')->middleware(['auth']);
+Route::get('listcmdimported', [ManageExcelController::class, 'getCommandes'])->name('listimported')->middleware(['auth']);
+Route::delete('import/delete/{id}', [ManageExcelController::class, 'delete'])->middleware(['auth']);
+
+Route::post('checkCommandeImport', [ManageExcelController::class, 'checkCmd'])->middleware(['auth']);
 
 require __DIR__.'/auth.php';

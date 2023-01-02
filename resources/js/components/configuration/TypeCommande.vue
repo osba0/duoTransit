@@ -7,7 +7,7 @@
                         <th class="p-2 border-right border-white h6">ID</th>
                         <th class="p-2 border-right border-white h6">Type commande</th>
                         <th class="p-2 border-right border-white h6">Couleur</th>
-                        <th class="p-2 border-right border-white h6">Société</th>
+                        <th class="p-2 border-right border-white h6" v-if="slugClient==''">Société</th>
                         <th class="p-2 border-right border-white h6">Etat</th>
                         <th class="text-right p-2 border-right border-white h6" v-if="isRoot">Action</th>
                     </tr>
@@ -27,7 +27,7 @@
                             <span class="badge badge-default px-2" :style="{background: typecommande.color}">&nbsp;</span>
                             
                         </td>
-                        <td>
+                        <td v-if="slugClient==''">
                             <template v-if="slugClient!=''">
                                 <template v-for="client in listClient">
                                     <template v-if="client.cltyco.includes(typecommande.id)">
@@ -206,6 +206,7 @@
                 data.append('type', this.typecommandesForm.type);
                 data.append('color', this.typecommandesForm.color);
                 data.append('etat', this.typecommandesForm.etat);
+                data.append('slug', this.slugClient); 
 
                 let action = "createTypeCommande";
 

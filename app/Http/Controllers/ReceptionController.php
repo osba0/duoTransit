@@ -17,6 +17,7 @@ use App\Models\TypActivity;
 use App\Models\LogActivity;
 use App\Models\Entite;
 use App\Models\User; 
+use App\Models\ImportCommandes;
 use Illuminate\Http\Request;
 
 use App\Http\Resources\ClientResource;
@@ -220,12 +221,22 @@ class ReceptionController extends Controller
                 'refasc' => $filename,
                 "entites_id" => request('IDentite'),
                 //"recmds" => json_encode(request('commandes')),
-                "reetat" => true
+                "reetat" => true,
+                "regroup" => array_unique(json_decode(request('group')))
             ];
             
             Reception::setIDClient(request('client'), request('IDentite'));  
           
             $store = Reception::create($params);
+
+            // Update table import commande
+            $cmd =  ImportCommandes::where('commandes','=',request('numCommande'))->firstOrFail(); 
+            
+            if($cmd){
+                $cmd->update([
+                    "etat_cmd" => 1
+                ]);
+            }
 
         }catch(\Exceptions $e){
               return response([

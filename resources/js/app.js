@@ -81,7 +81,9 @@ Vue.component('activity-journal', require('./components/configuration/journal.vu
 
 Vue.component('notification-list', require('./components/notification/index.vue').default); 
 
-Vue.component('choose-entite', require('./components/chooseEntite.vue').default);  
+Vue.component('choose-entite', require('./components/chooseEntite.vue').default); 
+
+Vue.component('import-commande', require('./components/import/importCommande.vue').default); 
    
 /**
  * Next, we will create a fresh Vue application instance and attach it to

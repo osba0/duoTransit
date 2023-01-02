@@ -65,7 +65,12 @@
                                  <div class="w-100 my-2 d-flex justify-content-between align-items-center">
                                     <label class="d-block m-0 text-right w-35 pr-2" for="numCommande">N°Commande</label>
                                     <div class="w-65 bg-light pl-2">
-                                        <span>{{ viewReception.rencmd }}</span>
+                                        <span v-if="!Array.isArray(viewReception.listgroup) || viewReception.listgroup.length==0">{{ viewReception.rencmd }}</span>
+                                        <div v-else class="w-100 bg-light rounded-lg pt-1">
+                                            <label v-for="c in viewReception.listgroup" class="badge badge-primary mr-2">
+                                                {{ c }} 
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">

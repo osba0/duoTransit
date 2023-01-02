@@ -349,6 +349,7 @@ class EmpotageController extends Controller
                                   'revolu'         => $key->revolu,
                                   'depalettisation'=> $key->depalettisation,
                                   'fournisseurs'   => $key->fournisseur->fonmfo,
+                                  'listgroup'      => $key->regroup, 
                                   'douane'         => $key->douane];
    
         }
