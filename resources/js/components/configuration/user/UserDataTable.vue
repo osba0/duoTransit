@@ -112,7 +112,7 @@
                         </button>
                     </div>
                     <div class="modal-body mx-3">
-                         <form @submit.prevent="saveUser" enctype="multipart/form-data" key=1 >
+                         <form @submit.prevent="saveUser" autocomplete="off" enctype="multipart/form-data" key=1 >
                             <div class="d-flex">
                                 <div class="w-50">
                                     <div class="row">
@@ -132,7 +132,7 @@
                                                 <label  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
                                                     Transitaire
                                                 </label>
-                                                <select v-model="userForm.entite" class="form-control form-control-sm w-65">
+                                                <select v-model="userForm.entite" :disabled="checkIsAdmin()" class="form-control form-control-sm w-65">
                                                     <option value="">Choisir</option>
                                                     <option v-for="entite in list_entites" :value="entite.id">{{ entite.nom }}</option>
                                                 </select>
@@ -195,10 +195,10 @@
                                             
                                             
                                             <div class="w-100 d-flex align-items-center">
-                                                 <label for="prenom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                                 <label for="identifiant"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
                                                 Login
                                                </label>
-                                                <input :disabled = "modeModify" class="w-65 form-control" id="username" v-model="userForm.username"  :class="{ 'border-danger': submitted && !$v.userForm.username.required }"/>
+                                                <input :disabled = "modeModify" class="w-65 form-control" id="identifiant" v-model="userForm.username"  :class="{ 'border-danger': submitted && !$v.userForm.username.required }"/>
                                             </div>
                                          </div>
                                          
@@ -207,8 +207,8 @@
                                         <div class="col-12 d-flex flex-column align-items-center">
                                          <div class="w-100 d-flex align-items-center my-2">
                                                     <div class="md-form w-100 d-flex justify-content-between align-items-center">
-                                                    <label for="password" class="d-block m-0 text-right w-35 pr-2" >Mot de passe</label>
-                                                    <input class="w-65 form-control"  v-model="userForm.password" type="password" id="password" :class="{ 'border-danger': submitted && !$v.userForm.password.required }"/>
+                                                    <label for="access" class="d-block m-0 text-right w-35 pr-2" >Mot de passe</label>
+                                                    <input class="w-65 form-control" autocomplete="off" v-model="userForm.password" type="password" id="access" :class="{ 'border-danger': submitted && !$v.userForm.password.required }"/>
                                                 </div>
                                          </div>
                                             
@@ -218,7 +218,7 @@
                                             
                                             
                                             <div class="w-100 d-flex align-items-center">
-                                                 <label for="confirmPassword"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;line-height: 18px;'>
+                                                 <label for="confirmPassword" autocomplete="off" class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;line-height: 18px;'>
                                                 Confirmer<br/> mot de passe
                                                </label>
                                                 <input class="w-65 form-control" id="confirmPassword" type="password" v-model="userForm.confirmPassword" :class="{ 'border-danger': submitted && !$v.userForm.confirmPassword.required }"/>
@@ -421,7 +421,7 @@
                 data.append('entite',  this.userForm.entite);
                 data.append('entiteClients',  JSON.stringify(this.userForm.entiteClients));
                 data.append('clientsAuth',  JSON.stringify(this.userForm.idClientAuth));
-
+                data.append('slugClient', this.slugClient);  
 
 
                 let action = "createUser";
@@ -544,6 +544,20 @@
                         return this.list_entites[i].nom;
                     }
                 }
+            },
+            checkIsAdmin(){
+                if(this.slugClient!=""){
+                    for(var i=0; i<this.list_entites.length; i++){
+                  
+                        if(this.slugClient==this.list_entites[i].slug){
+                            this.userForm.entite = this.list_entites[i].id;
+                            return true;
+                        }
+                    } 
+                }
+
+                return false;
+               
             }
         },
         mounted() {console.log("ded dd", this.listEntites, "ded dd");

@@ -88,7 +88,8 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-
+        
+        
         $user = Auth::user();
         $check = User::where('username', request('login'))->get();
         
@@ -104,7 +105,13 @@ class UserController extends Controller
         if(request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION){
             $profilSelected = json_decode(request('entiteClients'));
         }else{
-            $profilSelected = array((int) request('entite'));
+            if(request('slugClient')!=''){
+                $idEntite = Entite::where("slug", request('slugClient'))->first()->toArray()["id"];
+                $profilSelected = array((int) $idEntite);
+            }else{
+                $profilSelected = array((int) request('entite'));
+            }
+            
         }
 
 

@@ -323,6 +323,6 @@ Route::post('import', [ManageExcelController::class, 'import'])->name('import')-
 Route::get('listcmdimported', [ManageExcelController::class, 'getCommandes'])->name('listimported')->middleware(['auth']);
 Route::delete('import/delete/{id}', [ManageExcelController::class, 'delete'])->middleware(['auth']);
 
-Route::post('checkCommandeImport', [ManageExcelController::class, 'checkCmd'])->middleware(['auth']);
+Route::post('/checkCommandeImport', [ManageExcelController::class, 'checkCmd'])->middleware(['auth']);
 
 require __DIR__.'/auth.php';

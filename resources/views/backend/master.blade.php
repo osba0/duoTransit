@@ -313,21 +313,21 @@ $currentEntite = request()->route('currententite');
                             @php if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT)) : @endphp
 
                             <li class="nav-item">
-                                <a href="{{route('typecommande')}}" class="nav-link {{ request()->is('configuration/typecommande') ? 'active' : '' }}">
+                                <a href="{{route('typecommande')}}" class="nav-link {{ request()->is('configuration/typecommande/*') ? 'active' : '' }}">
                                     <i class="fa fa-arrows nav-icon"></i>
                                     <p>Type Commandes</p>
                                     
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{route('utilisateurs')}}" class="nav-link {{ request()->is('configuration/utilisateurs') ? 'active' : '' }}">
+                                <a href="{{route('utilisateurs')}}" class="nav-link {{ request()->is('configuration/utilisateurs/*') ? 'active' : '' }}">
                                     <i class="fa fa-users nav-icon"></i>
                                     <p>Utilisateurs</p>
                                     
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{route('fournisseurs')}}" class="nav-link {{ request()->is('configuration/fournisseurs') ? 'active' : '' }}">
+                                <a href="{{route('fournisseurs')}}" class="nav-link {{ request()->is('configuration/fournisseurs/*') ? 'active' : '' }}">
                                     <i class="fa fa-handshake-o nav-icon"></i>
                                     <p>Fournisseurs</p>
                                     
@@ -337,21 +337,21 @@ $currentEntite = request()->route('currententite');
                             @php else:  @endphp
 
                             <li class="nav-item">
-                                <a href="{{route('typecommandeAdmin', $currentEntite)}}" class="nav-link {{ request()->is('configuration/typecommande') ? 'active' : '' }}">
+                                <a href="{{route('typecommandeAdmin', $currentEntite)}}" class="nav-link {{ request()->is('configuration/typecommande/*') ? 'active' : '' }}">
                                     <i class="fa fa-arrows nav-icon"></i>
                                     <p>Type Commandes</p>
                                     
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{route('utilisateursAdmin', $currentEntite)}}" class="nav-link {{ request()->is('configuration/utilisateurs') ? 'active' : '' }}">
+                                <a href="{{route('utilisateursAdmin', $currentEntite)}}" class="nav-link {{ request()->is('configuration/utilisateurs/*') ? 'active' : '' }}">
                                     <i class="fa fa-users nav-icon"></i>
                                     <p>Utilisateurs</p>
                                     
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{route('fournisseursAdmin', $currentEntite)}}" class="nav-link {{ request()->is('configuration/fournisseurs') ? 'active' : '' }}">
+                                <a href="{{route('fournisseursAdmin', $currentEntite)}}" class="nav-link {{ request()->is('configuration/fournisseurs/*') ? 'active' : '' }}">
                                     <i class="fa fa-handshake-o nav-icon"></i>
                                     <p>Fournisseurs</p>
                                     
