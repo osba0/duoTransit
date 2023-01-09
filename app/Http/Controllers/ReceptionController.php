@@ -230,7 +230,7 @@ class ReceptionController extends Controller
             $store = Reception::create($params);
 
             // Update table import commande
-            $cmd =  ImportCommandes::where('commandes','=',request('numCommande'))->firstOrFail(); 
+            $cmd =  ImportCommandes::where('commandes','=',request('numCommande'))->first(); 
             
             if($cmd){
                 $cmd->update([
