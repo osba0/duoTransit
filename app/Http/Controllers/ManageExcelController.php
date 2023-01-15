@@ -9,6 +9,8 @@ use App\Models\UserRole;
 use App\Models\ImportCommandes;
 use App\Http\Resources\ImportCMDResource;
 use App\Imports\CommandesImport;
+use App\Models\TypeCommande;
+use App\Models\Fournisseur;
 
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -42,11 +44,16 @@ class ManageExcelController extends Controller
             abort(404);
         }
 
+        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get(); 
+
+        $fournisseurs = Fournisseur::get(); 
+
+
 
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
         }else{
-            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client];
+            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client, 'typeCmd' => $typeCmd, 'fournisseurListe' => $fournisseurs];
         }
         
         return  view('import', $data);
@@ -62,12 +69,31 @@ class ManageExcelController extends Controller
     {
         $user = Auth::user();
         $paginate = request('paginate');
-        
+
+
+        $cmds = ImportCommandes::importcmdQuery();
+
         if(isset($paginate)) {
-            $cmds = ImportCommandes::paginate($paginate);
+            $cmds = $cmds->paginate($paginate);
         }else{
-            $cmds = ImportCommandes::get();
+            $cmds = $cmds->get(); 
         }
+        
+        /*if(isset($paginate)) {
+            if(request('etat')!=""){
+                 $cmds = ImportCommandes::where("etat_cmd", request('etat'))->paginate($paginate);
+            }else{
+                $cmds = ImportCommandes::paginate($paginate);
+            }
+           
+        }else{
+            if(request('etat')!=""){
+                $cmds = ImportCommandes::where("etat_cmd", request('etat'))->get();
+            }else{
+                $cmds = ImportCommandes::get();
+            }
+            
+        }*/
 
 
 
@@ -104,10 +130,9 @@ class ManageExcelController extends Controller
     {
 
       $client = Client::where('slug', request('slug'))->get()->first();
-      // var_dump($client ); die();
-      Excel::import(new CommandesImport($client),request()->file('file'));
-
-             
+   
+      Excel::import(new CommandesImport($client, request('typeCommande')),request()->file('file'));
+       
       return response([
             "code" => 0,
             "message" => "ok"

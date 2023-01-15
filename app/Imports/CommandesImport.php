@@ -12,9 +12,11 @@ use Illuminate\Support\Facades\Auth;
 class CommandesImport implements ToModel, WithHeadingRow
 {
     public $client=null;
+    public $typeCmd=null;
 
-    public function __construct($client){
+    public function __construct($client, $type){
         $this->client = $client;
+        $this->typeCmd = $type;
     }
     /**
     * @param array $row
@@ -26,7 +28,7 @@ class CommandesImport implements ToModel, WithHeadingRow
         $user = Auth::user();
 
         return new ImportCommandes([
-            'type_commande'     => $row['type_commande'],
+            'type_commande'     => $this->typeCmd, //$row['type_commande'],
             'fournisseur'       => $row['fournisseur'], 
             'commandes'         => $row['commandes'], 
             'date_transmission' => $this->transformDate($row['date_transmission']),

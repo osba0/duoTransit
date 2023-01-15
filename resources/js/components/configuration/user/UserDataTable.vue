@@ -25,7 +25,7 @@
                             {{ user.firstname }}
                         </td>
                         <td class="p-2 align-middle">
-                            {{ user.lastname }}
+                            {{ user.lastname }} 
                         </td>
                         <td class="p-2 align-middle">
                             {{ user.email }}
@@ -69,8 +69,11 @@
                             </template> 
                         </td>
                          <td class="p-2 text-right">
-                             <a title="Editer" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editUser(user)" data-toggle="modal" data-target="#newUser">
+                             <a title="Editer le profil" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editUser(user)" data-toggle="modal" data-target="#newUser">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
+                                </a>
+                                 <a title="Modifier le mot de passe" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1" v-on:click="editPwd(user)" data-toggle="modal" data-target="#editAccess">
+                                    <i class="fa fa-key" aria-hidden="true"></i>
                                 </a>
                             <template v-if="user.login == 'root'">
                                 <a title=""  class="btn m-1 border-danger btn-circle border btn-circle-sm m-1">
@@ -94,6 +97,65 @@
                 :data="users"
                 @pagination-change-page="getUser"
             ></pagination>
+        </div>
+        <!--Modifier Mot de passe-->
+        <div class="modal fade" id="editAccess" tabindex="-1" role="dialog" aria-labelledby="myModalChange"
+          aria-hidden="true"  data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-lg" role="document">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left">
+                        <h4 class="modal-title w-100 font-weight-bold">Changement de mot de passe</h4>
+                        <button type="button" class="close" data-dismiss="modal" v-on:click="closeModalPwd()" aria-label="Close" ref="closePoupClosePwd">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                  
+                    <div class="modal-body mx-3">
+                         <form @submit.prevent="savePwd" autocomplete="off" enctype="multipart/form-data" key=1 >
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-start align-items-center">
+                                   Utilisateur: <span class="badge badge-primary mx-2">{{ userAccess.userCompte }}</span><span>{{ userAccess.userActual }}</span>
+                                </div>
+                           </div>
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <div v-if="this.submittedPwd && $v.userAccess.password.$error" class="text-center">
+                                      <span v-if="userAccess.password && !$v.userAccess.password.minLength" class="badge bg-danger mr-2">Le mot de passe doit comporter au moins 6 caractères</span>
+                                    </div> 
+                                    <div v-if="this.submittedPwd && $v.userAccess.confirmPasswordNew.$error" class="text-center">
+                                      <span v-if="userAccess.confirmPasswordNew && !$v.userAccess.confirmPasswordNew.sameAsPassword" class="badge bg-danger mr-2">Le mot de passe et la confirmation du mot de passe doivent correspondre</span>
+                                    </div>
+                                </div>
+                           </div>
+                            <div class="row">
+                                <div class="col-12 my-2 d-flex flex-column align-items-center">
+                                 <div class="w-100 d-flex align-items-center my-2">
+                                    <div class="md-form w-100">
+                                    <label for="passwordNew" class="d-block m-0 w-100 pr-2" >Nouveau mot de passe</label>
+                                    <input class="w-100 form-control"   autocomplete="new-password" v-model="userAccess.password" type="password" id="passwordNew" :class="{ 'border-danger': submittedPwd && !$v.userAccess.password.required }"/>
+                                </div>
+                                 </div>
+                                 </div>
+                                 <div class="col-12 my-2">
+                                    <div class="w-100 my-2">
+                                         <label for="confirmPasswordNew"  class="d-block m-0 w-100 pr-2" style='white-space: nowrap;'>
+                                        Confirmer le mot de passe
+                                       </label>
+                                        <input class="w-100 form-control" id="confirmPasswordNew" type="password" v-model="userAccess.confirmPasswordNew" :class="{ 'border-danger': submittedPwd && !$v.userAccess.confirmPasswordNew.required }"/>
+                                    </div>
+                                 </div>
+                                 
+                             </div>
+                             
+                            <button type="submit" class="btn btn-success">Modifier</button>
+                            <button type="button" v-on:click="closeModalPwd()" class="btn btn-warning">Annuler</button>
+                         </form>
+                    </div>
+                    
+             </div>
+            
+          </div>
         </div>
          <!-- Modal users-->
         <div class="modal fade" id="newUser" tabindex="-1" role="dialog" aria-labelledby="myModalFournisseur"
@@ -186,8 +248,8 @@
                                         <div class="col-12 my-2 d-flex flex-column align-items-center">
                                              <div class="w-100 d-flex align-items-center">
                                                         <div class="md-form w-100 d-flex justify-content-between align-items-center">
-                                                        <label for="email" class="d-block m-0 text-right w-35 pr-2" >Email</label>
-                                                        <input class="w-65 form-control"  v-model="userForm.email" type="text" id="email" :class="{ 'border-danger': submitted && !$v.userForm.email.required }"/>
+                                                        <label for="cc" class="d-block m-0 text-right w-35 pr-2" >Email</label>
+                                                        <input class="w-65 form-control"  autocomplete="off" v-model="userForm.email" type="text" id="cc" :class="{ 'border-danger': submitted && !$v.userForm.email.required }"/>
                                                     </div>
                                              </div>
                                          </div>
@@ -208,7 +270,7 @@
                                          <div class="w-100 d-flex align-items-center my-2">
                                                     <div class="md-form w-100 d-flex justify-content-between align-items-center">
                                                     <label for="access" class="d-block m-0 text-right w-35 pr-2" >Mot de passe</label>
-                                                    <input class="w-65 form-control" autocomplete="off" v-model="userForm.password" type="password" id="access" :class="{ 'border-danger': submitted && !$v.userForm.password.required }"/>
+                                                    <input class="w-65 form-control" autocomplete="new-password" v-model="userForm.password" type="password" id="access" :class="{ 'border-danger': submitted && !$v.userForm.password.required }"/>
                                                 </div>
                                          </div>
                                             
@@ -218,7 +280,7 @@
                                             
                                             
                                             <div class="w-100 d-flex align-items-center">
-                                                 <label for="confirmPassword" autocomplete="off" class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;line-height: 18px;'>
+                                                 <label for="confirmPassword" autocomplete="new-password" class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;line-height: 18px;'>
                                                 Confirmer<br/> mot de passe
                                                </label>
                                                 <input class="w-65 form-control" id="confirmPassword" type="password" v-model="userForm.confirmPassword" :class="{ 'border-danger': submitted && !$v.userForm.confirmPassword.required }"/>
@@ -298,6 +360,13 @@
                     entiteClients: []
 
                 },
+                userAccess: {
+                    id:'',
+                    userActual: '',
+                    userCompte: '',
+                    confirmPassword: '',
+                    password: ''
+                },
                 hasImage: false,
                 submitted: false,
                 noClientRole: true,
@@ -308,7 +377,8 @@
                 list_entites: JSON.parse(this.listEntites),
                 roles: JSON.parse(this.listRoles),
                 value: [],
-                options:  JSON.parse(this.listClients)
+                options:  JSON.parse(this.listClients),
+                submittedPwd: false
             }
 
         },
@@ -321,6 +391,11 @@
                 profil: { required },
                 password: { required, minLength: minLength(6) },
                 confirmPassword: { required, sameAsPassword: sameAs('password') }
+
+            },
+            userAccess : {
+                password: { required, minLength: minLength(6) },
+                confirmPasswordNew: { required, sameAsPassword: sameAs('password') }
 
             },
         },
@@ -497,6 +572,11 @@
                   }
                 })
             },
+            editPwd(user){
+                this.userAccess.userActual = user.lastname+' '+user.firstname;
+                this.userAccess.userCompte = user.login;
+                this.userAccess.id = user.id;
+            },
             editUser(user){
                 this.modeModify      = true;
                 this.submitted       = false;
@@ -535,6 +615,13 @@
                 this.modeModify = false;
 
             },
+            closeModalPwd(){
+                  this.$refs.closePoupClosePwd.click();
+                this.userAccess.id='';
+                this.userAccess.userActual='';
+                this.userAccess.password='';
+                this.userAccess.confirmPasswordNew='';
+            },
             getEntiteName(id){
 
                 for(var i=0; i<this.list_entites.length; i++){
@@ -558,6 +645,39 @@
 
                 return false;
                
+            },
+             savePwd(){
+                this.submittedPwd = true;
+                // stop here if form is invalid
+                this.$v.userAccess.$touch();
+                if (this.$v.userAccess.$invalid) {
+                    return;
+                }
+              
+                const data = new FormData();
+                data.append('password', this.userAccess.password);
+                data.append('id', this.userAccess.id); 
+
+                axios.post("/configuration/modifAccess/", data).then(response => {
+                  
+                    if(response.data.code==0){
+                       this.closeModalPwd();
+
+                        Vue.swal.fire(
+                          'Succés!',
+                          'Mot de passe modifié crée avec succés!',
+                          'success'
+                        );
+                    }else{
+                         Vue.swal.fire(
+                          '',
+                          response.data.message,
+                          'warning'
+                        )
+                    }
+                    this.submittedPwd = false;
+                   
+                });
             }
         },
         mounted() {console.log("ded dd", this.listEntites, "ded dd");

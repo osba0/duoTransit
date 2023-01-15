@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
                 'email' => 'root@yopmail.com',
                 'password' => Hash::make('passer@123456'),
                 'status' => 1,
-                'entites_id' => Entite::take(1)->first()['id']
+                'entites_id' => array(Entite::take(1)->first()['id']) 
             ]);
             $user->addRole(UserRole::ROLE_ROOT);
             $user->save();

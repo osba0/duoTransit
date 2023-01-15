@@ -276,6 +276,7 @@ Route::delete('/configuration/deleteFournisseur/{id}', [ConfigurationController:
 Route::post('/configuration/createFournisseur', [ConfigurationController::class, 'createFournisseur']);
 Route::post('/configuration/modifyFournisseur', [ConfigurationController::class, 'modifyFournisseur']);
 Route::post('/configuration/modifPwd', [UserController::class, 'changePassword'])->middleware(['auth']);
+Route::post('/configuration/modifAccess', [UserController::class, 'changePasswordAccess'])->middleware(['auth']);
 Route::post('/configuration/etatFournisseur', [ConfigurationController::class, 'etatFournisseur']);
 Route::get('/configuration/getUser', [UserController::class, 'list'])->middleware(['auth']);
 

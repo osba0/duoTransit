@@ -306,6 +306,8 @@ class ConfigurationController extends Controller
 
     public function createFournisseur(Request $request){
          try{
+            
+            $user = Auth::user();
 
             $filename = '';
 
@@ -330,10 +332,17 @@ class ConfigurationController extends Controller
 
             // Pour le profil Admin ajouter directement le fournisseur au client
             if($store){
+                $lastIDFour = Fournisseur::latest('id')->first(); 
                 if(request('slug')!=''){
-                    $lastIDFour = Fournisseur::latest('id')->first(); 
+                    
 
-                    $client = Client::/*where('slug',request('slug'))*/whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();     
+                    // Check si c'est le client qui rajoute ou le transitaire
+
+                    if($user->hasRole(UserRole::ROLE_CLIENT)){
+                        $client = Client::where('slug',request('slug'))->get()->first();     
+                    }else{
+                        $client = Client::whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();     
+                    }
 
                     $listfournisseur = $client['clfocl'];
 
@@ -345,40 +354,22 @@ class ConfigurationController extends Controller
 
                     // update
 
-                    Client::/*where('slug', request('slug'))*/whereJsonContains('clenti', Auth::getUser()->entites_id)
-                    ->update([
-                        "clfocl" => array_unique($listfournisseur)
-                    ]);
+                    if($user->hasRole(UserRole::ROLE_CLIENT)){
+                         Client::where('slug', request('slug'))
+                        ->update([
+                            "clfocl" => array_unique($listfournisseur)
+                        ]);
+                    }else{
+                         Client::whereJsonContains('clenti', Auth::getUser()->entites_id)
+                        ->update([
+                            "clfocl" => array_unique($listfournisseur)
+                        ]);
+                    }
+
+                   
                 }
             }
 
-                
-
-            // get last ID 
-            
-            /*$lastIDFour = Fournisseur::latest('id')->first();
-            
-            $listClientSet = json_decode(request('listClientAjouter'));
-
-            $listClientAll = Client::whereJsonContains('clenti',Auth::user()->entites_id)->get(); 
-
-            foreach($listClientAll as $client){
-
-                if (in_array($client['id'], $listClientSet)){
-
-                    $tabFour = $client['clfocl'];
-
-                    array_push($tabFour, $lastIDFour['id']);
-
-                    Client::where('id', $client['id'])
-                          ->update([
-                            "clfocl" => array_unique($tabFour)
-                      ]);
-                }
-            }*/
-           
-
-            //var_dump(json_decode(request('listClientAjouter'))); die();
         }catch(\Exceptions $e){
               return response([
                 "code" => 1,
@@ -389,7 +380,8 @@ class ConfigurationController extends Controller
         if($store){
             return response([
                 "code" => 0,
-                "message" => "OK"
+                "message" => "OK",
+                "lastedAdded" => json_encode($lastIDFour)
             ]);
         }else{
             return response([

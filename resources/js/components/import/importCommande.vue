@@ -1,10 +1,34 @@
 <template>
     <div>
         <div class="card-body table-responsive p-0">
+
             <form @submit.prevent="importFile" enctype="multipart/form-data" key=1>
-                <div class="d-flex align-items-center w-50 mb-3">
-                    <input type="file" id="file" name="file" ref="file" v-on:change="handleFileUpload()"  class="form-control mr-3">
-                    <button class="btn btn-success">Importer</button>
+                <div class="d-flex align-items-center  w-100 mb-3">
+                    <div class="d-flex align-items-center p-2 rounded">
+                        <label class="mb-0 badge-primary p-2 mr-2 rounded-circle badge">1.</label>
+                         <select
+                            v-model="typeCommande"
+                            class="form-control form-control-sm" @change="selectTypeCmd()" :class="{ 'border-danger': submitted && !$v.reception.typeCmd.required }" >
+                            <option value="">Choisir type Commande</option>
+                            <option :value="type.id" v-for="type in typeCmd">{{type.typcmd}}</option>
+                            
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-center mx-2">
+                        <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                    </div>
+                    <div class="d-flex align-items-center p-2 rounded" :class="[step==0 ? 'disbaled-1':'']">
+                        <label class="mb-0 badge-primary p-2 mr-2 rounded-circle badge">2.</label>
+                        <span class="text-nowrap pr-2">Choisir le fichier</span>
+                        <input type="file" :disabled="step==0" id="file" name="file" ref="file" v-on:change="handleFileUpload()"  class="form-control mr-3">
+                    </div>
+                     <div class="d-flex align-items-center mx-2">
+                        <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                    </div>
+                    <div class="d-flex align-items-center"  :class="[step <= 1 ? 'disbaled-1':'']">
+                         <label class="mb-0 badge-primary p-2 mr-2 rounded-circle badge">3.</label>
+                        <button :disabled="step<=1"  class="btn btn-success">Importer</button>
+                    </div>
 
                 </div>
                 
@@ -25,6 +49,31 @@
                             <option value="150">150</option>
                         </select>
                     </div>
+                </div>
+                <div class="mx-5">
+                    <div class="d-flex align-items-center">
+                        <label for="paginate" class="text-nowrap mr-2 mb-0"
+                            >Etat</label> 
+                        <select
+                            class="form-control form-control-sm" v-model="etatCmd">
+                            <option value="">Afficher tout</option>
+                            <option value="0">En cours</option>
+                            <option value="1">Réceptionnée</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="d-flex align-items-center">
+                        <label for="paginate" class="text-nowrap mr-2 mb-0"
+                            >Type commande</label> 
+                       <select class="form-control form-control-sm"  v-model="filtreCmd">
+                            <option value="">Afficher tout</option>
+                            <option :value="type.id" v-for="type in typeCmd">{{type.typcmd}}</option>
+                            
+                        </select>
+                    </div>
+                     
                 </div>
         
             </div>
@@ -57,11 +106,11 @@
                         <th class="text-right  p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
-             <tbody class="bgStripe">
+               <tbody class="bgStripe" :class="[isLoading ? 'loader-line' : '']">
                 <template v-if="!commandes.data || !commandes.data.length">
-                        <tr><td colspan="9" class="bg-white text-center">Aucune commande importée!</td></tr>
+                        <tr><td colspan="10" class="bg-white text-center" v-if="checking">Aucune commande trouvée!</td></tr>
                     </template>
-                      <tr v-for="cmd in commandes.data" class="bg-white">
+                      <tr v-for="cmd in commandes.data" class="bg-white" :class="[checkFournisseurExist(cmd.fournisseur) ? '':'bg-light-danger']">
                         <td class="p-2 align-middle">
                             {{ cmd.id }}
                         </td>
@@ -69,7 +118,16 @@
                             {{ cmd.type_commande }}
                         </td>
                         <td class="p-2 align-middle">
-                            {{ cmd.fournisseur }}
+                            <div v-if="!checkFournisseurExist(cmd.fournisseur)" class="d-flex align-items-center">
+                                <div class="circlePulse pulse redPulse"></div> 
+                                <span class="mx-2">{{ cmd.fournisseur }}</span>
+                                <button @click="setDefaultVal(cmd.fournisseur)" :title="'Ajouter le fournisseur: '+cmd.fournisseur" data-toggle="modal" data-target="#newFournisseur" class="btn btn-light rounded-circle text-primary"><i class="fa fa-plus"></i></button>
+                            </div>
+                            <div v-else  class="d-flex align-items-center">
+                                 <div class="circlePulse greenPulse"></div> 
+                                 <span class="mx-2">{{ cmd.fournisseur }}</span>
+                            </div>
+                             
                         </td>
                        <td class="p-2 align-middle">
                             {{ cmd.commandes }}
@@ -85,13 +143,14 @@
                         </td>
                         <td class="p-2 align-middle">
                             <label class="badge badge-warning" v-if="cmd.etat_cmd==0">En cours</label>
-                            <label class="badge badge-success" v-if="cmd.etat_cmd==1">Réceptionné</label>
+                            <label class="badge badge-success" v-if="cmd.etat_cmd==1">Réceptionnée</label>
                         </td>
                          <td class="p-2 align-middle">
                             {{ cmd.created_at }}
                         </td>
 
                         <td class="text-right">
+                            <!--button v-if="!checkFournisseurExist(cmd.fournisseur)"  @click="setDefaultVal(cmd.fournisseur)" :title="'Ajouter le fournisseur: '+cmd.fournisseur" data-toggle="modal" data-target="#newFournisseur" class="btn btn-light rounded-circle text-primary"><i class="fa fa-plus"></i></button-->
                             <button @click="deleteImportCmd(cmd)" class="btn btn-light rounded-circle text-danger"><i class="fa fa-trash" style="font-size:22px"></i></button>
                         </td>
                     </tr>
@@ -104,74 +163,90 @@
                 @pagination-change-page="getCommande"
             ></pagination>
         </div>
-         <!-- Modal Contenaire-->
-        <div class="modal fade" id="newContenaire" tabindex="-1" role="dialog" aria-labelledby="myModalContenaire"
+
+
+        <!-- Modal Fournisseurs-->
+        <div class="modal fade" id="newFournisseur" tabindex="-1" role="dialog" aria-labelledby="myModalFournisseur"
           aria-hidden="true"  data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-lg" role="document">
              <div class="modal-content">
                 
                     <div class="modal-header text-left">
                         <h4 class="modal-title w-100 font-weight-bold">
-                            <template v-if="modeModify">Modification Contenaire</template>
-                        <template v-else>Nouveau Contenaire</template>
-                        
+                         Ajout Fournisseur: <span class="h3 text-primary">{{ fournisseurForm.nom }}</span>
                         </h4>
-                        <button type="button" class="close" data-dismiss="modal" v-on:click="closeModal()" aria-label="Close" ref="closePoup">
+                        <button type="button" class="close" data-dismiss="modal" v-on:click="closeModalFour()" aria-label="Close" ref="closePoupFour">
                           <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body mx-3">
-                         <form @submit.prevent="saveContenaire" enctype="multipart/form-data" key=1 >
+                         <form @submit.prevent="saveFournisseur" enctype="multipart/form-data" key=1 >
                             <div class="row">
                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                        <label for="nom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
                                         Nom
                                        </label>
-                                        <input class="w-65 form-control" id="nom" v-model="contenaireForm.nom" 
-                                        :class="{ 'border-danger': submitted && !$v.contenaireForm.nom.required }" />
+                                        <input disabled class="w-65 form-control" id="nom" v-model="fournisseurForm.nom" 
+                                        :class="{ 'border-danger': submitted && !$v.fournisseurForm.nom.required }" />
                                     </div>
                                     
                                  </div>
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     
-                                    
                                     <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Capacité
-                                       </label>
-                                        <input class="w-65 form-control" id="capacite" v-model="contenaireForm.capacite"/>
-                                    </div>
+                                            <div class="md-form w-100 d-flex justify-content-between align-items-center">
+                                            <label for="tele" class="d-block m-0 text-right w-35 pr-2" >Telephone</label>
+                                            <input class="w-65 form-control"  v-model="fournisseurForm.telephone" type="text" id="tele"/>
+                                        </div>
+                                        </div>
+                                    
+                                    <div class="w-100 d-flex align-items-center my-2"></div>
+                                    
                                  </div>
                                 
                              </div>
                               <div class="row">
-                                    <div class="col-12 my-2 d-flex flex-column align-items-center">
-                                        <div class="w-100 d-flex align-items-center my-2">
-                                            <div class="md-form w-100 d-flex align-items-center">
-                                                <span for="tele" class="d-block m-0 text-right w-35 pr-2" >Choisir par défaut</span>
-                                                <div>
-                                                    <input v-model="contenaireForm.isdefault" type="radio"  name="isdefault" value="1"  id="oui"/>
-                                                    <label class="m-0 mr-3"  for="oui">Oui</label>
-                                                    <input v-model="contenaireForm.isdefault" type="radio" name="isdefault" checked value="0" id="non"/>
-                                                    <label class="m-0" for="non">Non</label>
-                                                </div>
-                                            
-                                            </div>
-                                        </div>
+                                <div class="col-6 my-2 d-flex flex-column align-items-center">
+                                 <div class="w-100 d-flex align-items-center my-2">
+                                         <label for="email"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Email
+                                       </label>
+                                        <input class="w-65 form-control" id="email" v-model="fournisseurForm.email"/>
+                                    </div>
                                  </div>
-                              
+                                 <div class="col-6 my-2 d-flex flex-column">
+                                        <div class="w-100 d-flex align-items-center my-2">
+                                         <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Adresse
+                                       </label>
+                                        <input class="w-65 form-control" id="adresse" v-model="fournisseurForm.adresse"/>
+                                    </div>
+                                    
+                                 </div>
                              </div>
-                             <div class="modal-footer d-flex justify-content-center"> 
 
-                                <template v-if="modeModify">
-                                        <button type="submit" class="btn btn-success">Modifier</button>
-                                        <button type="button" v-on:click="closeModal()" class="btn btn-warning">Annuler la modification</button>
-                                </template>
-                                <template v-else>
-                                    <button type="submit" class="btn btn-success">Enregister</button>
-                                    <button type="button" v-on:click="closeModal()" class="btn btn-warning">Annuler</button>
-                                </template>
+                              <div class="row">
+                                 <div class="col-6 my-2 d-flex flex-column">
+                                       <div class="w-100 d-flex my-2">
+                                            <div class="md-form w-100 d-flex justify-content-between">
+                                            <label for="logo" class="d-block m-0 text-right w-35 pt-3 pr-2" >Logo</label>
+                                            <div class="w-65 p-2">
+                                            <input class=" form-control"  ref="file2" v-on:change="handleFileUpload2()" type="file" id="logo"/>
+                                            
+                                             </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="w-100 d-flex align-items-center my-2"></div>
+                                    
+                                 </div>
+                             </div>
+                            
+                             <div class="modal-footer d-flex justify-content-center"> 
+                                <button type="submit" class="btn btn-success">Enregister</button>
+                                <button type="button" v-on:click="closeModalFour()" class="btn btn-warning">Annuler</button>
+                               
                                
                             </div>
                          </form>
@@ -188,27 +263,39 @@
     export default {
         props: [
           'slugClient',
+          'typeCmd',
+          'fournisseurList'
         ],
         data() { 
             return {
-                contenaireForm :{
-                    id: '',
-                    nom: '',
-                    capacite: '',
-                    isdefault: 0
-
-                },
-                hasImage: false,
                 submitted: false,
                 commandes: {},
                 paginate: 20,
                 modeModify: false,
-                fileExcel: null
+                fileExcel: null,
+                typeCommande: '',
+                step: 0,
+                 isLoading: true,
+                 checking: false,
+                fournisseurForm :{
+                    id: '',
+                    nom: '',
+                    adresse: '',
+                    logo: '',
+                    telephone: '',
+                    client: '',
+                    idClients:'',
+                    email: ''
+
+                },
+                page: 1,
+                etatCmd: '',
+                filtreCmd: ''
             }
 
         },
         validations: {
-            contenaireForm : {
+            fournisseurForm : {
                 nom: { required }
             },
         },
@@ -216,16 +303,28 @@
            paginate: function(){
 
                 this.getCommande();
-           }
+           },
+           etatCmd: function(){
+                this.getCommande();
+           },
+           filtreCmd: function(){
+                this.getCommande();
+           },
         },
          methods : { 
-            removeImage(){
-                this.hasImage = false;
-                this.contenaireForm.logo = "";
-            },
             handleFileUpload(){
 
                 this.fileExcel = this.$refs.file.files[0];  
+                if(this.fileExcel){
+                    this.step=2;
+                }else{
+                    this.step=1;
+                }
+
+            },
+            handleFileUpload2(){
+
+                this.fournisseurForm.logo = this.$refs.file2.files[0];  
             },
             importFile(){
 
@@ -240,6 +339,7 @@
                const data = new FormData();
                 data.append('file', this.fileExcel);
                 data.append('slug', this.slugClient);
+                data.append('typeCommande', this.typeCommande);
 
                 axios.post("/import", data).then(response => {
                   
@@ -272,9 +372,17 @@
                 
             },
             getCommande(page = 1){
-                axios.get('/listcmdimported?page=' + page + "&paginate=" + this.paginate).then(response => {
+                 this.isLoading=true;
+                axios.get('/listcmdimported?page=' + page + "&paginate=" + this.paginate+"&etat="+this.etatCmd+"&typeCmd="+this.filtreCmd).then(response => {
                     this.commandes = response.data;
+                    this.checking=true;
+                    var self=this;
+                    setTimeout(function(){
+                         self.isLoading=false;
+                    },800);
+                   
                 });
+                this.page = page;
             },
             deleteImportCmd(cmd){
                 Vue.swal.fire({
@@ -308,7 +416,88 @@
                 this.submitted = false;
                 this.modeModify = false;
 
+            },
+            selectTypeCmd(){
+                if(this.typeCommande!=''){
+                    this.step=1;
+                }else{
+                    this.step=0;
+                }
+            },
+            checkFournisseurExist(name){
+              console.log(this.fournisseurList);
+                for(var i=0; i<this.fournisseurList.length; i++){
+                    var obj=this.fournisseurList[i];
+                    if(name.trim() == obj.fonmfo.trim() ||  obj.fonmfo.toLowerCase().trim() === name.toLowerCase().trim() || obj.fonmfo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() === name.toLowerCase().trim()){
+                       return true
+                    }
+                }
+
+                return false;
+            },
+            setDefaultVal(name){
+                this.fournisseurForm.nom=name;
+            },
+            saveFournisseur(){
+
+                this.submittedFour = true;
+
+                // stop here if form is invalid
+                this.$v.fournisseurForm.$touch();
+                if (this.$v.fournisseurForm.$invalid) {
+                    return;
+                }
+                
+               const data = new FormData();
+                data.append('file', this.fournisseurForm.logo);
+                data.append('nom', this.fournisseurForm.nom);
+                data.append('adresse', this.fournisseurForm.adresse);
+                data.append('telephone', this.fournisseurForm.telephone);
+                data.append('email', this.fournisseurForm.email);
+                data.append('slug', this.slugClient);  
+
+                let action = "createFournisseur";
+
+                axios.post("/configuration/"+action, data).then(response => {
+                  
+                    if(response.data.code==0){
+                        this.$refs.closePoupFour.click();
+                        this.fournisseurList.push(JSON.parse(response.data.lastedAdded));
+                        this.flushDataFour();
+                        Vue.swal.fire(
+                          'succés!',
+                          'Fournisseur enregistré avec succés!',
+                          'success'
+                        ).then((result) => {
+                            this.getCommande(this.page);
+                        });
+                        
+                        
+                        
+                    }else{
+                         Vue.swal.fire(
+                          'error!',
+                          response.data.message,
+                          'error'
+                        )
+                    }
+                    this.submittedFour = false;
+                   
+                });
+            },
+            flushDataFour(){
+                this.fournisseurForm.nom = "";
+                this.fournisseurForm.adresse = "";
+                this.fournisseurForm.email = "";
+                this.fournisseurForm.telephone= "";
+                this.fournisseurForm.logo= "";
+                this.fournisseurForm.client= "";
+                this.fournisseurForm.idClients= "";
+            },
+            closeModalFour(){
+                 this.$refs.closePoupFour.click();
             }
+
         },
         mounted() {
          this.getCommande();

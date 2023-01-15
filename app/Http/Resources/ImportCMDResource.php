@@ -17,7 +17,7 @@ class ImportCMDResource extends JsonResource
 
         return [
             "id"                  => $this->id,
-            "type_commande"       => $this->type_commande,
+            "type_commande"       => $this->getTypeCommande->typcmd,
             "fournisseur"         => $this->fournisseur,
             "commandes"           => $this->commandes,
             "client"              => $this->client,

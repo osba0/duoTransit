@@ -586,7 +586,7 @@
                     dateDebut:   null,
                     dateCloture: null,
                     typeCommande: "",
-                    entrepot: ""
+                    entrepot: this.listEntrepots.length==1? this.listEntrepots[0].id:'', // si il y'a un seul 
 
                 },
                 checkedCommandes: [],

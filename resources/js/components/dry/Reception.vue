@@ -277,7 +277,7 @@
                                          <template v-if="groupCmds">
                                              <button type="button" class="btn btn-primary ml-1" @click="addCmd()"><i class="fa fa-plus"></i></button>
                                          </template>
-                                          <button type="button" :disabled="initRecep.numCommande=='' || initRecep.numCommande==null" title="Check commande" class="btn btn-info ml-1" @click="checkCmd()"><i class="fa fa-refresh"></i></button>
+                                          <button type="button" :disabled="initRecep.numCommande=='' || initRecep.numCommande==null" title="Check commande" class="btn btn-info ml-1" @click="checkCmd()"><i class="fa fa-search"></i></button>
                                             
                                         </div>
                                        
@@ -609,7 +609,7 @@
             	initRecep :{
             		fournisseur: '',
             		numCommande: null,
-            		entrepot: '',
+            		entrepot: this.listEntrepots.length==1? this.listEntrepots[0].id:'', // si il y'a un seul entrepot le prendre comme defaut
             		numfact: null
 
             	},
@@ -1119,6 +1119,8 @@
                 this.initRecep.numfact= "";
                 this.initRecep.entrepot= "";
                 this.initRecep.fournisseur= "";
+                this.groupCmds = false;
+                this.group = [];
         	},
         	getClient(){
 	        	axios.get('/client/'+this.idClient).then(response => {
@@ -1273,6 +1275,12 @@
                         // Set Commande
                         this.setTypeCommande(resp.type_commande);
                         // Set date reception
+                    }else{
+                         Vue.swal.fire(
+                              '',
+                              'Commande non importée',
+                              'warning'
+                            );
                     }
                     
                 });
@@ -1280,7 +1288,7 @@
             setFournisseur(four){
                 for(var i=0; i < this.listFournisseurs.length; i++){
                     var obj=this.listFournisseurs[i];
-                    if(obj.fonmfo == four || obj.fonmfo.normalize("NFD").replace(/[\u0300-\u036f]/g, "") == four){
+                    if(obj.fonmfo.toLowerCase().trim() == four.toLowerCase().trim() || obj.fonmfo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() == four.toLowerCase().trim()){
                         this.initRecep.fournisseur = obj.id;
                     }
                 }
@@ -1288,7 +1296,7 @@
             setTypeCommande(type){
                 for(var i=0; i < this.typeCmd.length; i++){
                     var obj=this.typeCmd[i]; 
-                    if(obj.typcmd == type || obj.typcmd.normalize("NFD").replace(/[\u0300-\u036f]/g, "") == type){
+                    if(obj.id == type){
                         this.reception.typeCmd = obj.id; 
                     }
                 }

@@ -15,7 +15,7 @@ class CreateImportCommandesTable extends Migration
     {
         Schema::create('import_commandes', function (Blueprint $table) {
             $table->id();
-            $table->string('type_commande');
+            $table->integer('type_commande');
             $table->string('fournisseur');
             $table->string('commandes')->unique();
             $table->string('client'); // duopharm ou autre client 

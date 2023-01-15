@@ -182,6 +182,36 @@ class UserController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function changePasswordAccess()
+    {
+       $user =  User::findOrFail(request('id'));
+ 
+        if($user) {
+
+            $user->update([
+                "password"  => Hash::make(request('password'))
+            ]);
+
+        }else{
+            return response([
+                "code" => 1,
+                "message" => "Utilisateur introuvable!"
+            ]);
+        }
+        
+        return response([
+            "code" => 0,
+            "message" => "OK"
+        ]);
+        
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

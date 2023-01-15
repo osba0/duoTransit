@@ -107,6 +107,58 @@
     font-style: normal;
 
 }
+body table .bgStripe .bg-light-danger{
+   /* background: #ff000017 !important; */
+}
+.greenPulse{
+  background: #38c172;
+}
+
+.orangePulse{
+    background: #f17c57fa;
+}
+
+.redPulse{
+  background: red;
+}
+
+.circlePulse {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  box-shadow: 0px 0px 1px 1px #0000001a;
+}
+
+.pulse {
+  animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(0, 0, 0, 0);
+  }
+}
+
+
+.master{
+  color:black;
+  float:right;
+}
+
+
+.fx-30{
+    font-size: 30px;
+}
+.disbaled-1{
+    color: #aeaeae;
+}
+.disbaled-1 .badge, .disbaled-1 button{
+    background: #aeaeae !important;
+    border-color: #aeaeae !important;
+}
 .boxAction{
     width:  35px;
     height: 35px;
@@ -128,6 +180,17 @@
   height: 20px;
   font-size: 10px;
   border: 2px solid white;
+}
+
+@font-face {
+  font-family: 'password';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://jsbin-user-assets.s3.amazonaws.com/rafaelcastrocouto/password.ttf);
+}
+
+#passwordNew {
+  font-family: 'password';
 }
 body{
     font-size: 1em;

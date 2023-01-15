@@ -223,7 +223,7 @@
                 
                     <table class="table table-bordered bg-white"> 
                         <tr>
-                            <th class="text-uppercase thead-blue py-1 w-60">Dossier selectionné 
+                            <th class="text-uppercase thead-blue py-1 w-60">Dossier selectionné  
                                 <span class="py-0 px-2 rounded text-lowercase bg-warning" v-if="selected.etat==0">En cours</span>
                             <span class="py-0 px-2 rounded text-lowercase bg-success" v-if="selected.etat==1">Validé</span></th>
                         </tr>
@@ -1003,7 +1003,7 @@ export default {
         },
         getColorTypeCmd(id){
              for(var i=0; i<this.typeCmd.length;i++){
-                if(this.typeCmd[i].id === id){
+                if(this.typeCmd[i].id === parseInt(id)){ 
                     return this.typeCmd[i].tcolor;
                 }
             }

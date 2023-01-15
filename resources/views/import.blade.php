@@ -7,7 +7,7 @@
             <div class="d-flex justify-content-between mb-3">
                 <h2>Import commandes</h2>
             </div>
-            <import-commande slug-client="{{request()->route('slug')}}"></import-commande> 
+            <import-commande :type-cmd="{{ json_encode($typeCmd) }}" slug-client="{{request()->route('slug')}}" :fournisseur-list="{{ json_encode($fournisseurListe) }}"></import-commande> 
             
         </div>
     </div>
