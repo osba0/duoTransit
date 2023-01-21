@@ -282,7 +282,7 @@
                 this.typecommandesForm.id = typecommande.id;
                 this.typecommandesForm.type = typecommande.type;
                 this.typecommandesForm.color = typecommande.color;
-                this.typecommandesForm.etat = typecommande.etat;
+                this.typecommandesForm.etat = parseInteger(typecommande.etat);
                
             
             },
