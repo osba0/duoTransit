@@ -67,7 +67,7 @@
                         </td>
                         <td>  
                             <label class="switch">
-                                <input class="switch-input inputCmd" :checked="(typecommande.etat)" type="checkbox" :value="typecommande.id" v-on:change="preselectionner($event,typecommande)" /> 
+                                <input class="switch-input inputCmd" :checked="(parseInt(typecommande.etat))" type="checkbox" :value="typecommande.id" v-on:change="preselectionner($event,typecommande)" /> 
                                 <span class="switch-label" data-on="Actif" data-off="Inactif"></span> 
                                 <span class="switch-handle"></span> 
                             </label>
@@ -282,7 +282,7 @@
                 this.typecommandesForm.id = typecommande.id;
                 this.typecommandesForm.type = typecommande.type;
                 this.typecommandesForm.color = typecommande.color;
-                this.typecommandesForm.etat = parseInteger(typecommande.etat);
+                this.typecommandesForm.etat = parseInt(typecommande.etat);
                
             
             },
