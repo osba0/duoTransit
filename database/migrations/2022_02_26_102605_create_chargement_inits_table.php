@@ -20,6 +20,11 @@ class CreateChargementInitsTable extends Migration
             $table->integer('entrepots_id')->constrained(); 
             $table->date('dateDebut');
             $table->date('dateCloture')->nullable();
+            $table->string('booking')->nullable();
+            $table->string('nomNavire')->nullable();
+            $table->string('terminalRetour')->nullable();
+            $table->date('dateDepart')->nullable();
+            $table->date('dateArrivee')->nullable();
             $table->foreignId('clients_id')->constrained();
             $table->foreignId('entites_id')->constrained();
             $table->foreignId('users_id')->constrained();

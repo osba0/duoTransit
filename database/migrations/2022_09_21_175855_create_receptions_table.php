@@ -24,6 +24,8 @@ class CreateReceptionsTable extends Migration
 
             $table->foreignId('fournisseurs_id')->constrained();
             $table->foreignId('type_commandes_id')->constrained();
+
+            $table->string('typeproduit')->nullable(); // DEAE Précurseur de drogue Psychotrope Dangereux
             $table->foreignId('clients_id')->constrained();
             $table->foreignId('entrepots_id')->constrained();
             $table->foreignId('users_id')->constrained();
