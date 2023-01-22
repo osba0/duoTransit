@@ -10,9 +10,10 @@
                <h3>Validation Préchargement  <template v-if="isDetail">:</template></h3>
                <template v-if="isDetail">
                    <span class="pl-2 h4 text-primary font-weight-bold"> N° Dossier {{ selected.id }}&nbsp;</span>
-                   <span class="h4 text-primary font-weight-bold"> du {{ selected.dateDebut }} au {{ selected.dateCloture }}</span>
+                   <!--span class="h4 text-primary font-weight-bold"> {{ selected.dateDebut }} au {{ selected.dateCloture }}</span-->
                 </template>
           </div>
+         
           <div class="col-sm-4">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Acceuil</a></li>
@@ -21,7 +22,6 @@
             </ol>
           </div>
         </div>
- 
 
         <template v-if="!isDetail">
             <div class="row d-flex align-items-center justify-content-between mb-3">
@@ -187,6 +187,38 @@
                     <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                 </button>
             </div>
+            <template v-if="isDetail">
+                <div class="d-flex bg-white rounded justify-content-between d-flex pt-2 justify-content-between border mb-2 px-2 fontSpan">
+                    <div>
+                        <label>Date empotage:</label>
+                        <span class="badge badge-primary">{{ selected.dateDebut }}</span>
+                    </div>
+                    <div class="ml-2">
+                        <label>Date cloture navire:</label>
+                        <span class="badge badge-primary">{{ selected.dateCloture }}</span>
+                    </div>
+                    <div class="ml-2">
+                        <label>Booking:</label>
+                        <span class="badge badge-primary">{{ selected.booking }}</span>
+                    </div>
+                     <div class="ml-2">
+                        <label>Nom navire:</label>
+                        <span class="badge badge-primary">{{ selected.nomNavire }}</span>
+                    </div>
+                    <div class="ml-2">
+                        <label>Terminal retour:</label>
+                        <span class="badge badge-primary">{{ selected.termRetour }}</span>
+                    </div>
+                     <div class="ml-2">
+                        <label>Date départ:</label>
+                        <span class="badge badge-primary">{{ selected.dateDepart }}</span>
+                    </div>
+                     <div class="ml-2">
+                        <label>Date arrivée:</label>
+                        <span class="badge badge-primary">{{ selected.dateArrivee }}</span>
+                    </div>
+                </div>
+          </template>
            
             <div class="mb-3">
                 <VueScrollFixedNavbar>
@@ -422,7 +454,8 @@
                     <div class="modal-body mx-3">
 
                         <form @submit.prevent="save" enctype="multipart/form-data"  key=1>
-
+                            <h5 class="text-primary mb-0 font-weight-bold">Détail Dossier</h5>
+                             <hr class="mt-1">
                             <div class="row">
                                 <div class="col-6 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
@@ -458,7 +491,7 @@
                                 <div class="col-6 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                            <label for="dateDeb" class="m-0 text-left w-35 pr-2 white-space-nowrap" >Date début</label>
+                                            <label for="dateDeb" class="m-0 text-left w-35 pr-2 white-space-nowrap" >Date empotage</label>
 
                                              <date-picker v-model="initChargement.dateDebut" class="w-100" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add && !$v.initChargement.dateDebut.required }"></date-picker>
                                            
@@ -468,12 +501,64 @@
                                 <div class="col-6 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                           <label for="dateClo" class="d-block m-0 text-left w-35 pr-2 text-nowrap" >Date cloture</label>
+                                           <label for="dateClo" class="d-block m-0 text-left w-35 pr-2 text-nowrap" >Date cloture navire</label>
                                             <date-picker v-model="initChargement.dateCloture" class="w-100"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add  && !$v.initChargement.dateCloture.required}"></date-picker>
                                         </div>
                                     </div>
                                 </div>
                              </div>
+                             <h5 class="text-primary mb-0 font-weight-bold">Info Navire</h5>
+                             <hr class="mt-1">
+                             <div class="row">
+                                <div class="col-4 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                           <label for="numBooking"  class="d-block m-0 text-left pr-2 white-space-nowrap">N° Booking</label>
+                                           <input autocomplete="off" class="form-control mr-2" id="numBooking" v-model="initChargement.numBooking" 
+                                            :class="{ 'border-danger': submitted_add && !$v.initChargement.numBooking.required}" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                           <label for="nomNavire"  class="d-block m-0 text-left pr-2 white-space-nowrap">Nom navire</label>
+                                           <input autocomplete="off" class="form-control mr-2" id="nomNavire" v-model="initChargement.nomNavire" 
+                                            :class="{ 'border-danger': submitted_add && !$v.initChargement.nomNavire.required}" />
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="col-4 my-2 d-flex flex-row align-items-center justify-content-between">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                           <label for="termRetour"  class="d-block m-0 text-left pr-2 white-space-nowrap">Terminal retour</label>
+                                           <input autocomplete="off" class="form-control mr-2" id="termRetour" v-model="initChargement.termRetour" 
+                                            :class="{ 'border-danger': submitted_add && !$v.initChargement.termRetour.required}" />
+                                        </div>
+                                    </div>
+                                </div>
+                             </div>
+                              <div class="row mb-4">
+                                <div class="col-6 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                            <label for="dateDeb" class="m-0 text-left w-35 pr-2 white-space-nowrap" >Date départ</label>
+
+                                             <date-picker v-model="initChargement.dateDepart" class="w-100" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add && !$v.initChargement.dateDepart.required }"></date-picker>
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                           <label for="dateClo" class="d-block m-0 text-left w-35 pr-2 text-nowrap" >Date arrivée</label>
+                                            <date-picker v-model="initChargement.dateArrivee" class="w-100"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add  && !$v.initChargement.dateArrivee.required}"></date-picker>
+                                        </div>
+                                    </div>
+                                </div>
+                             </div>
+
                              <div class="modal-footer d-flex justify-content-center"> 
                                 <button type="submit" class="btn btn-success d-flex align-items-center">
                                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" :class="{'d-none': !submitted_circle, 'd-inline-block': submitted_circle && !$v.typeCommande.required}"></span>Créer</button>
@@ -576,7 +661,11 @@
                     etat: 0,
                     entrepot: '',
                     idEntrepot: '',
-                    currentPage: 1
+                    currentPage: 1,
+                    booking: '',
+                    dateDepart: '',
+                    dateArrivee: '',
+                    termRetour: ''
                 },
                 capacite: this.defaultContenaire.volume,
                 nbrContenaire: 0,
@@ -585,6 +674,12 @@
                     numDossier: '',
                     dateDebut:   null,
                     dateCloture: null,
+                    numBooking: null,
+                    nomNavire: null,
+                    termRetour: null,
+                    dateDepart: null,
+                    dateArrivee: null,
+                    nomNavire: null,
                     typeCommande: "",
                     entrepot: this.listEntrepots.length==1? this.listEntrepots[0].id:'', // si il y'a un seul 
 
@@ -621,6 +716,11 @@
                 dateDebut:    { required },
                 dateCloture:  { required },
                 typeCommande: { required },
+                numBooking:   { required },
+                nomNavire:    { required },
+                termRetour:   { required },
+                dateDepart:   { required },
+                dateArrivee:  { required },
                 entrepot: { required },
             }
              
@@ -893,11 +993,31 @@
 
                 return false;
             }
+
+
+            var dateD = new Date(this.initChargement.dateDepart);
+            var dateA = new Date(this.initChargement.dateArrivee);
+
+            if(dateD.getTime() > dateA.getTime()){
+                Vue.swal.fire(
+                      'warning!',
+                      'Date départ incorrecte!',
+                      'warning'
+                    );
+                this.submitted_circle=false;
+
+                return false;
+            }
             
             axios.post("/gerer/createDossier", {
                 'numdossier'  : this.initChargement.numDossier,
                 'datedebut'   : this.initChargement.dateDebut,
                 'datecloture' : this.initChargement.dateCloture, 
+                'nomnavire'   : this.initChargement.nomNavire,
+                'booking'     : this.initChargement.numBooking,
+                'datedepart'   : this.initChargement.dateDepart,
+                'datearrivee' : this.initChargement.dateArrivee, 
+                'termretour'  : this.initChargement.termRetour,
                 'typeCmd'     : this.initChargement.typeCommande,
                 'entrepot'    : this.initChargement.entrepot,
                 'clientID'    : this.idClient,
@@ -1104,6 +1224,18 @@
                 entete.push([{text: "\n\nClient: "+that.currentClient['clnmcl'], fontSize: 13, alignment: 'left', colSpan: 3}]);
 
                 entete.push([{text: 'Prévision de chargement pour le '+that.selected.dateDebut+' ET '+that.selected.dateCloture+"\n\n", fontSize: 12, alignment: 'center', colSpan: 3}]); 
+
+                var infoNavire=[];
+
+                infoNavire.push([
+                    {text: 'Booking: '+ that.selected.booking, fontSize: 12, alignment: 'left', lineHeight: 1},
+                    {text: 'Nom navire: '+ that.selected.nomNavire, fontSize: 12, alignment: 'center', lineHeight: 1},
+                    {text: 'Terminal retour: '+ that.selected.termRetour, fontSize: 12, alignment: 'center', lineHeight: 1},
+                    {text: 'Date départ: '+ that.selected.dateDepart, fontSize: 12, alignment: 'center', lineHeight: 1},
+                    {text: 'Date arrivée: '+ that.selected.dateArrivee, fontSize: 12, alignment: 'right', lineHeight: 1}
+                ]); 
+
+                var navire = new Table(infoNavire).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
                
 
                 var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
@@ -1224,6 +1356,8 @@
 
                 pdf.add(header);
 
+                pdf.add(navire);
+
                 pdf.add(table);
 
                 pdf.add(
@@ -1310,7 +1444,12 @@
             this.selected.typeCmd    = dossier.typecmd;
             this.selected.dateDebut  = dossier.dateDebut;
             this.selected.dateCloture  = dossier.dateCloture;
-            this.selected.isSelected = true;
+            this.selected.booking     = dossier.booking;
+            this.selected.dateDepart  = dossier.dateDepart;
+            this.selected.dateArrivee = dossier.dateArrivee;
+            this.selected.termRetour  = dossier.terminal_retour;
+            this.selected.nomNavire  = dossier.nomNavire;
+            this.selected.isSelected  = true;
             this.selected.typeCommande = dossier.typecmdId;
             this.selected.etat = dossier.etat;
             this.selected.entrepot = dossier.entrepot;

@@ -42,6 +42,14 @@
                                         <span>{{ getTypeCmd(viewReception.id_commandes) }}</span>
                                     </div>
                                 </div>
+                                 <div class="w-100 d-flex align-items-center my-2">
+                                    <label class="d-block m-0 text-right w-35 pr-2">
+                                        Document spécifique
+                                    </label>
+                                    <div class="w-65 pl-2 bg-light" >
+                                        <span>{{ viewReception.typeproduit==""? "N/A": viewReception.typeproduit  }}</span>
+                                    </div>
+                                </div>
                                 <div class="w-100 my-2 d-flex justify-content-between align-items-center">
                                     <label class="d-block m-0 text-right w-35 pr-2" for="numfe">N°FE</label>
                                     <div class="w-65 pl-2 bg-light" >
@@ -67,8 +75,8 @@
                                     <div class="w-65 bg-light pl-2">
                                         <span v-if="!Array.isArray(viewReception.listgroup) || viewReception.listgroup.length==0">{{ viewReception.rencmd }}</span>
                                         <div v-else class="w-100 bg-light rounded-lg pt-1">
-                                            <label v-for="c in viewReception.listgroup" class="badge badge-primary mr-2">
-                                                {{ c }} 
+                                            <label v-for="cmd in viewReception.listgroup" class="badge badge-primary mr-2">
+                                                {{ cmd }} 
                                             </label>
                                         </div>
                                     </div>
@@ -292,7 +300,7 @@ export default {
         },
         getTypeCmd(id){
             for(var i=0; i<this.typeCmd.length; i++){
-                if(this.typeCmd[i].id==id){
+                if(this.typeCmd[i].id== parseInt(id)){
                   return this.typeCmd[i].typcmd; 
                 }
             }

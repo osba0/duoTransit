@@ -394,6 +394,22 @@
                                         </select>
 			                        </div>
 			                    </div>
+                                 <div class="w-100 d-flex align-items-center my-2">
+                                    <label class="d-block m-0 text-right w-35 pr-2">
+                                        Document spécifique
+                                    </label>
+                                    <div class="w-65" >
+                                        <select
+                                            v-model="reception.typeProduit"
+                                            class="form-control form-control-sm" >
+                                            <option value="">Choisir</option>
+                                            <option value="DEAE">DEAE</option>
+                                            <option value="Précurseur de drogue">Précurseur de drogue</option>
+                                            <option value="Psychotrope">Psychotrope</option>
+                                            <option value="Dangereux">Dangereux</option>
+                                        </select>
+                                    </div>
+                                </div>
 			                    <div class="w-100 my-2 d-flex justify-content-between align-items-center">
 			                        <label class="d-block m-0 text-right w-35 pr-2" for="numfe">N°FE</label>
 			                        <input autocomplete="off" class="w-65 form-control" v-model="reception.numfe" type="text" id="numfe" :class="{ 'border-danger': submitted && !$v.reception.numfe.required }" >
@@ -637,7 +653,8 @@
 					numCommande: null,
 					commentaire: "",
 					file: '',
-                    groupList: []
+                    groupList: [],
+                    typeProduit: ''
 				},
 				dries: {},
 				paginate: 10,
@@ -974,6 +991,8 @@
 				data.append('commentaire', this.reception.commentaire);
 				data.append('client', this.idClient);
                 data.append('IDentite', this.idEntite);
+
+                data.append('typeproduit', this.reception.typeProduit);
 
                 data.append('group', JSON.stringify(this.group)); 
 

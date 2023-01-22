@@ -110,6 +110,9 @@
 body table .bgStripe .bg-light-danger{
    /* background: #ff000017 !important; */
 }
+.fontSpan span{
+    font-size: 16px;
+}
 .greenPulse{
   background: #38c172;
 }

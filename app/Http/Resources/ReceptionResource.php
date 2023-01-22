@@ -38,6 +38,7 @@ class ReceptionResource extends JsonResource
             "redalivraison"  => $this->redali,
             "rencmd"         => $this->rencmd,
             "reetat"         => $this->reetat,
+            "typeproduit"    => $this->typeproduit,
             "refasc"         => $this->refasc,
             "recomt"         => $this->recomt,
             "douane"         => $this->douane,
