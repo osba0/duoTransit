@@ -18,7 +18,7 @@
                                               <date-picker v-model="filtre.dateFin" required valueType="YYYY-MM-DD" input-class="form-control w-100" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
                                         </div>
                                     </div>
-                                </template>
+                                </template> 
                                 <div class="d-flex align-items-end">
                                     <div class="mr-3 text-left" style="width: 180px">
                                         <label class="text-left w-100 mb-0">Type Commande</label>
@@ -155,6 +155,11 @@
                                             <td>{{ res.user }}</td>
                                              <td class="p-2 align-middle">
                                                 <div class="d-flex justify-content-end align-items-center">
+                                                    <a href="#" title="Autres documents" class="btn p-0 m-1 ml-2  position-relative"  @click="showAutreDocument(res)" data-toggle="modal" data-target="#openAutreDocument">
+                                                        <i class="fa fa-file-pdf-o mt-2" aria-hidden="true" style="font-size: 22px"></i>
+                                                        <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[getCountDoc(res.autre_document) == 0? 'bg-danger':'']">{{ getCountDoc(res.autre_document) > 9 ? '+9' : getCountDoc(res.autre_document) }}</span>
+                                                     
+                                                    </a>
                                                     <a href="#" title="Liste contenaire" class="btn p-0 m-1 ml-2 position-relative"  @click="showContenaire(res)">
                                                         <img src="/images/contenaire.png" alt="Contenaire" height="30">
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{res.totalContenaire}}</span>
@@ -259,7 +264,7 @@
                                                         </p>
                                                     </a>  
                                                 </th>
-                                                <th class="text-center"><button v-on:click="showRapport(currentIndexContenaire)" class="btn p-0 m-0 mb-0" data-toggle="modal" data-target="#openFacture" title="Rapport d'empotage"><span class="h3 mb-0"><i class="fa fa-file-pdf-o text-danger"></i></span></button></th>
+                                                <th class="text-center"><button v-on:click="showRapport(currentIndexContenaire)" class="btn p-0 m-0 mb-0" data-toggle="modal" data-target="#openModalEmpo" title="Rapport d'empotage"><span class="h3 mb-0"><i class="fa fa-file-pdf-o text-danger"></i></span></button></th>
                                             </tr>
                                       
                                         </tbody>
@@ -272,7 +277,8 @@
                     </table>
                 </div>
                 <hr>
-                <div class="d-flex justify-content-between align-content-center mb-2">
+                <div><typeproduit></typeproduit></div>
+                <div class="d-flex w-100 justify-content-between align-content-center mb-2">
                     <div class="d-flex align-items-end">
                         <div>
                             <div class="d-flex align-items-center">
@@ -326,7 +332,9 @@
                     </template>
                     <template v-else>
                         <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white">
-                        <td class="p-2 align-middle">{{ dry.reecvr }}</td>
+                         <td class="p-2 align-middle position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>  <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)">
+                                {{ dry.reecvr }}
+                            </label></td>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
                         <td class="p-2 align-middle">
                                 <template v-if="dry.renbcl > 0">
@@ -362,9 +370,14 @@
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                      <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                                 </a>
-                                <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
+                                <!--button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
                                     <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                     <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
+                                </button-->
+                                 <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)" data-toggle="modal" data-target="#openFacture">
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                <!--i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i-->
+                                <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(dry.refasc) > 9 ? '+9' : getCountFacture(dry.refasc) }}</span>
                                 </button>
                             </div>
                         </td>
@@ -384,7 +397,8 @@
             </template>
         </template>
         <!-- Modal Facture-->
-        <div class="modal fade fullscreenModal" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+        <modalFacture></modalFacture>  
+        <div class="modal fade fullscreenModal" id="openModalEmpo" tabindex="-1" role="dialog" aria-labelledby="myModalEmpo"
           aria-hidden="true" data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
              <div class="modal-content">
@@ -395,7 +409,7 @@
                             <template v-if="pdfFileModal != null">Rapport d'empotage</template>
                             <template v-if="pdfFileModal != null && pdfFile != null"> Document </template>
                             </h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdfEmpo">
                           <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -409,7 +423,7 @@
                          <template v-if="pdfFileModal != null && pdfFile != null"> Auncun fichier </template>
                     </div>
                     <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" v-on:click="closeModalPdf()" class="btn btn-warning">Fermer</button>
+                    <button type="button" v-on:click="closeModalPdfEmpo()" class="btn btn-warning">Fermer</button>
                   </div>
              </div>
             
@@ -463,6 +477,61 @@
                     </div>
                     <div class="modal-footer d-flex justify-content-center">
                     <button type="button" v-on:click="closeModalDoc()" class="btn btn-warning">Fermer</button>
+                  </div>
+             </div>
+            
+          </div>
+        </div>
+
+
+        <!-- Modal Autre Document-->
+        <div class="modal fade fullscreenModal" id="openAutreDocument" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+          aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="document">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left align-items-center">
+                        <h4 class="modal-title font-weight-bold">Autre documents</h4>
+                        <template v-if="userRole=='admin'">
+                            <div class="flex-1 text-center">
+                                <label class="mb-0">Ajout un fichier</label>
+                                <input type="file" id="fileAutre" name="fileAutre" multiple ref="fileAutreDoc" v-on:change="handleFileUploadOtherDoc()"/>
+                                <button class="btn btn-success" v-on:click="saveAutreDocs()">Enregister</button>
+                            </div>
+                        </template>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupAutreDoc" v-on:click="search(currentPage)">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                        
+                    </div>
+                    <div class="modal-body mx-3 overflow-hidden">
+                        <div class="d-flex justify-content-between h-100">
+                            <div>
+                                <div class="d-flex flex-column">
+                                    <template v-for="doc, index in tabAutreDoc">
+                                        <div class="position-relative">
+                                            <button v-on:click="getAutreDoc(index)" class="btn rounded-circle  btn-default mb-2" :class="index==currentIndexAutre ? 'bg-light':''">
+                                                <span class="h1"><i class="fa fa-file"></i></span>
+                                            </button>
+                                            <template v-if="userRole=='admin'">
+                                                <button style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="removeAutreDoc(doc)"><i class="fa fa-times"></i></button>
+                                            </template>
+                                        </div>
+                                    </template>
+                                   
+                                </div>
+                            </div>
+                             <template v-if="tabAutreDoc.length > 0">
+                                <embed :src="'/assets/documents/'+tabAutreDoc[currentIndexAutre]" frameborder="0" width="95%" height="450px">
+                              </template>
+                             <template v-else>
+                                <div class="w-100 text-center">Aucun document </div> 
+                              </template>
+                            
+                         </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" v-on:click="closeModalAutreDoc()" class="btn btn-warning">Fermer</button>
                   </div>
              </div>
             
@@ -580,6 +649,8 @@ import 'vue2-timepicker/dist/VueTimepicker.css';
 import { PdfMakeWrapper, Table } from 'pdfmake-wrapper';
 
 import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
+import modalFacture from '../../components/modal/facture.vue';
+import typeproduit from '../../components/modal/typeproduit.vue';
 
 export default { 
     props: [
@@ -592,7 +663,9 @@ export default {
             'idEntite'
     ],
      components: {
-        modalDetailsCommande
+        modalDetailsCommande,
+        modalFacture,
+        typeproduit
     },
     data() {
         return {
@@ -649,7 +722,10 @@ export default {
             messageError: '',
             currentIndexPhoto: 0,
             attachmentsPhoto: [],
-            tabPhoto: []
+            tabPhoto: [],
+            attachmentsAutreDoc: [],
+            currentIndexAutre: 0,
+            tabAutreDoc: []
         };
     },
     watch: {
@@ -734,6 +810,9 @@ export default {
                 
             });
         },
+        getAutreDoc(index){
+            this.currentIndexAutre = index;
+        },
         getDoc(index){
             this.currentIndex = index;
         },
@@ -765,6 +844,12 @@ export default {
           today.setHours(0, 0, 0, 0);
 
           return date > today;
+        },
+        handleFileUploadOtherDoc(){
+            this.attachmentsAutreDoc = [];
+            for(var i=0; i<this.$refs.fileAutreDoc.files.length;i++){
+                this.attachmentsAutreDoc.push(this.$refs.fileAutreDoc.files[i])
+            }
         },
         handleFileUploadDoc(){
                 this.attachments = [];
@@ -799,7 +884,7 @@ export default {
 
             data.append('TotalFiles', this.attachmentsDouane.length);
 
-            data.append('Document[]', this.tabDeclaration  ); 
+            data.append('Document[]', this.tabDeclaration); 
 
             axios.post("/saveDocsDouane/"+this.currentEmpotage, data,  {
                         headers: {
@@ -831,11 +916,11 @@ export default {
             const data = new FormData();
 
             if(!this.attachments.length > 0){
-                 Vue.swal.fire(
-                          '',
-                          'Ajouter un document avant de valider!',
-                          'warning'
-                        )   
+                Vue.swal.fire(
+                      '',
+                      'Ajouter un document avant de valider!',
+                      'warning'
+                    )   
                 return false;
             }
             
@@ -876,58 +961,151 @@ export default {
                    
                 });
         },
+        saveAutreDocs(){
+            const data = new FormData();
+
+            if(!this.attachmentsAutreDoc.length > 0){
+                Vue.swal.fire(
+                      '',
+                      'Ajouter un document avant de valider!',
+                      'warning'
+                    )   
+                return false;
+            }
+            
+            data.append('file[]', this.attachmentsAutreDoc);
+
+            for (let i = 0; i < this.attachmentsAutreDoc.length; i++) {
+                data.append('files' + i, this.attachmentsAutreDoc[i]);
+            }
+
+
+            data.append('TotalFiles', this.attachmentsAutreDoc.length);
+
+            data.append('Document[]', this.tabAutreDoc); 
+
+            axios.post("/saveOtherDocs/"+this.currentEmpotage, data,  {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        } 
+                }).then(response => {
+                   
+                    this.$refs.fileAutreDoc.value = null;
+                    if(response.data.code==0){
+                         this.tabAutreDoc = response.data.file;
+                         this.currentIndex = 0;
+                        Vue.swal.fire(
+                          'succés!',
+                          'Document(s) ajouté(s) avec succés!',
+                          'success'
+                        )         
+
+                    }else{
+                         Vue.swal.fire(
+                          'error!',
+                          response.data.message,
+                          'error'
+                        )
+                    }
+                   
+                });
+        },
         format_nbr(mnt){
             if(mnt != '' && mnt != null){
                 return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             }
             return mnt;
         },
+        removeAutreDoc(nameDoc){
+            Vue.swal.fire({
+              title: 'Confirmez la suppression du document',
+              text: nameDoc,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Oui, supprimer!'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                   // remove Doc
+                   const data = new FormData();
+
+                    data.append('Document[]', this.tabDoc); 
+                    data.append('nameFile', nameDoc); 
+
+                    axios.post("/removeAutreDocs/"+this.currentEmpotage, data,  {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                } 
+                        }).then(response => {
+                           
+                            if(response.data.code==0){
+                                 this.tabAutreDoc = response.data.file;
+                                 this.currentIndexAutre = 0;
+                                Vue.swal.fire(
+                                  'succés!',
+                                  'Document(s) supprimé(s) avec succés!',
+                                  'success'
+                                )         
+
+                            }else{
+                                 Vue.swal.fire(
+                                  'error!',
+                                  response.data.message,
+                                  'error'
+                                )
+                            }
+                           
+                        });
+              
+              }
+            });
+        },
         removeDoc(nameDoc){
+            Vue.swal.fire({
+              title: 'Confirmez la suppression du document',
+              text: nameDoc,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Oui, supprimer!'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                   // remove Doc
+                   const data = new FormData();
 
-                Vue.swal.fire({
-                  title: 'Confirmez la suppression du document',
-                  text: nameDoc,
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#d33',
-                  cancelButtonColor: '#3085d6',
-                  confirmButtonText: 'Oui, supprimer!'
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                       // remove Doc
-                       const data = new FormData();
+                    data.append('Document[]', this.tabDoc); 
+                    data.append('nameFile', nameDoc); 
 
-                        data.append('Document[]', this.tabDoc); 
-                        data.append('nameFile', nameDoc); 
+                    axios.post("/removeDocs/"+this.currentEmpotage, data,  {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                } 
+                        }).then(response => {
+                           
+                            if(response.data.code==0){
+                                 this.tabDoc = response.data.file;
+                                 this.currentIndex = 0;
+                                Vue.swal.fire(
+                                  'succés!',
+                                  'Document(s) supprimé(s) avec succés!',
+                                  'success'
+                                )         
 
-                        axios.post("/removeDocs/"+this.currentEmpotage, data,  {
-                                    headers: {
-                                        'Content-Type': 'multipart/form-data'
-                                    } 
-                            }).then(response => {
-                               
-                                if(response.data.code==0){
-                                     this.tabDoc = response.data.file;
-                                     this.currentIndex = 0;
-                                    Vue.swal.fire(
-                                      'succés!',
-                                      'Document(s) supprimé(s) avec succés!',
-                                      'success'
-                                    )         
-
-                                }else{
-                                     Vue.swal.fire(
-                                      'error!',
-                                      response.data.message,
-                                      'error'
-                                    )
-                                }
-                               
-                            });
-                  
-                  }
-                });
-            },
+                            }else{
+                                 Vue.swal.fire(
+                                  'error!',
+                                  response.data.message,
+                                  'error'
+                                )
+                            }
+                           
+                        });
+              
+              }
+            });
+        },
         removeDocDouane(nameDoc){
               Vue.swal.fire({
                   title: 'Confirmez la suppression du document',
@@ -1015,6 +1193,11 @@ export default {
             axios.get('/histoEmpotage/reception/'+this.clientCurrent.id+"/"+this.selected.typeCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&filtre_four="+this.filtre.fournisseur+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order+"&contenaireSelected="+this.contenaires.data[this.currentIndexContenaire].id+"&contenaireEtat="+this.contenaires.data[this.currentIndexContenaire].etat).then(response => {
                 this.reception = response.data;
                 this.selected.nbrcmd = this.reception.data.length;
+                 // get Ŝpecification
+
+                    EventBus.$emit('SET_PRODUIT_SPECIFIK', { 
+                        prd: this.reception.data
+                    });
                 console.log(this.reception, "reception");
             });
         },
@@ -1116,6 +1299,15 @@ export default {
             this.getReception();
 
        },
+        showAutreDocument(empo){
+            this.tabAutreDoc = [];
+            this.currentEmpotage = empo.id;
+            if(Array.isArray(empo.autre_document)){
+                this.tabAutreDoc = empo.autre_document;
+            }
+            
+           
+       },
        showDocument(empo){
             this.tabDoc = [];
             this.currentEmpotage = empo.id;
@@ -1144,15 +1336,15 @@ export default {
             this.$refs.closePoupDoc.click();
             this.search(this.currentPage);
         },
-       closeModalPdf(){
+        closeModalAutreDoc(){
+            this.$refs.closePoupAutreDoc.click();
+            this.search(this.currentPage);
+        },
+        closeModalPdf(){
             this.$refs.closePoupPdf.click();
         },
-        showFacture(file){
-            this.pdfFileModal = null;
-            this.pdfFile = null;    
-            if(file!=''){
-                this.pdfFile = file;
-            }
+        closeModalPdfEmpo(){
+            this.$refs.closePoupPdfEmpo.click();
         },
         showModal(dry){ 
     
@@ -1217,6 +1409,29 @@ export default {
             },
              closeModalPhoto(){
                 this.$refs.closePoupPhoto.click();
+            },
+             showFacture(fact){
+                 EventBus.$emit('VIEW_FACT', { 
+                    listeFacture: fact.refasc,
+                    idReception: fact.reidre,
+                    can_modify: false
+                }); 
+            },
+              getCountFacture(doc){
+                if(Array.isArray(doc)){
+                    return doc.length;
+                }
+                return 0;
+            },
+            getTypeProduit(produit){
+                   switch(produit){
+                    case 'DEAE': return 'deae text-white'; break;
+                    case 'Précurseur de drogue': return 'precurseur_drogue text-white'; break;
+                    case 'Psychotrope': return 'psychotrope text-white'; break;
+                    case 'Dangereux': return 'dangereux text-white'; break;
+                    case 'Autre': return 'autre text-white'; break;
+                    default: return 'border border-width-2 border-primary'; 
+                }
             }
     },
     mounted() {

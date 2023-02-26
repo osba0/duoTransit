@@ -235,7 +235,8 @@ class PrechargementController extends Controller
             $dries = Reception::where('clients_id', request('id'))->where(function($query2){
 
                     $query2->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL)->orWhere('dossier_prechargements_id', request('idPre'));
-                })->where('type_commandes_id', request('typecmd'))->where('entites_id', request('entite')); //request('entiteID')
+                })->where('type_commandes_id', request('typecmd'))->where('entites_id', request('entite'))->leftJoin('commande_retourner_motifs', 'receptions.reidre', '=', 'commande_retourner_motifs.idReception')
+            ->select('receptions.*','commande_retourner_motifs.idReception')->groupBy('receptions.reidre'); //request('entiteID')
 
             if(request('etatSelected')==true){
 

@@ -185,23 +185,20 @@
                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                        <label for="nom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Nom
+                                        Fournisseur
                                        </label>
-                                        <input disabled class="w-65 form-control" id="nom" v-model="fournisseurForm.nom" 
+                                        <input  class="w-65 form-control" id="nom" v-model="fournisseurForm.nom" 
                                         :class="{ 'border-danger': submitted && !$v.fournisseurForm.nom.required }" />
                                     </div>
                                     
                                  </div>
-                                  <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                            <div class="md-form w-100 d-flex justify-content-between align-items-center">
-                                            <label for="tele" class="d-block m-0 text-right w-35 pr-2" >Telephone</label>
-                                            <input class="w-65 form-control"  v-model="fournisseurForm.telephone" type="text" id="tele"/>
-                                        </div>
-                                        </div>
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2"></div>
+                                  <div class="col-6 my-2 d-flex flex-column">
+                                        <div class="w-100 d-flex align-items-center my-2">
+                                         <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Gestionnaire
+                                       </label>
+                                        <input class="w-65 form-control" id="adresse" v-model="fournisseurForm.gestionnaire"/>
+                                    </div>
                                     
                                  </div>
                                 
@@ -239,6 +236,18 @@
 
                                         </div>
                                         <div class="w-100 d-flex align-items-center my-2"></div>
+                                    
+                                 </div>
+                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
+                                    
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                            <div class="md-form w-100 d-flex justify-content-between align-items-center">
+                                            <label for="tele" class="d-block m-0 text-right w-35 pr-2" >Telephone</label>
+                                            <input class="w-65 form-control"  v-model="fournisseurForm.telephone" type="text" id="tele"/>
+                                        </div>
+                                        </div>
+                                    
+                                    <div class="w-100 d-flex align-items-center my-2"></div>
                                     
                                  </div>
                              </div>
@@ -285,7 +294,8 @@
                     telephone: '',
                     client: '',
                     idClients:'',
-                    email: ''
+                    email: '',
+                    gestionnaire: ''
 
                 },
                 page: 1,
@@ -344,14 +354,22 @@
                 axios.post("/import", data).then(response => {
                   
                     if(response.data.code==0){
-                        this.$refs.closePoup.click();
+                        /*this.$refs.closePoupFour.click();
                          this.getCommande();
-                        this.flushData();
+                        this.flushData();*/
                         Vue.swal.fire(
                           'succés!',
                           'Importé avec succés!',
                           'success'
-                        )
+                        );
+                        Vue.swal.fire(
+                         'succés!',
+                          'Importé avec succés!',
+                          'success'
+                        ).then((result) => {
+                             location.reload();
+                        });
+                       
                         
 
                     }else{
@@ -397,12 +415,15 @@
                   if (result.isConfirmed) {
                         axios.delete('/import/delete/'+cmd.id).then(response => {
                             console.log(response);
-                             Vue.swal.fire(
-                              'Supprimé!',
-                              'Commande supprimé avec succés.',
-                              'success'
-                            );
-                             this.getCommande();
+                               
+                            Vue.swal.fire(
+                                'Supprimé!',
+                                'Commande supprimé avec succés.',
+                                'success'
+                            ).then((result) => {
+                                localStorage.setItem('current_page_import', this.page);  
+                                location.reload();
+                            });
 
 
                         });
@@ -411,7 +432,7 @@
                 })
             },
             closeModal(){
-                this.$refs.closePoup.click();
+                this.$refs.closePoupFour.click();
                 this.flushData();
                 this.submitted = false;
                 this.modeModify = false;
@@ -428,7 +449,7 @@
               console.log(this.fournisseurList);
                 for(var i=0; i<this.fournisseurList.length; i++){
                     var obj=this.fournisseurList[i];
-                    if(name.trim() == obj.fonmfo.trim() ||  obj.fonmfo.toLowerCase().trim() === name.toLowerCase().trim() || obj.fonmfo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() === name.toLowerCase().trim()){
+                    if((name.trim() == obj.fonmfo.trim() ||  obj.fonmfo.toLowerCase().trim() === name.toLowerCase().trim() || obj.fonmfo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() === name.toLowerCase().trim()) && (obj.fogefo!='' && obj.fogefo!=null) && (obj.foemail!='' && obj.foemail!=null)){
                        return true
                     }
                 }
@@ -437,6 +458,14 @@
             },
             setDefaultVal(name){
                 this.fournisseurForm.nom=name;
+
+                for(var i=0; i<this.fournisseurList.length; i++){
+                    var obj=this.fournisseurList[i];
+                    if((name.trim() == obj.fonmfo.trim() ||  obj.fonmfo.toLowerCase().trim() == name.toLowerCase().trim() || obj.fonmfo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() == name.toLowerCase().trim())){
+                        this.fournisseurForm.id = obj.id;
+                    } 
+                }
+              
             },
             saveFournisseur(){
 
@@ -454,22 +483,25 @@
                 data.append('adresse', this.fournisseurForm.adresse);
                 data.append('telephone', this.fournisseurForm.telephone);
                 data.append('email', this.fournisseurForm.email);
+                data.append('gestionnaire', this.fournisseurForm.gestionnaire);
+                data.append('id', this.fournisseurForm.id);
                 data.append('slug', this.slugClient);  
 
-                let action = "createFournisseur";
+                let action = "modifyFournisseur"; //"createFournisseur";
 
                 axios.post("/configuration/"+action, data).then(response => {
                   
                     if(response.data.code==0){
                         this.$refs.closePoupFour.click();
-                        this.fournisseurList.push(JSON.parse(response.data.lastedAdded));
+                        //this.fournisseurList.push(JSON.parse(response.data.lastedAdded));
                         this.flushDataFour();
                         Vue.swal.fire(
                           'succés!',
                           'Fournisseur enregistré avec succés!',
                           'success'
                         ).then((result) => {
-                            this.getCommande(this.page);
+                            localStorage.setItem('current_page_import', this.page);  
+                            location.reload();
                         });
                         
                         
@@ -493,6 +525,7 @@
                 this.fournisseurForm.logo= "";
                 this.fournisseurForm.client= "";
                 this.fournisseurForm.idClients= "";
+                this.fournisseurForm.id= "";
             },
             closeModalFour(){
                  this.$refs.closePoupFour.click();
@@ -500,7 +533,7 @@
 
         },
         mounted() {
-         this.getCommande();
+            this.getCommande(localStorage.getItem('current_page_import')=== null? this.page : localStorage.getItem('current_page_import'));
         }
     }
 </script>

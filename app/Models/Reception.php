@@ -17,7 +17,8 @@ class Reception extends Model
     use HasFactory, LogsActivity;
 
     protected $casts = [
-        'regroup' => 'array'
+        'regroup' => 'array',
+        'refasc'  => 'array'
     ];
 
     public static $idClient=0;
@@ -63,8 +64,8 @@ class Reception extends Model
             $query->where('type_commandes_id', $typeCmd);
         }
 
-        if($sortedColumn!=""){
-            $query = $query->select("*", \DB::raw("SUM(renbcl + renbpl) as totalColis"))
+        if($sortedColumn!=""){ 
+            $query = $query->select("receptions.*", \DB::raw("SUM(receptions.renbcl + receptions.renbpl) as totalColis"))
                     ->groupBy("reidre");
 
             $query = $query->orderByRaw('CONVERT('.$sortedColumn.', SIGNED) '.$order);

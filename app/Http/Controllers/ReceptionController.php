@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ReceptionResource;
 use App\Http\Resources\TypeCommandeResource;
+use App\Http\Resources\MotifListResource;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\receptionCommandes;
 
@@ -18,6 +19,7 @@ use App\Models\LogActivity;
 use App\Models\Entite;
 use App\Models\User; 
 use App\Models\ImportCommandes;
+use App\Models\commandeRetournerMotif;
 use Illuminate\Http\Request;
 
 use App\Http\Resources\ClientResource;
@@ -26,6 +28,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Contracts\Activity;
 use DB;
+use File;
 
 
 
@@ -97,7 +100,8 @@ class ReceptionController extends Controller
             })->where(function($query){
                 $query->orWhere('dossier_prechargements_id', NULL)->orWhere('dossier_prechargements_id', 0);
             })->leftJoin('users', 'receptions.users_id', '=', 'users.id')
-            ->select('*','users.username as user_created');
+            ->leftJoin('commande_retourner_motifs', 'receptions.reidre', '=', 'commande_retourner_motifs.idReception')
+            ->select('receptions.*','commande_retourner_motifs.idReception','users.username as user_created', 'users.entites_id as user_entite')->groupBy('receptions.reidre');
 
         // Profil User lister que ses receptions
 
@@ -184,8 +188,9 @@ class ReceptionController extends Controller
         try{
 
             $filename = '';
+            $allFileName=[];
 
-            if(!is_null($request->file('file'))){
+           /* if(!is_null($request->file('file'))){
 
                 $file = $request->file('file');
 
@@ -196,7 +201,23 @@ class ReceptionController extends Controller
                 $filename = 'fact_'.explode('.', $request->file('file')->getClientOriginalName())[0].'_'.request('numfact').'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
                
                 $request->file->move("assets/factures/", $filename);
-            }
+            } */
+
+           for ($x = 0; $x < $request->TotalFiles; $x++) 
+           {
+ 
+               if ($request->hasFile('files'.$x)) 
+                {
+                    $current_date_time = Carbon::now()->toDateTimeString();
+                    $paseDate = explode(' ', $current_date_time);
+                    $file     = $request->file('files'.$x); 
+                    $filename = 'fact_'.request('numfact')."_".($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
+
+                    $file->move("assets/factures/", $filename);
+                    array_push($allFileName, $filename);
+                  
+                }
+           } 
 
             $params = [
                 "refere" => request('fe'),
@@ -219,7 +240,7 @@ class ReceptionController extends Controller
                 'renbpl' => request('nbrpalette'),
                 'recomt' => request('commentaire'),
                 'typeproduit' => request('typeproduit'),
-                'refasc' => $filename,
+                'refasc' => json_encode($allFileName), //$filename,
                 "entites_id" => request('IDentite'),
                 //"recmds" => json_encode(request('commandes')),
                 "reetat" => true,
@@ -405,6 +426,105 @@ class ReceptionController extends Controller
                 "message" => "OK"
             ]);
     }
+
+     public function getMotif(Request $request)
+    {
+        $user = Auth::user();
+        $motif =  commandeRetournerMotif::where('idReception','=',request('idreception'))->get(); 
+
+        return response([
+            "code" => 0,
+            "data" => MotifListResource::collection($motif)
+        ]);
+    }
+
+    public function updateFacture(Request $request){
+
+        try{   
+                $filename = '';
+                $allFileName=[];
+                $docs = explode(",", $request->Document[0]);
+         
+
+               for ($x = 0; $x < $request->TotalFiles; $x++) 
+               {
+     
+                   if ($request->hasFile('files'.$x)) 
+                    {
+
+                        $current_date_time = Carbon::now()->toDateTimeString();
+                        $paseDate = explode(' ', $current_date_time);
+                        $file     = $request->file('files'.$x); 
+                        $filename = 'fact_'.strval(random_int(100000, 999999))."_".($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
+
+                        $file->move("assets/factures/", $filename);
+                        array_push($allFileName, $filename);
+                      
+                    }
+               } 
+        
+               for($i=0; $i<sizeof($docs); $i++){
+                    if($docs[$i]!=''){
+                        array_push($allFileName, $docs[$i]); 
+                    } 
+               }
+        
+                Reception::where('reidre', request('idReception'))
+                  ->update([
+                    "refasc" => json_encode($allFileName)
+                ]);
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+         return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
+    }
+     public function removeFacture(Request $request){
+        try{   
+
+                $allFileName=[];
+                $docs = explode(",", $request->Document[0]);
+         
+                for($i=0; $i<sizeof($docs); $i++){
+                    if($docs[$i]!='' && $docs[$i]!=$request->nameFile){
+                        array_push($allFileName, $docs[$i]); 
+                    } 
+                }
+        
+                Reception::where('reidre', request('idReception'))
+                  ->update([
+                    "refasc" => json_encode($allFileName)
+                ]);
+
+                // delete file
+
+                File::delete("assets/factures/".$request->nameFile);
+                
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
+    }
+
+
+    
 
 
     

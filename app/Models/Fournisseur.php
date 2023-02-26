@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Fournisseur extends Model
 {
     use HasFactory;
-    protected $fillable = ['fonmfo', 'foadrs', 'fologo', 'fotele', 'foetat', 'foemail'];
+    protected $fillable = ['fonmfo', 'fogefo' ,'foadrs', 'fologo', 'fotele', 'foetat', 'foemail']; // fogefo le gestionnaire fournisseur
 }

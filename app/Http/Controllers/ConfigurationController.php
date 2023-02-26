@@ -322,6 +322,7 @@ class ConfigurationController extends Controller
             
             $store = Fournisseur::create([
                 "fonmfo" => strtoupper(request('nom')),
+                "fogefo" => request('gestionnaire'),
                 "foemail" => request('email'),
                 "foadrs" => request('adresse'),
                 "fotele" => request('telephone'),
@@ -411,6 +412,7 @@ class ConfigurationController extends Controller
           ->update([
             "fonmfo" => request('nom'),
             "foemail" => request('email'),
+            "fogefo" => request('gestionnaire'),
             "foadrs" => request('adresse'),
             "fotele" => request('telephone'),
             'fologo' => $filename

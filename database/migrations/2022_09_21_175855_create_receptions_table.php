@@ -20,7 +20,7 @@ class CreateReceptionsTable extends Migration
             $table->double('reecvr'); // Reference ECV
             $table->string('renufa'); // Numero facture
             $table->double('revafa'); // Valeur facture
-            $table->string('refasc')->nullable(); // Facture Scanné
+            $table->text('refasc')->nullable(); // Facture Scanné
 
             $table->foreignId('fournisseurs_id')->constrained();
             $table->foreignId('type_commandes_id')->constrained();

@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserRole;
 use App\Models\User;
+use App\Models\commandeRetournerMotif;
 
 
 use Spatie\Activitylog\Contracts\Activity;
@@ -123,7 +124,8 @@ class GestionController extends Controller
                 "type_commandes_id"    => request('typeCmd'),
                 "entrepots_id"         => request('entrepot'),
                 "entites_id"           => request('entiteID'),
-                "is_empote"               => false,
+                "is_empote"            => false,
+                "on_empote"            => false,
                 "reetat"               => false
             ]); 
 
@@ -147,6 +149,38 @@ class GestionController extends Controller
         }
 
         
+    }
+
+     public function editDossier(Request $request)
+    {
+        $user = Auth::user();
+
+        $dossier =  ChargementCreation::where('numDossier','=',request('numdossier'))->where('type_commandes_id','=',request('typeCmd'))->firstOrFail(); 
+
+        if($dossier){ 
+            $dossier->update([
+                "numDossier"           => request('numdossier'),
+                "dateDebut"            => request('datedebut'),
+                "dateCloture"          => request('datecloture'),
+                "booking"              => request('booking'),
+                "nomNavire"            => request("nomnavire"),
+                "dateDepart"           => request('datedepart'),
+                "dateArrivee"          => request('datearrivee'),
+                "terminalRetour"       => request('termretour')
+            ]);
+
+            return response([
+                "code" => 0,
+                "message" => "Insersion OK"
+            ]);
+
+        }else{
+            return response([
+                "code" => 1,
+                "message" => "Dossier introuvable"
+            ]);
+        }
+          
     }
 
      /**
@@ -188,6 +222,8 @@ class GestionController extends Controller
                 'chargement_creations.dateArrivee',
                 'chargement_creations.booking',
                 'chargement_creations.nomNavire',
+                'chargement_creations.is_empote',
+                'chargement_creations.on_empote',
                 'chargement_creations.terminalRetour',
                 'chargement_creations.reetat as etat',
                 'chargement_creations.created_at as creation_dos',
@@ -240,7 +276,7 @@ class GestionController extends Controller
         if (isset($paginate)) {
 
             $dries = Reception::where('receptions.clients_id', request('id'))->where(function($query){
-                if(request('etat')==1){
+                if(request('etat')==1 && request('idPre')!=''){
                     $query->where('dossier_id', request('idPre'));
                 }else{
                     $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
@@ -250,7 +286,12 @@ class GestionController extends Controller
             ->leftJoin('dossier_prechargements', 'dossier_prechargements.id', '=', 'receptions.dossier_prechargements_id')
             ->leftJoin('users as a', 'dossier_prechargements.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
-            ->select('*','b.username as user_created','a.username as prechargeur')->where("dossier_prechargements.reetat", true)->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entites_id', intval(request('entite')))->where('receptions.entrepots_id', request('idEntrepot')); 
+            ->leftJoin('commande_retourner_motifs', 'receptions.reidre', '=', 'commande_retourner_motifs.idReception')
+            ->select('receptions.*','b.username as user_created','a.username as prechargeur', 'commande_retourner_motifs.idReception')->groupBy('receptions.reidre')->where("dossier_prechargements.reetat", true)->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entites_id', intval(request('entite'))); 
+
+            if(request('idEntrepot') != ""){
+                $dries = $dries->where('receptions.entrepots_id', request('idEntrepot'));
+            }
 
             if($keyword!=''){
                 $dries = $dries->search($keyword);
@@ -553,12 +594,28 @@ class GestionController extends Controller
             })->select('*','chargement_creations.type_commandes_id as type_commandes', 'chargement_creations.entrepots_id as entrepots', 'chargement_creations.id as idpre')->where(function($query){
                 $query->orWhereNull('empo.reference')->orWhereNull('empo.type_commandes_id')->orWhereNull('empo.entrepots_id');
 
-            })/*->where('chargement_creations.reetat', true)*/->get();
+            })->where('chargement_creations.reetat', true)->get();
+
+        $listeDossierEnCours =  DB::table('chargement_creations')->where('chargement_creations.entites_id',$entite->id)
+            ->leftJoin('empotages as empo', function($join){
+                $join->on('empo.reference', '=', 'chargement_creations.numdossier');
+                $join->on('empo.type_commandes_id','=','chargement_creations.type_commandes_id');    
+            })->select('*','chargement_creations.type_commandes_id as type_commandes', 'chargement_creations.entrepots_id as entrepots', 'chargement_creations.id as idpre')->where('chargement_creations.on_empote', true)->where('chargement_creations.is_empote', false)->get();
+
+        $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])->where("receptions.entites_id", $entite->id)->leftJoin('chargement_creations', function($join){
+                             $join->on('receptions.dossier_id', '=', 'chargement_creations.numDossier');
+                             $join->on('receptions.type_commandes_id', '=', 'chargement_creations.type_commandes_id');
+                         })
+                 ->select('receptions.type_commandes_id', DB::raw('count(*) as total'))
+                 ->groupBy('receptions.type_commandes_id')->whereNotNull('numDossier')->where(function($query){
+                            $query->orWhere('dossier_empotage_id', 0)->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '');
+                        })->where("chargement_creations.reetat", true)->where('chargement_creations.is_empote', false)
+                 ->get();  
 
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
         }else{
-            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client, 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires,"entite" => $entite, 'client' => $client, 'entrepots' => $entrepots, 'listeDossier' => $listeDossier];
+            $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client, 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires,"entite" => $entite, 'client' => $client, 'entrepots' => $entrepots, 'listeDossier' => $listeDossier, 'listeDossierEnCours' => $listeDossierEnCours, 'nbrCmdACharger'=> $nbrCmdACharger];
         }
 
         activity(TypActivity::LISTER)->performedOn($client)->log('Affichage empotage');
@@ -566,6 +623,31 @@ class GestionController extends Controller
         $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $entite->id]);
         
         return  view('backend.gestion.empotage', $data);
+    }
+
+    public function saveMotif(){
+        $user = Auth::user();
+        // Update column Prechargement
+        Reception::where("reidre", request('idreception'))->update([
+            "dossier_prechargements_id" => "",
+            "dossier_id" => "0"
+        ]);
+        
+        $resp = commandeRetournerMotif::create([
+            "motif"           => request('motif'),
+            "username"        => request('username'), // User ayant ajouter la commande
+            "user"            => $user->username,
+            "numcommande"     => request('numcmd'),
+            "idreception"     => request('idreception'),
+            "datecmd"         => request('date')
+        ]); 
+
+        $response = [
+            "code" => 0,
+            "message" => "OK"
+        ];
+
+        return response($response);
     }
 
 }

@@ -2,16 +2,21 @@
     <div>
         <div class="row">
           <div class="col-sm-6">
-
-               <h2 class="d-inline-block">Préchargement <template v-if="isDetail">:</template></h2>
-               <template v-if="isDetail">
-                   <span class="pl-2 h3 text-primary font-weight-bold"> N° Dossier {{ selected.id }}&nbsp;</span>
+               <template v-if="!showCurrentOrder">
+                    <h2 class="d-inline-block">Préchargement <template v-if="isDetail">:</template></h2>
+                    <template v-if="isDetail">
+                        <span class="pl-2 h3 text-primary font-weight-bold"> N° Dossier {{ selected.id }}&nbsp;</span>
+                    </template>
+                </template>
+                <template v-else>
+                    <h2 class="d-inline-block">Liste des commandes à précharger</h2>
                 </template>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Acceuil</a></li>
-              <li class="breadcrumb-item active"><a href="#">Préchargement</a></li>
+              <li class="breadcrumb-item active"  v-if="!showCurrentOrder"><a href="#">Préchargement</a></li>
+              <li class="breadcrumb-item active"  v-if="showCurrentOrder"><a href="#">Liste des commandes à précharger</a></li>
             </ol>
           </div>
         </div>
@@ -23,10 +28,10 @@
                         <div class="d-flex justify-content-between align-items-center mb-4">
 
                             <ul class="legend mt-0 mb-0 pl-0 flex-1">
-                                <li v-for="type in typeCmd" class="d-flex align-items-center">
-                                    <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
-                                    <label class="m-0 mr-2">{{type.typcmd}}</label>
-                                    <label class="m-0 mr-2 badge badge-primary">{{ getNbreCmd(type.id) }}</label>
+                                <li v-for="type in typeCmd" class="d-flex  cursor-pointer  align-items-center" title="Afficher"  @click="showOrders(type.id)">
+                                    <span class="etat_T m-0 mr-1  cursor-pointer border-0" :style="{'background': type.tcolor}"></span> 
+                                    <label class="m-0 mr-2  cursor-pointer ">{{type.typcmd}}</label>
+                                    <label class="m-0 mr-2  cursor-pointer  badge badge-primary">{{ getNbreCmd(type.id) }}</label>
                                 </li>
                             </ul>
                             <div>
@@ -155,7 +160,10 @@
                                             <td class="p-2 align-middle">{{ pre.user }}</td>
                                             <td class="p-2 align-middle">
                                                 <div class="w-100 text-right">
-                                                    <button @click="showDossier(pre)" class="btn btn-info btn-sm">Ouvrir</button>
+                                                    <!--button @click="showDossier(pre)" class="btn btn-info btn-sm">Ouvrir</button-->
+                                                    <a v-if="pre.etat!=1"@click="showDossier(pre)" title="Ouvrir le dossier" href="#" class="btn m-1 border-primary btn-circle border btn-circle-sm m-1 bg-white">
+                                                        <i class="fa fa-folder-open"></i>
+                                                    </a>
                                                     <a v-if="pre.etat==1" href="#" title="Rapport Préchargement" class="btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(pre)" data-toggle="modal" data-target="#openFacture">
                                                         <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                                     </a>
@@ -193,11 +201,11 @@
                 </button>
             </div>
             
-            <div class="mb-3 mb-4">
+            <div class="mb-3 mb-4" v-if="!showCurrentOrder">
                 <VueScrollFixedNavbar>
                 <table class="table table-bordered bg-white"> 
                     <tr>
-                        <th class="text-uppercase thead-blue py-1 w-60">Dossier selectionné</th>
+                        <th class="text-uppercase thead-blue py-1 w-60">Dossier selectionné</th> 
                         <th class="text-uppercase thead-blue py-1">Etat Contenaire</th>
                     </tr>
                     <tr>
@@ -229,7 +237,6 @@
                         <td class="pt-1 pb-4">
                             <div class="d-flex m-0 customRadio justify-content-center">
 
-
                                 <p class="pr-3 m-0" v-for="contenaire in listContenaire" >
 
                                     <input type="radio" :value="contenaire.volume" v-model="capacite" @change="switchContenaire(contenaire.id, contenaire.volume)" :id="'cont_'+contenaire.volume" name="radio-group">
@@ -248,8 +255,9 @@
                 </VueScrollFixedNavbar>
             </div>
             
-            <div class="mb-2 w-100 d-flex justify-content-end align-items-end">
-                <div class="mr-3">
+            <div class="mb-2 w-100 d-flex justify-content-between align-items-center">
+                <div><typeproduit></typeproduit></div>
+                <div class="mr-3" v-if="!showCurrentOrder">
                      <button class="btn btn-lg btn-primary" :disabled = "selected.etat == 1" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
             </div>
@@ -328,10 +336,10 @@
                                  <!--label class="badge badge-primary mr-1 numCmdLab w-100">{{ dry.rencmd }}</label-->
                                
 
-                                  <label class="badge badge-primary" v-if="!Array.isArray(dry.listgroup) || dry.listgroup.length==0">
+                                  <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)" v-if="!Array.isArray(dry.listgroup) || dry.listgroup.length==0">
                                 {{ dry.rencmd }}
                             </label> 
-                            <label v-else v-for="c in dry.listgroup" class="badge badge-primary mr-2">
+                            <label v-else v-for="c in dry.listgroup"  class="badge mr-2" :class="getTypeProduit(dry.typeproduit)">
                                 {{ c }} 
                             </label>
                             </td> 
@@ -372,21 +380,34 @@
 
                                 <div class="d-flex align-items-center justify-content-end">
 
+                                    <template v-if="dry.motifID != ''">
+                                        <a title="Commande non chargé" href="#" class="btn btnAction mx-1 btn-circle border btn-circle-sm bg-white" v-on:click="showMotifModal(dry)">
+                                            <i class="fa fa-info" aria-hidden="true"></i>
+                                        </a>
+                                        
+                                    </template>
+
                                     <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
                                         <i class="fa fa-eye" aria-hidden="true"></i>
                                          <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                                     </a>
 
-                                    <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)">
+                                    <!--button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)">
                                         <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                         <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
+                                    </button-->
+                                     <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)" data-toggle="modal" data-target="#openFacture">
+                                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                        <!--i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i-->
+                                        <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(dry.refasc) > 9 ? '+9' : getCountFacture(dry.refasc) }}</span>
                                     </button>
-                                    
-                                    <label class="switch mr-0"  v-bind:style="[dry.dossier_id > 0 || selected.etat == 1 ? {'opacity': 0.5} : {'opacity': '1'}]">
-                                        <input :disabled="dry.dossier_id > 0 || selected.etat == 1" class="switch-input inputCmd" :checked="selected.id == dry.idPre" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
-                                        <span class="switch-label" data-on="OK" data-off="Choisir"></span> 
-                                        <span class="switch-handle"></span> 
-                                    </label>
+                                    <template  v-if="!showCurrentOrder">
+                                        <label class="switch mr-0"  v-bind:style="[dry.dossier_id > 0 || selected.etat == 1 ? {'opacity': 0.5} : {'opacity': '1'}]">
+                                            <input :disabled="dry.dossier_id > 0 || selected.etat == 1" class="switch-input inputCmd" :checked="selected.id == dry.idPre" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
+                                            <span class="switch-label" data-on="OK" data-off="Choisir"></span> 
+                                            <span class="switch-handle"></span> 
+                                        </label>
+                                    </template>
                                 </div>
                             </td>
                         </tr>
@@ -414,7 +435,7 @@
                 </table>
                 </div>
                 <div class="mb-2 w-100 d-flex justify-content-end align-items-end mt-2">
-                <div class="mr-3">
+                <div class="mr-3" v-if="!showCurrentOrder">
                      <button class="btn btn-lg btn-primary" :disabled = "selected.etat == 1" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
             </div>
@@ -430,7 +451,7 @@
        </template>
 
         <!-- Modal Facture-->
-        <div class="modal fade fullscreenModal" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+        <!--div class="modal fade fullscreenModal" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
           aria-hidden="true" data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
              <div class="modal-content">
@@ -453,7 +474,8 @@
              </div>
             
           </div>
-        </div>
+        </div-->
+        <modalMotif></modalMotif>
         <modalFacture></modalFacture>
         <modalDetailsCommande></modalDetailsCommande>
 
@@ -465,6 +487,8 @@
 
     import modalFacture from '../../components/modal/facture.vue';
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
+    import modalMotif from '../../components/modal/motif.vue';
+    import typeproduit from '../../components/modal/typeproduit.vue';
 
 
     import { PdfMakeWrapper, Table, Img, QR } from 'pdfmake-wrapper';
@@ -493,7 +517,9 @@
             /*PageLoader*/
             modalDetailsCommande,
             modalFacture,
-            VueScrollFixedNavbar
+            VueScrollFixedNavbar,
+            modalMotif,
+            typeproduit
           },
         data() { 
             return {
@@ -539,7 +565,8 @@
                 sortedColumn: '',
                 order: 'asc',
                 run: false,
-                entite:''
+                entite:'',
+                showCurrentOrder: false
             }
 
         },
@@ -687,6 +714,12 @@
                 this.dries = response.data;
 
                 this.isLoading = false;
+
+                // get Ŝpecification
+
+                EventBus.$emit('SET_PRODUIT_SPECIFIK', { 
+                    prd: this.dries.data
+                });
             });
         },
         save(){ 
@@ -723,6 +756,7 @@
             this.isDetail = false;
             this.run = false;
             this.dries = {};
+            this.showCurrentOrder=false;
            },
         valider(){
         
@@ -1160,11 +1194,6 @@
                   }
                 })
             },
-            showFacture(fact){
-                 EventBus.$emit('VIEW_FACT', {
-                    pathFile: fact
-                }); 
-            },
             cloturer(pre){
                      Vue.swal.fire({
                       title: 'Confirmez la cloture',
@@ -1201,6 +1230,44 @@
                       }
                     })
                },
+            showMotifModal(dry){
+                EventBus.$emit('VIEW_MOTIF', { 
+                    dryCmd: dry
+                }); 
+            },
+             getTypeProduit(produit){
+                /*EventBus.$emit('VIEW_PRODUIT', { 
+                    prd: produit
+                }); */
+                   switch(produit){
+                    case 'DEAE': return 'deae text-white'; break;
+                    case 'Précurseur de drogue': return 'precurseur_drogue text-white'; break;
+                    case 'Psychotrope': return 'psychotrope text-white'; break;
+                    case 'Dangereux': return 'dangereux text-white'; break;
+                    case 'Autre': return 'autre text-white'; break;
+                    default: return 'border border-width-2 border-primary'; 
+                }
+            },
+            showOrders(type){
+               this.isDetail = true;
+               this.showCurrentOrder=true;
+               this.selected.typeCommandeID=type;
+               this.getReception();
+               
+            },
+             getCountFacture(doc){
+                if(Array.isArray(doc)){
+                    return doc.length;
+                }
+                return 0;
+            },
+              showFacture(fact){
+                 EventBus.$emit('VIEW_FACT', { 
+                    listeFacture: fact.refasc,
+                    idReception: fact.reidre,
+                    can_modify: false
+                }); 
+            },
 
         }, 
         mounted() {

@@ -158,7 +158,7 @@
                     </div-->
                 </div>
                    
-
+                 <div class="mb-2 float-left w-100 mt-3"><typeproduit></typeproduit></div>
                     <table class="table">
                     <thead class="thead-blue borderorange">
                          <tr>
@@ -182,7 +182,10 @@
                     </template>
                     <template v-else>
                         <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white">
-                        <td class="p-2 align-middle">{{ dry.rencmd }}</td>
+                        <td class="p-2 align-middle position-relative"> <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div> 
+                            <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)">
+                                {{ dry.rencmd }}
+                            </label></td>
                         <td class="p-2 align-middle">{{ dry.refere }}</td>
                         <td class="p-2 align-middle">{{ dry.reecvr }}</td>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
@@ -219,9 +222,14 @@
                                 <i class="fa fa-eye" aria-hidden="true"></i>
                                    <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                             </button>
-                            <button title="Voir la facture" :disabled="dry.refasc === null || dry.refasc === ''" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
+                            <!--button title="Voir la facture" :disabled="dry.refasc === null || dry.refasc === ''" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
                                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                 <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
+                            </button-->
+                            <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)" data-toggle="modal" data-target="#openFacture">
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                <!--i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i-->
+                                <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(dry.refasc) > 9 ? '+9' : getCountFacture(dry.refasc) }}</span>
                             </button>
                         </td>
                     </tr>
@@ -232,42 +240,16 @@
                 <div class="d-flex mt-4 justify-content-center">
                     <pagination
                         :data="reception"
-                        @pagination-change-page="gerReception"
+                        @pagination-change-page="getReception"
                     ></pagination>
                     
                 </div>
                 <hr>
             </template>
         </template>
-         <!-- Modal Facture-->
-        <div class="modal fade fullscreenModal" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
-          aria-hidden="true" data-backdrop="static" data-keyboard="false">
-          <div class="modal-dialog modal-xl" role="document">
-             <div class="modal-content">
-                
-                    <div class="modal-header text-left">
-                        <h4 class="modal-title w-100 font-weight-bold">Détails</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body mx-3">
-                         <template v-if="pdfFile != null">
-                            <embed :src="'/assets/factures/'+pdfFile" frameborder="0" width="100%" height="450px">
-                          </template>
-                         <template v-if="pdfFileModal != null">
-                            <embed :src="'/pdf/prechargementClient/'+pdfFileModal" frameborder="0" width="100%" height="450px">
-                          </template>
-                         <template v-if="pdfFileModal != null && pdfFile != null"> Auncun fichier </template>
-                    </div>
-                    <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" v-on:click="closeModalPdf()" class="btn btn-warning">Fermer</button>
-                  </div>
-             </div>
-            
-          </div>
-        </div>
-        
+         
+    <!-- Modal Facture-->    
+     <modalFacture></modalFacture>   
      <modalDetailsCommande></modalDetailsCommande>
     </div>
     
@@ -283,6 +265,8 @@ import 'vue2-timepicker/dist/VueTimepicker.css';
 import { PdfMakeWrapper, Table } from 'pdfmake-wrapper';
 
 import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
+import modalFacture from '../../components/modal/facture.vue';
+import typeproduit from '../../components/modal/typeproduit.vue';
 
 export default { 
     props: [
@@ -293,7 +277,9 @@ export default {
             'idEntite'
     ],
     components: {
-        modalDetailsCommande
+        modalDetailsCommande,
+        modalFacture,
+        typeproduit
     },
     data() {
         return {
@@ -367,14 +353,19 @@ export default {
             this.selected.identifiant = empotage.id;
             this.selected.typeCmd    = empotage.typecmdID;
            
-            this.gerReception();
+            this.getReception();
             
         },
-        gerReception(page = 1){
+        getReception(page = 1){
             // get commandes
           
             axios.get('/histoPrechargement/reception/'+this.clientCurrent.id+"/"+this.selected.typeCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&id_pre="+this.selected.identifiant+"&filtre_four="+this.filtre.fournisseur+"&filtre_cmd="+this.filtre.commande).then(response => {
                 this.reception = response.data;
+                 // get Ŝpecification
+
+                EventBus.$emit('SET_PRODUIT_SPECIFIK', { 
+                    prd: this.reception.data
+                });
                 console.log(this.reception, "reception");
             });
         },
@@ -392,13 +383,13 @@ export default {
        closeModalPdf(){
              this.$refs.closePoupPdf.click();
         },
-        showFacture(file){
-            this.pdfFileModal = null;
-            this.pdfFile = null;    
-            if(file!=''){
-                this.pdfFile = file;
-            }
-        },
+       showFacture(fact){
+                 EventBus.$emit('VIEW_FACT', { 
+                    listeFacture: fact.refasc,
+                    idReception: fact.reidre,
+                    can_modify: false
+                }); 
+            },
         showModal(dry){ 
 
             EventBus.$emit('VIEW_CMD', {
@@ -411,7 +402,23 @@ export default {
                 canDeleteIncident: false
             });
 
-        }
+        },
+        getCountFacture(doc){
+            if(Array.isArray(doc)){
+                return doc.length;
+            }
+            return 0;
+        },
+        getTypeProduit(produit){
+                   switch(produit){
+                    case 'DEAE': return 'deae text-white'; break;
+                    case 'Précurseur de drogue': return 'precurseur_drogue text-white'; break;
+                    case 'Psychotrope': return 'psychotrope text-white'; break;
+                    case 'Dangereux': return 'dangereux text-white'; break;
+                    case 'Autre': return 'autre text-white'; break;
+                    default: return 'border border-width-2 border-primary'; 
+                }
+            },
     },
     mounted() {
       this.search();

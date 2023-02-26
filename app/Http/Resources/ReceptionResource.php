@@ -39,7 +39,7 @@ class ReceptionResource extends JsonResource
             "rencmd"         => $this->rencmd,
             "reetat"         => $this->reetat,
             "typeproduit"    => $this->typeproduit,
-            "refasc"         => $this->refasc,
+            "refasc"         => (isset($this->refasc) && !is_null($this->refasc) && $this->refasc!='')? is_array($this->refasc)?$this->refasc: json_decode($this->refasc) : json_decode("[]"),
             "recomt"         => $this->recomt,
             "douane"         => $this->douane,
             "depalettisation" => $this->depalettisation,
@@ -55,7 +55,8 @@ class ReceptionResource extends JsonResource
             "hasIncident"    => $this->reinci,
             "priorite"       => isset($this->priorite)? $this->priorite:'',
             "nbreJour"       =>  Carbon::now()->diffInDays(Carbon::parse($this->redali)),
-            "listgroup"      => $this->regroup
+            "listgroup"      => $this->regroup,
+            "motifID"        => isset($this->idReception)? $this->idReception : '',
             //"isPreLoaded"    => $this->dossier_prechargements_id 
 
         ];

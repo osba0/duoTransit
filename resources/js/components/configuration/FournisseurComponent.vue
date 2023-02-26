@@ -5,7 +5,8 @@
                 <thead class="thead-blue" :class="[isLoading ? '' : 'hasborder']">
                      <tr>
                         <th class="p-2 border-right border-white h6">#</th>
-                        <th class="p-2 border-right border-white h6">Nom</th>
+                        <th class="p-2 border-right border-white h6">Fournisseur</th>
+                        <th class="p-2 border-right border-white h6">Gestionnaire</th>
                         <th class="p-2 border-right border-white h6">Telephone</th>
                         <th class="p-2 border-right border-white h6">Email</th>
                         <th class="p-2 border-right border-white h6">Adresse</th>
@@ -25,6 +26,10 @@
                         </td>
                         <td class="p-2 align-middle">
                             {{ fournisseur.nom }}
+                        </td>
+
+                         <td class="p-2 align-middle">
+                            {{ fournisseur.gestionnaire }}
                         </td>
                        
                         <td class="p-2 align-middle">
@@ -129,25 +134,24 @@
                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                        <label for="nom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Nom
+                                        Fournisseur
                                        </label>
                                         <input class="w-65 form-control" id="nom" v-model="fournisseurForm.nom" 
                                         :class="{ 'border-danger': submitted && !$v.fournisseurForm.nom.required }" />
                                     </div>
                                     
                                  </div>
-                                  <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2">
-                                            <div class="md-form w-100 d-flex justify-content-between align-items-center">
-                                            <label for="tele" class="d-block m-0 text-right w-35 pr-2" >Telephone</label>
-                                            <input class="w-65 form-control"  v-model="fournisseurForm.telephone" type="text" id="tele"/>
-                                        </div>
-                                        </div>
-                                    
-                                    <div class="w-100 d-flex align-items-center my-2"></div>
+
+                                 <div class="col-6 my-2 d-flex flex-column">
+                                        <div class="w-100 d-flex align-items-center my-2">
+                                         <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Gestionnaire
+                                       </label>
+                                        <input class="w-65 form-control" id="adresse" v-model="fournisseurForm.gestionnaire"/>
+                                    </div>
                                     
                                  </div>
+                                  
                                 
                              </div>
                               <div class="row">
@@ -186,6 +190,18 @@
 
                                         </div>
                                         <div class="w-100 d-flex align-items-center my-2"></div>
+                                    
+                                 </div>
+                                 <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
+                                    
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                            <div class="md-form w-100 d-flex justify-content-between align-items-center">
+                                            <label for="tele" class="d-block m-0 text-right w-35 pr-2" >Telephone</label>
+                                            <input class="w-65 form-control"  v-model="fournisseurForm.telephone" type="text" id="tele"/>
+                                        </div>
+                                        </div>
+                                    
+                                    <div class="w-100 d-flex align-items-center my-2"></div>
                                     
                                  </div>
                              </div>
@@ -248,7 +264,8 @@
                     telephone: '',
                     client: '',
                     idClients:'',
-                    email: ''
+                    email: '',
+                    gestionnaire: ''
 
                 },
                 hasImage: false,
@@ -314,6 +331,7 @@
                 data.append('adresse', this.fournisseurForm.adresse);
                 data.append('telephone', this.fournisseurForm.telephone);
                 data.append('email', this.fournisseurForm.email);
+                data.append('gestionnaire', this.fournisseurForm.gestionnaire);
                 data.append('slug', this.slugClient);  
 
 

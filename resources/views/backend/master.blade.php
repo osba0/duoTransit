@@ -149,9 +149,7 @@ $currentEntite = request()->route('currententite');
                             @endif
 
                             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT))  
-                             <li class="nav-item"> 
-                                <a href="/{{$currentEntite}}/importCommande/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/importCommande/*') ? 'active' : '' }}"><i class="nav-icon fa fa-cloud-download"></i> <p>Import</p></a> 
-                            </li>
+                             
                             <li class="nav-item">
                                 <a href="/{{$currentEntite}}/precharger/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/precharger/*') ? 'active' : '' }}"><i class="nav-icon fa fa-asterisk"></i> <p>Préchargement</p></a>
                             </li>
@@ -170,6 +168,9 @@ $currentEntite = request()->route('currententite');
                                   <i class="fa  fa-clock-o nav-icon"></i>
                                   <p>Histo DOCIM</p>
                                 </a>
+                            </li>
+                            <li class="nav-item"> 
+                                <a href="/{{$currentEntite}}/importCommande/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/importCommande/*') ? 'active' : '' }}"><i class="nav-icon fa fa-cloud-download"></i> <p>Import</p></a> 
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('listNotif', ['client' => $client['slug']?? '', $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/notifications/*')) ? 'active' : '' }}">

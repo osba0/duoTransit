@@ -121,6 +121,7 @@ class HistoActionController extends Controller
                 //'empotages.rapport_pdf as rapport_pdf',
                 'empotages.created_at as created_at',
                 'empotages.complements_document as docs',
+                'empotages.autres_document as autre_docs',
                 'empotages.declaration_douane as decldouane',
                 'users.username as user',
                 'entrepots.nomEntrepot as nomEntrepot', 

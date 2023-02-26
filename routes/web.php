@@ -50,6 +50,7 @@ Route::get('/dries/{id}/{entite}', [ReceptionController::class, 'listeDries'])->
 Route::post('/createReception', [ReceptionController::class, 'create'])->middleware(['auth']);
 Route::post('/modifyReception', [ReceptionController::class, 'modify'])->middleware(['auth']);
 Route::get('/driesState/{id}/{entite}', [ReceptionController::class, 'stateDries'])->middleware(['auth']);
+Route::post('/removeFacture/{idReception}', [ReceptionController::class, 'removeFacture'])->middleware(['auth']);
 
 Route::post('/incidents/createIncident', [IncidentController::class, 'store'])->middleware(['auth']);
 Route::get('/incidents/getIncident/{id}', [IncidentController::class, 'list'])->middleware(['auth']);
@@ -165,12 +166,18 @@ Route::middleware(['web','auth'])->group(function () {
     //Route::group(['prefix' => '/{currententite}/gerer'], function () {
         Route::get('/{currententite}/gerer/prechargement/{id}', [GestionController::class, 'index'])->name('gerer_prechargement');
         Route::post('/gerer/createDossier', [GestionController::class, 'create'])->middleware(['auth']);
+        Route::post('/gerer/editDossier', [GestionController::class, 'editDossier'])->middleware(['auth']);
         Route::post('/gerer/createDossier/valider/{id}/{entite}', [GestionController::class, 'valider'])->middleware(['auth']);
         Route::post('/gerer/createDossier/notification/{id}/{entite}', [GestionController::class, 'notifier'])->middleware(['auth']);
         Route::get('/gerer/dossier/list/{id}/{entite}', [GestionController::class, 'listing'])->middleware(['auth']);
         Route::get('/gerer/dossier/pre/reception/{id}/{entite}/{typecmd}', [GestionController::class, 'listingReception'])->middleware(['auth']);
         Route::post('/gerer/dossier/setPrechargement/{entite}', [GestionController::class, 'precharger'])->middleware(['auth']);
         Route::get('/gerer/getCmd/{id}/{typecommande}', [GestionController::class, 'getCommande'])->middleware(['auth']);
+        
+        Route::get('/getmotif/{idreception}', [ReceptionController::class, 'getMotif'])->middleware(['auth']);
+        
+        
+        Route::post('/gerer/saveMotif', [GestionController::class, 'saveMotif'])->middleware(['auth']);
         Route::delete('/gerer/deletePre/{id}/{entite}', [GestionController::class, 'deletePre']);
         Route::post('/gerer/reactiver/{id}/{entite}', [GestionController::class, 'reactiver'])->name('reactiverPrechargement');
 
@@ -204,12 +211,16 @@ Route::middleware(['web','auth'])->group(function () {
 
 Route::post('/saveDocs/{idEmpotage}', [EmpotageController::class, 'saveDoc'])->middleware(['auth']);
 
+Route::post('/saveOtherDocs/{idEmpotage}', [EmpotageController::class, 'saveOtherDoc'])->middleware(['auth']);
+
 Route::post('/savePhotos/{idcontenaire}', [EmpotageController::class, 'savePhotos'])->middleware(['auth']);
 Route::post('/removePhotos/{idcontenaire}', [EmpotageController::class, 'removePhotos'])->middleware(['auth']);
 
 Route::post('/saveDocsDouane/{idEmpotage}', [EmpotageController::class, 'saveDeclaration'])->middleware(['auth']); 
 
 Route::post('/removeDocs/{idEmpotage}', [EmpotageController::class, 'removeDoc'])->middleware(['auth']);
+
+Route::post('/removeAutreDocs/{idEmpotage}', [EmpotageController::class, 'removeOtherDoc'])->middleware(['auth']);
 
 Route::post('/removeDocsdouane/{idEmpotage}', [EmpotageController::class, 'removeDeclarationDouane'])->middleware(['auth']);
 
@@ -281,6 +292,8 @@ Route::post('/configuration/etatFournisseur', [ConfigurationController::class, '
 Route::get('/configuration/getUser', [UserController::class, 'list'])->middleware(['auth']);
 
 Route::delete('/deleteReception/{id}/{idClient}', [ReceptionController::class, 'delete'])->middleware(['auth']);
+
+Route::post('/updateFacture/{idReception}', [ReceptionController::class, 'updateFacture'])->middleware(['auth']);
 
 
 Route::post('/prechargementClient/valider/{id}/{entite}', [PrechargementController::class, 'valider'])->middleware(['auth']);    

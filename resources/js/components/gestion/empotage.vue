@@ -3,16 +3,25 @@
         <!--PageLoader :is-loading = isLoading ></PageLoader--> 
         <div class="row">
           <div class="col-sm-8 d-flex align-items-center">
-               <h3>Empotage<template v-if="isDetail">:</template></h3>
-               <template v-if="isDetail">
-                   <span class="pl-2 h4 text-primary font-weight-bold"> N° Dossier {{ selected.dossier }}&nbsp;</span>
+               <template  v-if="!showCurrentOrder">
+                   <h3>Empotage<template v-if="isDetail">:</template></h3>
+                   <template v-if="isDetail">
+                       <span class="pl-2 h4 text-primary font-weight-bold"> N° Dossier {{ selected.dossier }}&nbsp;</span>
+                    </template>
+                </template>
+                <template v-else>
+                    <h3>Liste des commandes à empoter</h3>
                 </template>
           </div>
           <div class="col-sm-4">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Acceuil</a></li>
               <li class="breadcrumb-item" :class="!isDetail ? 'active': ''"><a href="#">Empotage</a></li>
-              <li class="breadcrumb-item active"  v-if="isDetail"><a href="#">Dossier n° {{ selected.dossier }}</a></li>
+              <li class="breadcrumb-item active"  v-if="isDetail && !showCurrentOrder"><a href="#">Dossier n° {{ selected.dossier }}</a></li>
+
+
+
+
             </ol>
           </div>
         </div>
@@ -22,9 +31,10 @@
                 <div class="col-sm-12">
                     <div class="d-flex align-items-center justify-content-between mb-3">
                          <ul class="legend mt-4 mb-2 pl-0 flex-1">
-                            <li v-for="type in typeCmd" class="d-flex align-items-center">
-                                <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
-                                <label class="m-0 mr-2">{{type.typcmd}}</label>
+                            <li v-for="type in typeCmd" class="d-flex align-items-center cursor-pointer" @click="showOrders(type.id)">
+                                <span class="etat_T m-0 mr-1 border-0 cursor-pointer" :style="{'background': type.tcolor}"></span> 
+                                <label class="m-0 mr-2 cursor-pointer">{{type.typcmd}}</label>
+                                <label class="m-0 mr-2 cursor-pointer badge badge-primary">{{ getNbreCmd(type.id) }}</label>
                             </li>
                         </ul>
                         <a href="#" class="text-white h2 btn btn-primary font-weight-bold" data-toggle="modal" data-target="#newEmpotage">
@@ -146,26 +156,23 @@
                                         <td class="align-middle">{{ empo.date }}</td>
                                         <td class="align-middle">{{ empo.user }}</td>
                                         <td class="align-middle text-right">  
-                                             <!--a v-if="pre.etat==1" href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(empo)" data-toggle="modal" data-target="#openFacture">
-                                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
-                                                </a-->
-                                            <a v-if="empo.etat==1" href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-danger"  @click="showRapport(empo)" data-toggle="modal" data-target="#openFacture">
-                                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                            
+                                            <a v-if="empo.etat==1" href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-danger"  @click="showRapport(empo)" data-toggle="modal" data-target="#openModalEmpo">
+                                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i> 
                                                 </a>
                                             <!--button v-if="empo.etat==0"  @click="showDossier(empo)" class="btn btn-info btn-sm">Ouvrir</button-->
                                             
-                                            <a href="#" title="Liste contenaire" class="btn p-0 m-1 ml-2  position-relative"  @click="showContenaire(empo)">
-                                                <img src="/images/contenaire.png" alt="Contenaire" height="30">
-                                                <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[empo.nbreContenaireNonValide > 0? 'bg-danger':'']">{{empo.totalContenaire}}</span></a>
-                                             <a v-if="empo.etat==0" href="#" title="Complément de document" class="btn p-0 m-1 ml-2  position-relative"  @click="showDocument(empo)" data-toggle="modal" data-target="#openDocument">
+                                            <a href="#" title="Liste conteneur" class="btn p-0 m-1 ml-2  position-relative"  @click="showContenaire(empo)">
+                                                <img src="/images/contenaire.png" alt="Conteneur" height="30">
+                                                <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[empo.nbreContenaireNonValide >= 0 && empo.totalContenaire == 0 ? 'bg-danger':'']">{{empo.totalContenaire}}</span></a>
+                                            <a v-if="empo.etat==0" href="#" title="Complément de document" class="btn p-0 m-1 ml-2  position-relative"  @click="showDocument(empo)" data-toggle="modal" data-target="#openDocument">
                                                         <img src="/images/document_compl.png" alt="Documents" height="30">
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[getCountDoc(empo.document) == 0? 'bg-danger':'']">{{ getCountDoc(empo.document) > 9 ? '+9' : getCountDoc(empo.document) }}</span>
-                                                     
-                                                    </a>
-                                            <a v-if="empo.etat==0"  title="Editer" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white"  data-toggle="modal" data-target="#newEmpotage" v-on:click="editEmpotage(empo)">
-                                                <i class="fa fa-pencil" aria-hidden="true"></i>
                                             </a>
-                                             <a v-if="empo.etat==0"  title="Cloturer" class="btn bg-success text-white border-success ml-3 m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="cloturer(empo)">
+                                            <a v-if="empo.etat==0"  title="Editer" class="btn ml-3  m-1 btn-circle border btn-circle-sm m-1 bg-white"  data-toggle="modal" data-target="#newEmpotage" v-on:click="editEmpotage(empo)">
+                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                            </a>
+                                             <a v-if="empo.etat==0"  title="Cloturer" class="btn bg-success text-white border-success m-1 btn-circle border btn-circle-sm m-1 bg-white" v-on:click="cloturer(empo)">
                                                 <i class="fa fa-check" aria-hidden="true"></i>
                                             </a>
                                             <a v-if="empo.etat==0"  title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1 bg-white" v-on:click="deleteEmpotage(empo)">
@@ -194,12 +201,12 @@
                 <button class="btn btn-primary mb-2 mr-3" @click="back()">
                     <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                 </button>
-                <div class="w-100 overflow-auto">
+                <div class="w-100 overflow-auto" v-if="!showCurrentOrder">
                     <div class="d-flex flex-row align-items-center justify-content-end outlineBtn">
                         <template v-for="contenaire, index in contenaires.data">
                             <div class="position-relative ml-3">
                                 <button v-on:click="contenaireSelectionner(index)" class="btn btn-default d-flex flex-column mb-0 p-0">
-                                    <img src="/images/contenaire.png" alt="Contenaire" height="45"  :class="index==currentIndex ? 'activeContent':'imageGrey'">
+                                    <img src="/images/contenaire.png" alt="Conteneur" height="45"  :class="index==currentIndex ? 'activeContent':'imageGrey'">
                                     <span class="badge w-100 mt-1" :class="index==currentIndex ? 'badge-primary':'badge-secondary opacity-7'">{{ contenaire.numContenaire}}</span>
                                 </button>
                                 <button v-if="contenaire.etat == 1" style="top: -0px; right: -3px;"  v-on:click="reactiver(contenaire, index)" class="badge badge-success position-absolute rounded-circle  border-0" title="Réactiver le contenaire"><i class="fa fa-refresh"></i></button>
@@ -216,7 +223,7 @@
                        
                         <template v-else>
                             <div class="position-relative ml-3">
-                                <button class="text-white h2 btn btn-primary font-weight-bold" data-toggle="modal" data-target="#creerContenaire">  <span class="mb-0 align-middle"><i class="fa fa-plus"></i></span><span class="mb-0 pl-1">Ajouter un contenaire</span>
+                                <button class="text-white h2 btn btn-primary font-weight-bold" data-toggle="modal" data-target="#creerContenaire">  <span class="mb-0 align-middle"><i class="fa fa-plus"></i></span><span class="mb-0 pl-1">Ajouter un conteneur</span>
                                 </button>
                             </div>
                         </template>
@@ -225,19 +232,19 @@
                 </div>
             </div>
             <div :class="[isLoadingContenaire ? 'loader-line' : '']"></div>
-                <template v-if="!contenaires.data || !contenaires.data.length">
+                <template v-if="(!contenaires.data || !contenaires.data.length) && !showCurrentOrder">
                     <hr>
                     <div class="text-center mt-5">
                         <div class="d-inline-block position-relative cursor-pointer" data-toggle="modal" data-target="#creerContenaire">
-                            <img src="/images/contenaire.png" alt="Contenaire" class="text-center">
+                            <img src="/images/contenaire.png" alt="Conteneur" class="text-center">
                             <label class="badge badge-success position-absolute rounded-circle p-2 border-0 text-white" style="top: -5px;right: -20px;"><i class="fa fa-plus" style="font-size: 20px;"></i></label> 
                         </div>
                         
-                        <br>Créer un contenaire 
+                        <br>Créer un conteneur 
                     </div>
                 </template>
-                <template v-else>
-                    <div class="d-flex mb-2">
+                <template v-else> 
+                    <div class="d-flex mb-2" v-if="!showCurrentOrder">
                         <div class="h5 mb-0 rounded bg-white py-2 px-3 border">N°TC: <b>{{ selected.numtc }}</b></div>
                         <div class="h5 mb-0 rounded bg-white py-2 px-3 border mx-3">Type TC: <b>{{ selected.typetc }}</b></div>
                         <div class="h5 mb-0 rounded bg-white py-2 px-3 border">Plomb: <b>{{ selected.plomb }}</b></div>
@@ -263,7 +270,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="mb-3 mb-3 d-block">
+                    <div class="mb-3 mb-3 d-block" v-if="!showCurrentOrder">
                         <VueScrollFixedNavbar>
                         <table class="table table-bordered bg-white"> 
                         <tr>
@@ -271,7 +278,7 @@
                             <span class="ml-2 py-0 px-2 rounded text-lowercase bg-warning" v-if="selected.etat==0">En cours</span>
                             <span class="ml-2 py-0 px-2 rounded text-lowercase bg-success" v-if="selected.etat==1">Validé</span>
                             </th>
-                            <th class="text-uppercase thead-blue py-1">Etat contenaire</th>
+                            <th class="text-uppercase thead-blue py-1">Etat conteneur</th>
                         </tr>
                         <tr>
                             <td class="align-middle">
@@ -282,13 +289,13 @@
                                             {{ selected.typeCmd}}
                                         </li>
                                     </ul>
-                                    <table class="table m-0 mt-3 table-striped">
+                                    <table class="table m-0 mt-3 table-striped fs-13-px">
                                         <tbody> 
                                              <tr>
-                                                <th>Nbre Commande: {{ format_nbr(selected.nbrCmd) }}</th>
-                                                <th>Nbre de colis empoté: {{ format_nbr(selected.nbrColis) }}</th>
-                                                <th>Poids empoté: {{ format_nbr(selected.poids) }} KG</th>
-                                                <th>Volume empoté: {{ format_dec(selected.volume) }} m<sup>3</sup></th>
+                                                <th>Nbre Commande: <b>{{ format_nbr(selected.nbrCmd) }}</b></th>
+                                                <th>Nbre de colis empoté: <b>{{ format_nbr(selected.nbrColis) }}</b></th>
+                                                <th>Poids empoté: <b>{{ format_nbr(selected.poids) }}</b> KG</th>
+                                                <th>Volume empoté: <b>{{ format_dec(selected.volume) }}</b> m<sup>3</sup></th>
                                             </tr>
                                       
                                         </tbody>
@@ -318,46 +325,15 @@
                     </table>
                     </VueScrollFixedNavbar>
                     </div>
-                    <div v-if="selected.etat==0" class="d-flex justify-content-end align-items-center mr-3  mb-3 sucesss"> 
-                        <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
+                    <div v-if="selected.etat==0" class="d-flex justify-content-between align-items-center mr-3  mb-3 sucesss"> 
+                        <div><typeproduit></typeproduit></div>
             
-                        <div>
-                             <!--button class="btn btn-lg btn-secondary text-white mr-3  mx-2" :disabled = "checkedCommandes == '' || selected.isClosed==1 || selected.etat == 0" v-on:click="cloturer()">Cloturer</button-->
+                        <div v-if="!showCurrentOrder">
                             <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                         </div>
                        
                     </div>
                     <hr>
-
-                <!--div class="d-flex justify-content-between align-content-center mb-2">
-                    <div class="d-flex align-items-end">
-                        <div>
-                            <div class="d-flex align-items-center">
-                                <label for="paginateRecep" class="text-nowrap mr-2 mb-0"
-                                    >Nbre de ligne par Page</label> 
-                                <select
-                                    v-model="paginate"
-                                    class="form-control form-control-sm">
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="30">30</option>
-                                </select>
-                            </div>
-                        </div>
-                
-                    </div>
-                    
-                    <div class="d-flex px-0 align-items-end col-md-4">
-                        <input
-                            v-model.lazy="searchRecep"
-                            type="search"
-                            class="form-control"
-                            placeholder="Rechercher par n°cmd, n°fe, n°ecv,n°fact, utilisateur, fournisseur..."
-                        />
-                    </div>
-                   
-                </div-->  
                 <div :class="[selected.etat==1? 'position-relative bgValid':'']" >
                     <table class="table">
                         <thead class="thead-blue position-relative" :class="[run? 'disabled-row':'']">
@@ -387,7 +363,9 @@
                             <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white">
                             <!--td class="p-2 align-middle">{{ dry.rencmd }}</td>
                             <td class="p-2 align-middle">{{ dry.refere }}</td-->
-                            <td class="p-2 align-middle">{{ dry.reecvr }}</td>
+                            <td class="p-2 align-middle position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>  <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)">
+                                {{ dry.reecvr }}
+                            </label></td>
                             <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
                             <td class="p-2 align-middle white-space-nowrap">
                                     <template v-if="dry.renbcl > 0">
@@ -421,7 +399,7 @@
                                     <span>{{ dry.depalettisation }}</span>
                                     <i class="fa fa-edit" v-on:click="editDepaletissation(dry)"></i>
                                 </div>
-                                <form v-on:submit.prevent="saveDepalettisation(dry)"><input :data-id="dry.reidre" :class="[dry.depalettisation!='' && dry.depalettisation != null? 'd-none':'d-block']" type="text" :id="'depal_'+dry.reidre" v-model="depaletissation[dry.reidre]" style="width:90px" @blur="saveDepalettisation(dry)" @onfocusout="saveDepalettisation(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
+                                <form v-on:submit.prevent="saveDepalettisation(dry)"><input :disabled="showCurrentOrder"  :data-id="dry.reidre" :class="[dry.depalettisation!='' && dry.depalettisation != null? 'd-none':'d-block']" type="text" :id="'depal_'+dry.reidre" v-model="depaletissation[dry.reidre]" style="width:90px" @blur="saveDepalettisation(dry)" @onfocusout="saveDepalettisation(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
                                 
                                
                              </td>
@@ -431,12 +409,17 @@
                                     <span>{{dry.douane}}</span>
                                     <i class="fa fa-edit" v-on:click="editDouane(dry)"></i>
                                 </div>
-                                <form v-on:submit.prevent="saveDouane(dry)"><input :data-id="dry.reidre" :class="[dry.douane!='' && dry.douane != null? 'd-none':'d-block']" type="text" :id="dry.reidre" v-model="douane[dry.reidre]" style="width:90px" @blur="saveDouane(dry)" @onfocusout="saveDouane(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
+                                <form v-on:submit.prevent="saveDouane(dry)"><input :data-id="dry.reidre" :class="[dry.douane!='' && dry.douane != null? 'd-none':'d-block']" type="text" :id="dry.reidre" :disabled="showCurrentOrder" v-model="douane[dry.reidre]" style="width:90px" @blur="saveDouane(dry)" @onfocusout="saveDouane(dry)"  class="text-center val-douane"/><button type="submit" class="d-none"></button></form>  
                                 
                                 <!--input v-else class="text-center val-douane" style="width:80px" :disabled="(dry.douane!='' && dry.douane != null)" type="text" :data-id="dry.reidre" v-model="douane[dry.reidre]" @focus="focusDoune(dry)" @blur="saveDouane(dry)" :placeholder="dry.douane"-->   
                              </td>
                             <td class="p-2 text-right">
                                 <div class="d-flex justify-content-end align-items-center">
+                                    <template v-if="dry.motifID != ''">
+                                        <a title="Commande non chargé" href="#" class="btn btnAction mx-1 btn-circle border btn-circle-sm bg-white" v-on:click="showMotifModal(dry)">
+                                            <i class="fa fa-info" aria-hidden="true"></i>
+                                        </a>
+                                    </template>
                                     <a title="Voir les détails" href="#" class="btn m-1 btn-circle border btn-circle-sm m-1 bg-white mr-3 position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
                                         <i class="fa fa-eye" aria-hidden="true"></i>
                                         <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
@@ -455,6 +438,12 @@
                                         </template>
                                         
                                     </label>
+                                     <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)" data-toggle="modal" data-target="#openFacture">
+                                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                        <!--i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i-->
+                                        <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(dry.refasc) > 9 ? '+9' : getCountFacture(dry.refasc) }}</span>
+                                    </button>
+                                   <button title="Retourner la commande" @click="showMotifCreationModal(dry)" class="btn mx-1 btn-circle border-0 btn-circle-sm btnAction bg-transparent mr-1 position-relative"><i class="mt-1 fa fa-ban text-danger" style="font-size:26px" aria-hidden="true"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -490,7 +479,7 @@
                     </div>
                     </div>
                     <hr>
-                    <div v-if="selected.etat==0" class="d-flex justify-content-end mr-3  mb-5 sucesss"> 
+                    <div v-if="selected.etat==0 && !showCurrentOrder" class="d-flex justify-content-end mr-3  mb-5 sucesss"> 
                         <!--button class="btn btn-lg btn-danger" :disabled = "selected.dossier == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
                         <button class="btn btn-lg btn-primary" :disabled = "(selected.dossier == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                     </div>
@@ -505,7 +494,7 @@
                 
                     <div class="modal-header text-left">
                         <h4 class="modal-title w-100 font-weight-bold">
-                            <template v-if="modeModify">Modifier</template>
+                            <template v-if="modeModify">Détails</template>
                         <template v-else>Nouveau rapport d'empotage</template>
                         
                         </h4>
@@ -525,18 +514,11 @@
                                             <input  class="w-65 form-control" type="text" readonly disabled v-model="numDossierEdit">
                                         </template>
                                         <template v-else>
-                                            <select  class="form-control w-65" @change="setData($event)" >
+                                            <select  class="form-control w-65"  @change="setData($event)" >
                                                 <option value="">Choisir</option>
                                                 <option v-for="dossier in listeDossier" :value="dossier.idpre">{{dossier.numDossier}} {{ getTypeCommande(dossier.type_commandes) }}</option>
                                             </select>
                                         </template>
-                                        <!--input class="w-65 form-control" autocomplete="off" id="numDossier" aria-haspopup="true" aria-expanded="false" v-model="keyword" @focus="isFocus"  @blur="handleBlur"
-                                        :class="{ 'border-danger': submitted && !$v.keyword.required }" />
-                                         <ul class="dropdown-menu filterUl p-2" :class="{'d-block': showDropDown}" v-if="dossiers.length > 0">
-                                            <li v-for="dossier in dossiers" :key="dossier.id" >
-                                                <a class="p-2" v-text="dossier.numDossier+' '+getTypeCommande(dossier.type_commandes_id)" v-on:click="say(dossier.numDossier, dossier.type_commandes_id,  dossier.entrepots_id)"></a>
-                                            </li>
-                                        </ul-->
                                     </div>
                                     
                                  </div>
@@ -561,7 +543,7 @@
                                  </div>
                                 
                              </div>
-                             <div class="row">
+                             <div class="row d-none"> <!-- A supprimer aprés il n'y a pas d'utilité ici on prend a la place les date du navire deja renseigné au préchargement-->
                                   <div class="col-6 my-2 d-flex flex-column justify-content-start align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2 dateW65">
                                         <label class="d-block m-0 text-right  w-35 pr-2" title="Date départ du bâteau">Date Départ</label>
@@ -575,14 +557,65 @@
                                     </div>
                                  </div>
                              </div>
-                             <div class="modal-footer d-flex justify-content-center mt-2"> 
+                            <template v-if="empotageForm.typeCmd!=''">
+                            <h5 class="text-primary mb-0 font-weight-bold">Infos Navire</h5>
+                             <hr class="mt-1">
+                             <div class="row">
+                                <div class="col-4 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                           <label for="numBooking"  class="d-block m-0 text-left pr-2 white-space-nowrap">N° Booking</label>
+                                           <span class="w-100 d-block bg-light rounded border py-1 px-3">{{ infosNavire.booking }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                           <label for="nomNavire"  class="d-block m-0 text-left pr-2 white-space-nowrap">Nom navire</label>
+                                           <span class="w-100 d-block bg-light rounded border py-1 px-3">{{ infosNavire.nom }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-4 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                           <label for="nomNavire"  class="d-block m-0 text-left pr-2 white-space-nowrap">Terminal retour</label>
+                                           <span class="w-100 d-block bg-light rounded border py-1 px-3">{{ infosNavire.terminal }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                             </div>
+                              <div class="row mb-4">
+                                <div class="col-6 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                            <label for="dateDeb" class="m-0 text-left w-35 pr-2 white-space-nowrap" >Date Départ</label>
+
+                                             <date-picker disabled v-model="infosNavire.dateDepart" class="w-100" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 my-2 d-flex flex-column align-items-center">
+                                    <div class="w-100 d-flex align-items-center my-2">
+                                        <div class="md-form w-100">
+                                           <label for="dateClo" class="d-block m-0 text-left w-35 pr-2 text-nowrap" >Date Arrivée</label>
+                                            <date-picker disabled v-model="infosNavire.dateArrivee" class="w-100"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" ></date-picker>
+                                        </div>
+                                    </div>
+                                </div>
+                             </div>
+                             </template>
+                            <div class="modal-footer d-flex justify-content-center mt-2"> 
 
                                 <template v-if="modeModify">
-                                        <button type="submit" class="btn btn-success">Modifier</button>
-                                        <button type="button" v-on:click="closeModal()" class="btn btn-warning">Annuler la modification</button>
+                                        <!--button type="submit" class="btn btn-success">Modifier</button-->
+                                        <button type="button" v-on:click="closeModal()" class="btn btn-warning"><!--Annuler la modification-->Fermer</button>
                                 </template>
                                 <template v-else>
-                                    <button type="submit" class="btn btn-success">Enregister</button>
+                                    <button type="submit" class="btn btn-success">Créer</button>
                                     <button type="button" v-on:click="closeModal()" class="btn btn-warning">Annuler</button>
                                 </template>
                                
@@ -719,14 +752,14 @@
           </div>
         </div>
          <!-- Modal Facture-->
-        <div class="modal fade" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+        <div class="modal fade" id="openModalEmpo" tabindex="-1" role="dialog" aria-labelledby="myModalEmpo"
           aria-hidden="true" data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
              <div class="modal-content">
                 
                     <div class="modal-header text-left">
                         <h4 class="modal-title w-100 font-weight-bold">Rapport d'empotage</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdfEmpo">
                           <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -737,12 +770,15 @@
                          <template  v-else> Auncun fichier </template>
                     </div>
                     <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" v-on:click="closeModalPdf()" class="btn btn-warning">Fermer</button>
+                    <button type="button" v-on:click="closeModalPdfEmpo()" class="btn btn-warning">Fermer</button>
                   </div>
              </div>
             
           </div>
         </div>
+        <modalFacture></modalFacture>
+        <modalMotif></modalMotif>
+        <creationMotif></creationMotif>
         <modalDetailsCommande></modalDetailsCommande>
         <!-- Modal Document-->
         <div class="modal fade fullscreenModal" id="openDocument" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
@@ -808,6 +844,11 @@
     import VueTimepicker from 'vue2-timepicker';
     import 'vue2-timepicker/dist/VueTimepicker.css'; 
 
+    import typeproduit from '../../components/modal/typeproduit.vue';
+
+    import modalMotif from '../../components/modal/motif.vue';
+    import creationMotif from '../../components/modal/creationMotif.vue'; 
+
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
     import { PdfMakeWrapper, Table, QR, Img} from 'pdfmake-wrapper';
 
@@ -816,6 +857,7 @@
     import pdfFonts from "pdfmake/build/vfs_fonts";
     import { required, minLength, between } from 'vuelidate/lib/validators';
     import PageLoader from '../../components/PageLoader.vue';  
+    import modalFacture from '../../components/modal/facture.vue';
     export default {
         props: [ 
             'idClient',
@@ -827,11 +869,17 @@
             'currentEntite',
             'listEntrepots',
             'listeDossier',
-            'idEntite'
+            'listeDossierCours',
+            'idEntite',
+            'cmdAPrecharger'
         ],  
         components: {
             PageLoader,
-            VueScrollFixedNavbar
+            VueScrollFixedNavbar,
+            typeproduit,
+            modalMotif,
+            creationMotif,
+            modalFacture
           },
         data() { 
             return {
@@ -931,7 +979,15 @@
                 tabPhoto: [],
                 depaletissation: [],
                 isLoadingContenaire: false,
-                submittedEmpo: false
+                submittedEmpo: false,
+                infosNavire: {
+                    booking: '',
+                    nom: '',
+                    terminal: '',
+                    dateDepart: null,
+                    dateArrivee: null
+                },
+                showCurrentOrder: false
             }
 
         },
@@ -977,6 +1033,14 @@
             sortByColumn(column) {
               this.sortedColumn = column;
               this.order = (this.order === 'asc') ? 'desc' : 'asc';
+            },
+             getNbreCmd(id){
+                for(var i=0; i<this.cmdAPrecharger.length; i++){
+                    if(this.cmdAPrecharger[i].type_commandes_id == id){
+                        return this.cmdAPrecharger[i].total;
+                    }
+                }
+                return 0;
             },
             switchContenaire(id, volume){
                 this.capacite = volume; 
@@ -1068,8 +1132,14 @@
             }, 
             getReception(page = 1){
                 this.isLoading=true;
+
+                var paramContenaire = "";
+
+                if(!this.showCurrentOrder){
+                    paramContenaire = "&contenaireSelected="+this.contenaires.data[this.currentIndex].id+"&contenaireEtat="+this.contenaires.data[this.currentIndex].etat;
+                }
                
-                axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order+"&contenaireSelected="+this.contenaires.data[this.currentIndex].id+"&contenaireEtat="+this.contenaires.data[this.currentIndex].etat).then(response => {
+                axios.get('/gerer/dossier/empotage/reception/'+this.idClient+"/"+this.selected.idCmd+'?page=' + page + "&paginate=" + this.paginateRecep+"&idEntrepot="+this.selected.idEntrepot+"&ref="+this.selected.dossier+"&id_empotage="+this.selected.identifiant+"&keysearch="+this.searchRecep+"&column="+this.sortedColumn+"&order="+this.order+paramContenaire).then(response => {
 
                     this.reception = response.data;
 
@@ -1109,9 +1179,6 @@
                                     }
                                 }
 
-
-                                
-                                
                             }
 
                         }
@@ -1123,6 +1190,12 @@
                    // }
                    
                     this.isLoading = false;
+
+                    // get Ŝpecification
+
+                    EventBus.$emit('SET_PRODUIT_SPECIFIK', { 
+                        prd: this.reception.data
+                    });
                 });
             },
             currentDateTime() {
@@ -1284,6 +1357,31 @@
                     entete.push([{text: "\n\nDestination: "+that.clientCurrent.pays, fontSize: 13, alignment: 'left', colSpan: 3}]);
                     entete.push([{text: "Rapport d'empotage pour le compte de: "+" "+that.clientCurrent.clnmcl+"\n", fontSize: 16, alignment: 'center', colSpan: 3}]);
                     
+                    // info navire
+                    var booking='', terminal='', nomNavire='', depart='', arrivee='';
+                    for(var i=0; i<that.listeDossierCours.length; i++){ 
+                        
+                        if(that.selected.dossier==that.listeDossierCours[i].numDossier && that.selected.idCmd==that.listeDossierCours[i].type_commandes){
+                            booking = that.listeDossierCours[i].booking;
+                            terminal = that.listeDossierCours[i].terminalRetour;
+                            nomNavire = that.listeDossierCours[i].nomNavire;
+                            depart = that.listeDossierCours[i].dateDepart;
+                            arrivee = that.listeDossierCours[i].dateArrivee; 
+                        }
+                    }
+                    var infoNavire=[];
+
+                    infoNavire.push([
+                        {text: 'Booking: '+ booking, fontSize: 12, alignment: 'left', lineHeight: 1},
+                        {text: 'Nom navire: '+ nomNavire, fontSize: 12, alignment: 'center', lineHeight: 1},
+                        {text: 'Terminal retour: '+ terminal, fontSize: 12, alignment: 'right', lineHeight: 1},
+                    ]); 
+                     infoNavire.push([
+                        {text: 'Date départ: '+ depart+' ~ Date arrivée: '+ arrivee, fontSize: 12, alignment: 'center', lineHeight: 1,colSpan: 3}
+                    ]); 
+
+                    var navire = new Table(infoNavire).widths('*').margin([0, 0, 0, 7]).end;
+               
                   
 
                     var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
@@ -1407,6 +1505,8 @@
                     text: 'DuoTransit'}, {text: currentPage.toString() + ' / ' + pageCount, alignment: "right"}]}; });
 
                     pdf.add(header);
+
+                    pdf.add(navire);
 
                     pdf.add(contenaire);
 
@@ -1602,7 +1702,8 @@
                 this.eventCmdSelected.ischecked = -1;
                 this.eventCmdSelected.idcmd = '';
                 this.run = false;
-                this.reception = {};
+                this.reception = {}; 
+                this.showCurrentOrder=false;
 
                },
                 getResults() {
@@ -1642,7 +1743,7 @@
                 reactiver(contenaire, index){
                      Vue.swal.fire({
                       title: 'Confirmez la réactivation',
-                      text: "Contenaire n° "+contenaire.numContenaire,
+                      text: "Conteneur n° "+contenaire.numContenaire,
                       icon: 'warning',
                       showCancelButton: true,
                       confirmButtonColor: '#3085d6',
@@ -1710,7 +1811,7 @@
                             this.flushData();
                             Vue.swal.fire(
                                   'succés!',
-                                  'Contenaire crée avec succés!',
+                                  'Conteneur crée avec succés!',
                                   'success'
                                 ).then((result) => {
 
@@ -1788,12 +1889,17 @@
                         if(response.data.code==0){
                             this.$refs.closePoup.click();
                             this.flushData();
+
                             Vue.swal.fire(
-                              'succés!',
-                              'Empotage enregistré avec succés!',
-                              'success'
-                            );
-                            this.getEmpotage();
+                                'succés!',
+                                'Empotage enregistré avec succés!',
+                                'success').then((result) => {
+                                // redirection   
+                                location.reload();
+                            }); 
+
+                            
+                            //this.getEmpotage();
                             
                         }else{
                              Vue.swal.fire(
@@ -1821,11 +1927,30 @@
                     this.empotageFormContenaire.plomb = "";
                 },
                 setData(event) { 
+                    console.log("Dossier details:", this.listeDossier);
+                    if(event.target.value==""){
+                        this.empotageForm.reference = '';
+                        this.empotageForm.typeCmd = '';
+                        this.empotageForm.idEntrepot = '';
+                        return false;
+                    }
                     for(var i=0; i< this.listeDossier.length; i++){
                         if(this.listeDossier[i].idpre==event.target.value){
                             this.empotageForm.reference = this.listeDossier[i].numDossier;
                             this.empotageForm.typeCmd = this.listeDossier[i].type_commandes;
                             this.empotageForm.idEntrepot = this.listeDossier[i].entrepots;
+
+                            // date arrivee & depart existant mettre par defaut a supprimer Aprés car il n'y a pas d'utilité ici
+
+                            this.empotageForm.dateDepart = this.listeDossier[i].dateDepart;
+                            this.empotageForm.dateArrivee = this.listeDossier[i].dateArrivee;
+
+                            // info navire
+                            this.infosNavire.booking = this.listeDossier[i].booking;
+                            this.infosNavire.terminal = this.listeDossier[i].terminalRetour;
+                            this.infosNavire.nom = this.listeDossier[i].nomNavire;
+                            this.infosNavire.dateDepart = this.listeDossier[i].dateDepart;
+                            this.infosNavire.dateArrivee = this.listeDossier[i].dateArrivee;
                         }
                     }
                    
@@ -1948,7 +2073,7 @@
                supprimerContenaire(contenaire){
                      Vue.swal.fire({
                       title: 'Confirmez la suppression',
-                      text:   'N° Contenaire: '+contenaire.numContenaire,
+                      text:   'N° Conteneur: '+contenaire.numContenaire,
                       icon: 'warning',
                       showCancelButton: true,
                       confirmButtonColor: '#e3342f',
@@ -1963,7 +2088,7 @@
 
                                 Vue.swal.fire(
                                   'Supprimé!',
-                                  'Contenaire supprimé',
+                                  'Conteneur supprimé',
                                   'success'
                                 ).then((result) => {
                                     // rafraichir all contenaire 
@@ -2003,6 +2128,22 @@
                     this.empotageForm.dateDepart= empotage.dateDepartEng;
                     this.empotageForm.dateArrivee= empotage.dateArriveeEng;
                     this.numDossierEdit = empotage.reference;
+
+                    this.infosNavire.booking ="";
+                    this.infosNavire.terminal = "";
+                    this.infosNavire.nom ="";
+                    // info navire
+                    for(var i=0; i<this.listeDossierCours.length; i++){ 
+                        
+                        if(empotage.reference==this.listeDossierCours[i].numDossier && empotage.typeCommandeID==this.listeDossierCours[i].type_commandes){
+                            this.infosNavire.booking = this.listeDossierCours[i].booking;
+                            this.infosNavire.terminal = this.listeDossierCours[i].terminalRetour;
+                            this.infosNavire.nom = this.listeDossierCours[i].nomNavire;
+                        }
+                    }
+                    
+                    this.infosNavire.dateDepart = empotage.dateDepartEng;
+                    this.infosNavire.dateArrivee = empotage.dateArriveeEng;
                },
                deleteEmpotage(empotage){
                     Vue.swal.fire({
@@ -2015,7 +2156,7 @@
                       confirmButtonText: 'Oui, supprimer!'
                     }).then((result) => {
                       if (result.isConfirmed) {
-                            axios.delete('/gerer/deleteEmpotage/'+empotage.id+'/'+this.idEntite+"?idClient="+this.idClient).then(response => {
+                            axios.delete('/gerer/deleteEmpotage/'+empotage.id+'/'+this.idEntite+"?idClient="+this.idClient+'&ref='+empotage.reference+'&typeCmd='+empotage.typeCommandeID).then(response => {
                                 Vue.swal.fire(
                                     'Supprimé!',
                                     'Dossier supprimé avec succés.',
@@ -2054,6 +2195,9 @@
                 },
                 closeModalPdf(){
                      this.$refs.closePoupPdf.click();
+                },
+                 closeModalPdfEmpo(){
+                     this.$refs.closePoupPdfEmpo.click();
                 },
                 getCountDoc(doc){
                     if(Array.isArray(doc)){
@@ -2338,10 +2482,54 @@
             },
              getPhoto(index){
                 this.currentIndexPhoto = index;
-            }
+            },
+            showMotifModal(dry){
+                EventBus.$emit('VIEW_MOTIF', { 
+                    dryCmd: dry
+                }); 
+            },
+             getTypeProduit(produit){
+                   switch(produit){
+                    case 'DEAE': return 'deae text-white'; break;
+                    case 'Précurseur de drogue': return 'precurseur_drogue text-white'; break;
+                    case 'Psychotrope': return 'psychotrope text-white'; break;
+                    case 'Dangereux': return 'dangereux text-white'; break;
+                    case 'Autre': return 'autre text-white'; break;
+                    default: return 'border border-width-2 border-primary'; 
+                }
+            },
+            showMotifCreationModal(dry){
+                EventBus.$emit('VIEW_MOTIF_CREATION', { 
+                    dryMotif: dry
+                }); 
+            },  
+             showOrders(type){
+               this.isDetail = true;
+               this.showCurrentOrder=true;
+               this.selected.idCmd=type;
+               this.getReception(); 
+               
+            },
+              getCountFacture(doc){
+                if(Array.isArray(doc)){
+                    return doc.length;
+                }
+                return 0;
+            },
+             showFacture(fact){
+                 EventBus.$emit('VIEW_FACT', { 
+                    listeFacture: fact.refasc,
+                    idReception: fact.reidre,
+                    can_modify: false
+                }); 
+            },
         },
         mounted() {
           this.getEmpotage();
+          // Lister reception aprés enregistrement du motif
+          EventBus.$on('LISTER_RECEPTION', (event) => {
+              this.getReception();
+          });
         }
     }
 </script>

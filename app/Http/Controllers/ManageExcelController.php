@@ -131,11 +131,11 @@ class ManageExcelController extends Controller
 
       $client = Client::where('slug', request('slug'))->get()->first();
    
-      Excel::import(new CommandesImport($client, request('typeCommande')),request()->file('file'));
+      $rep = Excel::import(new CommandesImport($client, request('typeCommande')),request()->file('file'));
        
       return response([
             "code" => 0,
-            "message" => "ok"
+            "message" => $rep
         ]);
 
     }

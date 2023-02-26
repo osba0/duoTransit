@@ -45,6 +45,7 @@ class EmpotageController extends Controller
 
         $sql = "";
 
+
         if (isset($paginate)) {
             $query = DB::table('empotages')
             //->leftJoin('receptions', 'receptions.dossier_empotage_id', '=', 'empotages.id')
@@ -67,6 +68,7 @@ class EmpotageController extends Controller
                 'empotages.created_at as created_at',
                 'empotages.numDocim as numDocim',
                 'empotages.complements_document as docs',
+                'empotages.autres_document as autre_docs',
                 'users.username as user',
                 'entrepots.nomEntrepot as nomEntrepot', 
                 'entrepots.id as idEntrepot',
@@ -134,6 +136,11 @@ class EmpotageController extends Controller
             "entites_id" => intval(request('idEntite'))
         ]);
 
+        // desactiver la réactivation dans préchargement
+         DB::table('chargement_creations')->where("numdossier", request('reference'))->where("type_commandes_id", request('typeCmd'))->update([
+                "on_empote" => true
+            ]); 
+
         return response([
             "code" => 0,
             "message" => "OK"
@@ -179,15 +186,25 @@ class EmpotageController extends Controller
 
         if (isset($paginate)) {
 
-            $dries = Reception::where('dossier_id', request('ref'))->where(function($query){
-                            $query->orWhere('dossier_empotage_id', request('id_empotage'))->orWhere('dossier_empotage_id', 0)->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '');
-                        })->where(function($query){
-                            $query->orWhere('numero_contenaire', request('contenaireSelected'))->orWhere('numero_contenaire', 0)->orWhere('numero_contenaire', NULL)->orWhere('numero_contenaire', '');
-                        })
-            ->leftJoin('empotages', 'empotages.id', '=', 'receptions.dossier_empotage_id')
+            $dries = Reception::where(function($query){
+                $query->orWhere('dossier_empotage_id', request('id_empotage'))->orWhere('dossier_empotage_id', 0)->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '');
+            })->where(function($query){
+                $query->orWhere('numero_contenaire', request('contenaireSelected'))->orWhere('numero_contenaire', 0)->orWhere('numero_contenaire', NULL)->orWhere('numero_contenaire', '');
+            })->leftJoin('empotages', 'empotages.id', '=', 'receptions.dossier_empotage_id')
             ->leftJoin('users as a', 'empotages.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
-            ->select('*','receptions.type_commandes_id as typeCmd','b.username as user_created','a.username as prechargeur')->where('receptions.clients_id', request('id'))->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entrepots_id', request('idEntrepot')); 
+            ->leftJoin('commande_retourner_motifs', 'receptions.reidre', '=', 'commande_retourner_motifs.idReception')
+            ->select('receptions.*','receptions.type_commandes_id as typeCmd','b.username as user_created','a.username as prechargeur', 'commande_retourner_motifs.idReception')->where('receptions.clients_id', request('id'))->groupBy('receptions.reidre')->where('receptions.type_commandes_id', request('typecmd')); 
+
+            if(request('ref') != ""){
+                $dries = $dries->where('dossier_id', request('ref'));
+            }else{
+                $dries = $dries->whereNotNull("dossier_id")->where("dossier_id",'!=' ,0)->whereNotNull("dossier_prechargements_id");
+            }
+
+            if(request('idEntrepot') != ""){
+                $dries = $dries->where('receptions.entrepots_id', request('idEntrepot'));
+            } 
 
             if(request('contenaireEtat') == 1){
                 $dries = $dries->whereNotNull('douane');
@@ -529,6 +546,12 @@ class EmpotageController extends Controller
         
         $rapport->delete();
 
+
+        // réactivation dans préchargement
+         DB::table('chargement_creations')->where("numdossier", request('ref'))->where("type_commandes_id", request('typeCmd'))->update([
+                "on_empote" => false
+            ]); 
+
         return response([
             "code" => 0,
             "message" => "OK"
@@ -611,8 +634,54 @@ class EmpotageController extends Controller
             ]);
         }
 
-        // get Files
-        //$files = Empotage::where('id', request('idEmpotage'))->pluck('complements_document')->first();
+         return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
+    }
+
+
+    public function saveOtherDoc(Request $request){
+        try{   
+                $filename = '';
+                $allFileName=[];
+                $docs = explode(",", $request->Document[0]);
+         
+
+               for ($x = 0; $x < $request->TotalFiles; $x++) 
+               {
+     
+                   if ($request->hasFile('files'.$x)) 
+                    {
+                        $current_date_time = Carbon::now()->toDateTimeString();
+                        $paseDate = explode(' ', $current_date_time);
+                        $file     = $request->file('files'.$x); 
+                        $filename = 'autre_doc'.'_'.request('idEmpotage').'_'.($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
+
+                        $file->move("assets/documents/", $filename);
+                        array_push($allFileName, $filename);
+                      
+                    }
+               } 
+        
+               for($i=0; $i<sizeof($docs); $i++){
+                    if($docs[$i]!=''){
+                        array_push($allFileName, $docs[$i]); 
+                    } 
+               }
+        
+                Empotage::where('id', request('idEmpotage'))
+                  ->update([
+                    "autres_document" => json_encode($allFileName)
+                ]);
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
 
          return response([
             "code" => 0,
@@ -722,6 +791,42 @@ class EmpotageController extends Controller
                 Empotage::where('id', request('idEmpotage'))
                   ->update([
                     "complements_document" => json_encode($allFileName)
+                ]);
+
+                // delete file
+
+                File::delete("assets/documents/".$request->nameFile);
+                
+
+        }catch(\Exceptions $e){
+              return response([
+                "code" => 1,
+                "message" => $e->getMessage()
+            ]);
+        }
+
+        return response([
+            "code" => 0,
+            "message" => "OK",
+            "file" => $allFileName
+        ]);
+    }
+
+    public function removeOtherDoc(Request $request){
+        try{   
+
+                $allFileName=[];
+                $docs = explode(",", $request->Document[0]);
+         
+                for($i=0; $i<sizeof($docs); $i++){
+                    if($docs[$i]!='' && $docs[$i]!=$request->nameFile){
+                        array_push($allFileName, $docs[$i]); 
+                    } 
+                }
+        
+                Empotage::where('id', request('idEmpotage'))
+                  ->update([
+                    "autres_document" => json_encode($allFileName)
                 ]);
 
                 // delete file
@@ -871,9 +976,6 @@ class EmpotageController extends Controller
                 "message" => $e->getMessage()
             ]);
         }
-
-        // get Files
-        //$files = Empotage::where('id', request('idEmpotage'))->pluck('complements_document')->first();
 
          return response([
             "code" => 0,

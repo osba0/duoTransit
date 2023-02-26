@@ -10,7 +10,7 @@ use App\Models\TypActivity;
 
 class ChargementCreation extends Model
 {
-    protected $fillable = ['numDossier', 'dateDebut', 'dateCloture','booking', 'nomNavire', 'terminalRetour', 'dateDepart', 'dateArrivee', 'users_id', 'clients_id', 'type_commandes_id', 'reetat','entites_id', 'entrepots_id', 'is_empote'];
+    protected $fillable = ['numDossier', 'dateDebut', 'dateCloture','booking', 'nomNavire', 'terminalRetour', 'dateDepart', 'dateArrivee', 'users_id', 'clients_id', 'type_commandes_id', 'reetat','entites_id', 'entrepots_id', 'is_empote', 'on_empote'];
    
     use HasFactory, LogsActivity;
 

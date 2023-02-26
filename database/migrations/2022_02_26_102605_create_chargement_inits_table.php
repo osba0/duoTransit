@@ -30,6 +30,7 @@ class CreateChargementInitsTable extends Migration
             $table->foreignId('users_id')->constrained();
             $table->boolean('reetat');  
             $table->boolean('is_empote');  
+            $table->boolean('on_empote'); // new bloquer le prechargement quand c'est en cours d'empotage 
             $table->timestamps();
             
         });

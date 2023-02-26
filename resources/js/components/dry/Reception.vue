@@ -47,7 +47,7 @@
                     <span></span>
                   </div>
                   <div class="text-center py-3">
-                    <h4 class="mb-0">{{ format_nbr(totalPoids) }}</h4>
+                    <h4 class="mb-0">{{ format_dec(totalPoids) }}</h4>
                   </div>
                 </div>
             </div>
@@ -60,19 +60,23 @@
                     <span></span>
                   </div>
                   <div class="text-center py-3">
-                    <h4 class="mb-0">{{ format_dec(totalVolume) }}</h4>
+                    <h4 class="mb-0">{{ format_dec(totalVolume) }}</h4> 
                   </div>
                 </div>
             </div>
         </div>        
     </div>
     <div class="row d-flex align-items-center justify-content-between mb-3">
-            <ul class="legend mt-4 mb-2 pl-3 flex-1">
-                <li v-for="type in typeCmd" class="d-flex align-items-center">
-                    <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
-                    <label class="m-0 mr-2">{{type.typcmd}}</label>
-                </li>
-            </ul>
+            <div class="d-flex flex-column">
+                <ul class="legend mt-4 mb-1 pl-3 flex-1">
+                    <li v-for="type in typeCmd" class="d-flex align-items-center">
+                        <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
+                        <label class="m-0 mr-2">{{type.typcmd}}</label>
+                    </li>
+                </ul>
+                <typeproduit></typeproduit>
+               
+            </div>
             <div class="mt-2 mr-3">
                 <a href="#" class="text-white btn btn-primary font-weight-bold" data-toggle="modal" data-target="#newReception">
                     <i class="fa fa-plus" aria-hidden="true"></i> Nouvelle Réception
@@ -136,7 +140,7 @@
                         N°FE <i class="fa fa-sort" aria-hidden="true"></i></th>
                         <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true"></i></th>
                         <th class="p-2 border-right border-white h6 ">Fournisseur</th>
-                        <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[7])">Emballage <i class="fa fa-sort" aria-hidden="true" ></i></th> 
+                        <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="/*sortByColumn(columns[7])*/">Emballage <!--i class="fa fa-sort" aria-hidden="true" ></i--></th> 
                         <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[5])">Poids(KG)  <i class="fa fa-sort" aria-hidden="true" ></i></th>
                         <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true"></i></th>
                         <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[3])">Num Fact <i class="fa fa-sort" aria-hidden="true" ></i></th>
@@ -163,14 +167,16 @@
                         	{{ dry.type_commandes }}
                         </td--> 
                         <td class="p-2 align-middle position-relative ">
-                             <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>
+                            <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>
                         	 <!--label class="badge badge-primary mr-1 numCmdLab w-100">{{ dry.rencmd }}</label-->
-                            <label class="badge badge-primary" v-if="!Array.isArray(dry.listgroup) || dry.listgroup.length==0">
+                             
+                            <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)" v-if="!Array.isArray(dry.listgroup) || dry.listgroup.length==0">
                                 {{ dry.rencmd }}
                             </label> 
-                            <label v-else v-for="c in dry.listgroup" class="badge badge-primary mr-2">
+                            <label v-else v-for="c in dry.listgroup" class="badge mr-2" :class="getTypeProduit(dry.typeproduit)">
                                 {{ c }} 
                             </label>
+                           
                              
                         </td>
                         <td class="p-2 align-middle">{{ dry.refere }}</td>
@@ -195,31 +201,43 @@
                         <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.reuser}}</td>
                         <td class="p-2 text-right align-middle">
                             <div class="d-flex justify-content-end">
+                                 <template v-if="dry.motifID != ''">
+                                    <!--a title="Commande non chargé" href="#" class="btn btnAction mx-1 btn-circle border btn-circle-sm bg-white" v-on:click="getMotif(dry.motifID, dry)" data-toggle="modal" data-target="#listMotif">
+                                        <i class="fa fa-info" aria-hidden="true"></i>
+                                    </a-->
+                                    <a title="Commande non chargé" href="#" class="btn btnAction mx-1 btn-circle border btn-circle-sm bg-white" v-on:click="showMotifModal(dry)">
+                                        <i class="fa fa-info" aria-hidden="true"></i>
+                                    </a>
+                                    
+                                </template>
                                 <a title="Voir les détails" href="#" class="btn btnAction mx-1 btn-circle border btn-circle-sm bg-white" v-on:click="showDetail(dry)" data-toggle="modal" data-target="#detailReception">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </a>
+                               
+                               
                                 <a title="Editer" href="#" class="btn btnAction mx-1 btn-circle border btn-circle-sm bg-white" v-on:click="editDry(dry)" data-toggle="modal" data-target="#newReception">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                 </a>
-                                <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry.refasc)" data-toggle="modal" data-target="#openFacture">
+                                <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)" data-toggle="modal" data-target="#openFacture">
 				                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
-				                    <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
+				                    <!--i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i-->
+                                    <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(dry.refasc) > 9 ? '+9' : getCountFacture(dry.refasc) }}</span>
 				                </button>
                                  <a title="Incident" href="#" class="btn btnAction mx-1 btn-circle position-relative border btn-circle-sm bg-white" v-on:click="incident(dry)" data-toggle="modal" data-target="#newIncident">
                                     <i class="fa fa-bolt" aria-hidden="true"></i>
                                     <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                                 </a>
                                  <a title="Supprimer" href="#" class="btn btnAction mx-1 border-danger btn-circle border btn-circle-sm bg-white" v-on:click="deleteDry(dry)">
-                                    <i class="fa fa-close text-danger" aria-hidden="true"></i>
+                                    <i class="fa fa-close text-danger" aria-hidden="true"></i> 
                                 </a>
                             </div>
                         </td>
                     </tr>
                     <tr class="thead-blue">
-                        <td colspan="4" class="p-2 h5 align-middle text-right border-right thead-blue">TOTAL</td>
-                        <td class="p-2 align-middle h6 text-center border-right thead-blue">{{ format_nbr(nbrColis) }}</td>
-                        <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ format_nbr(totalPoids) }}</td>
-                        <td class="p-2 align-middle h6 text-right border-right thead-blue">{{ format_nbr(totalVolume) }}</td>
+                        <td colspan="4" class="p-2 h5 align-middle text-right border-right thead-blue"><b><i>TOTAL</i></b></td>
+                        <td class="p-2 align-middle h6 text-center border-right thead-blue totalSize">{{ format_nbr(nbrColis) }}</td>
+                        <td class="p-2 align-middle h6 text-right border-right thead-blue totalSize">{{ format_dec(totalPoids) }}</td>
+                        <td class="p-2 align-middle h6 text-right border-right thead-blue totalSize">{{ format_dec(totalVolume) }}</td>
                         <td colspan="5" class="p-2 h5 align-middle text-center  border-right" :class="[nbrJoursMoy<=8?'bg-success':'', (nbrJoursMoy>8 && nbrJoursMoy<=15)?'bg-warning':'', nbrJoursMoy>15?'bg-danger':'']">Nbr Jours Moyen: {{nbrJoursMoy}}</td>
                         
                     </tr>
@@ -343,7 +361,6 @@
                 </div>
             </form>
             <transition>
-
             <!-- Reception details -->
 
             <form @submit.prevent="createReception" enctype="multipart/form-data"  key=1 v-if="!show">
@@ -407,6 +424,7 @@
                                             <option value="Précurseur de drogue">Précurseur de drogue</option>
                                             <option value="Psychotrope">Psychotrope</option>
                                             <option value="Dangereux">Dangereux</option>
+                                            <!--option value="Autre">Autre</option-->
                                         </select>
                                     </div>
                                 </div>
@@ -424,18 +442,18 @@
 				                        <label data-error="wrong" data-success="right" for="formname" class="d-block m-0 text-right w-35 pr-2">Date de livraison</label>
                                         <date-picker v-model="reception.datalivr" class="flex-1" :disabled-date="disabledFutureDate"  required valueType="YYYY-MM-DD" input-class="form-control w-100" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :input-class="{ 'border-danger': submitted && !$v.reception.datalivr.required }"></date-picker>
 				                    </div>
-				                   <div class="md-form w-100 d-flex my-3 justify-content-between align-items-start">
+				                   <div class="d-flex md-form w-100 my-3 justify-content-between align-items-start" v-if="!modeModify">
 				                        <label for="formname" class="d-block m-0 text-right w-35 pr-2">Facture scanné</label>
 				                        <div class="w-65">
 				                        	<!--input type="file" id="formname" v-on:change="onFileChange" accept=".pdf,.doc"-->
-				                        	 <input type="file" id="file" name="file" ref="file" v-on:change="handleFileUpload()" :disabled = "modeModify && hasPdf"/>
+				                        	 <input type="file" id="file" multiple name="file" ref="file" v-on:change="handleFileUpload()" :disabled = "modeModify && hasPdf"/>
                                              <template v-if="modeModify && hasPdf">
                                                 <div class="d-flex align-items-center">
                                                     <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                                     <span class="ml-1 small">{{nameFacture}}</span>
                                                     <button class="btn p-0" type="button" v-on:click="removePDF(nameFacture)"><i aria-hidden="true" class="fa fa-close text-danger"></i></button>
                                                 </div>
-                                               
+                                                
                                             </template>
 				                        </div>
 				                        
@@ -519,12 +537,12 @@
           </div>
         </div>
 
-        
+        <modalMotif></modalMotif>
         <modalFacture></modalFacture>
         <modalDetailsCommande></modalDetailsCommande>
 
           <!-- Modal incidents-->
-        <div class="modal fade" id="newIncident" tabindex="-1" role="dialog" aria-labelledby="myModalIncident"
+        <div class="modal fade " id="newIncident" tabindex="-1" role="dialog" aria-labelledby="myModalIncident"
           aria-hidden="true"  data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-xl" role="document">
              <div class="modal-content">
@@ -596,6 +614,8 @@
 <script type="text/ecmascript-6">
     import modalFacture from '../../components/modal/facture.vue';
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
+    import modalMotif from '../../components/modal/motif.vue';
+    import typeproduit from '../../components/modal/typeproduit.vue';
 	import { required, minLength, between } from 'vuelidate/lib/validators';
     import PageLoader from '../../components/PageLoader.vue';  
     import { EventBus } from "../../event-bus"; 
@@ -610,7 +630,9 @@
          components: {
             PageLoader,
             modalDetailsCommande,
-            modalFacture
+            modalFacture,
+            modalMotif,
+            typeproduit
           },
 		data() { 
             return {
@@ -627,7 +649,6 @@
             		numCommande: null,
             		entrepot: this.listEntrepots.length==1? this.listEntrepots[0].id:'', // si il y'a un seul entrepot le prendre comme defaut
             		numfact: null
-
             	},
                 groupCmds: false,
                 hasPdf: false,
@@ -685,8 +706,10 @@
                 columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis'],
                 sortedColumn: '',
                 order: 'asc',
-                group: []
+                group: [],
+                attachmentsFacture: []
             }
+            
         },
 
         validations: {
@@ -886,8 +909,11 @@
                 });
             },
         	handleFileUpload(){
-
-        		this.reception.file = this.$refs.file.files[0];
+        		//this.reception.file = this.$refs.file.files[0];
+                this.attachmentsFacture = [];
+                for(var i=0; i<this.$refs.file.files.length;i++){
+                    this.attachmentsFacture.push(this.$refs.file.files[i]);
+                }
         	},
         	addCommande(){
 
@@ -973,7 +999,16 @@
 
 
         	    const data = new FormData();
-				data.append('file', this.reception.file);
+
+                data.append('file[]', this.attachmentsFacture);
+
+                for (let i = 0; i < this.attachmentsFacture.length; i++) {
+                    data.append('files' + i, this.attachmentsFacture[i]);
+                }
+
+
+                data.append('TotalFiles', this.attachmentsFacture.length);
+				//data.append('file', this.reception.file);
 				data.append('type_commande', this.reception.typeCmd);
 				data.append('fournisseur', this.reception.fournisseur);
 				data.append('entrepot', this.reception.entrepot);
@@ -1036,7 +1071,7 @@
                         console.log(err.code);
                         console.log(err.message);
 
-                        Vue.swal.close();
+                        /*Vue.swal.close();
                             Vue.swal.fire(
                           'Warning!',
                           'Echec envoi de mail',
@@ -1044,7 +1079,7 @@
                         ).then((result) => {
                             // redirection   
                             location.reload();
-                        });
+                        });*/
                     });
         		
         	},
@@ -1076,16 +1111,24 @@
                              this.checking=true;
                         }
 
-                         this.totalPoids = responseTwo.data.poidsTotal;
-                            this.nbrColis = responseTwo.data.nbreColis;
-                            this.totalVolume = responseTwo.data.volumeTotal;
-                            this.nbrCommande = responseTwo.data.commandesTotal; 
-                            this.nbrJoursMoy = responseTwo.data.nbrJourMoyen;
-                            this.typeCommandeUsed = responseTwo.data.typeCmd;
-                            this.checking=true;
+                        this.totalPoids = responseTwo.data.poidsTotal;
+                        this.nbrColis = responseTwo.data.nbreColis;
+                        this.totalVolume = responseTwo.data.volumeTotal;
+                        this.nbrCommande = responseTwo.data.commandesTotal; 
+                        this.nbrJoursMoy = responseTwo.data.nbrJourMoyen;
+                        this.typeCommandeUsed = responseTwo.data.typeCmd;
+                        this.checking=true;
                         this.closeLoader();
 
-                    }).catch(errors => {
+
+                        // get Ŝpecification
+
+                        EventBus.$emit('SET_PRODUIT_SPECIFIK', { 
+                            prd: this.dries.data
+                        });
+                    
+
+                    }).catch(errors => { 
 
                       // react on errors.
 
@@ -1147,7 +1190,7 @@
 	            
 	            });
         	},
-            showDetail(dry){
+            showDetail(dry){ 
                  EventBus.$emit('VIEW_CMD', {
                     openView: true,
                     dry: dry,
@@ -1159,8 +1202,11 @@
                 }); 
             },
              showFacture(fact){
-                 EventBus.$emit('VIEW_FACT', {
-                    pathFile: fact
+                 EventBus.$emit('VIEW_FACT', { 
+                    //pathFile: fact,
+                    listeFacture: fact.refasc,
+                    idReception: fact.reidre,
+                    can_modify: true
                 }); 
             },
         	editDry(dry){
@@ -1184,6 +1230,7 @@
 				this.reception.numCommande = dry.rencmd;
 				this.reception.commentaire = dry.recomt; 
                 this.reception.groupList = dry.listgroup;
+                this.reception.typeProduit = dry.typeproduit;
                 if(dry.refasc==null || dry.refasc==''){
                    
                     this.hasPdf=false;
@@ -1260,7 +1307,7 @@
                 if(!this.group.includes(this.initRecep.numCommande) && this.initRecep.numCommande!=''){
                     this.group.push(this.initRecep.numCommande);
                     this.initRecep.numCommande='';   
-                }
+                } 
               
             },
             remCmd(cmd){
@@ -1319,12 +1366,41 @@
                         this.reception.typeCmd = obj.id; 
                     }
                 }
-            }
+            },
+            getTypeProduit(produit){
+                var result='';
+                   switch(produit){
+                    case 'DEAE': result = 'deae text-white'; break;
+                    case 'Précurseur de drogue': result = 'precurseur_drogue text-white'; break;
+                    case 'Psychotrope':  result = 'psychotrope text-white'; break;
+                    case 'Dangereux': result = 'dangereux text-white'; break;
+                    case 'Autre': result = 'autre text-white'; break;
+                    default: result = 'border border-width-2 border-primary'; 
+                }
+
+                return result;
+            },
+            showMotifModal(dry){
+                EventBus.$emit('VIEW_MOTIF', { 
+                    dryCmd: dry,
+                    can_edit: false
+                }); 
+            },
+            getCountFacture(doc){
+                if(Array.isArray(doc)){
+                    return doc.length;
+                }
+                return 0;
+            },
         },
         
         mounted() {
 	        this.getDries();
             this.totalFourniseur = this.listFournisseurs.length;
+
+            EventBus.$on('REFRESH_RECEPTION', (event) => {
+               this.getDries();
+            });
 
 	    }
 

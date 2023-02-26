@@ -6,19 +6,29 @@
                 <qr-code text='Text to encode'></qr-code>
             </div-->
             
-          <div class="col-sm-8 d-flex align-items-center">
+          <div class="col-sm-8 d-flex align-items-center" v-if="!showCurrentOrder">
                <h3>Validation Préchargement  <template v-if="isDetail">:</template></h3>
                <template v-if="isDetail">
                    <span class="pl-2 h4 text-primary font-weight-bold"> N° Dossier {{ selected.id }}&nbsp;</span>
                    <!--span class="h4 text-primary font-weight-bold"> {{ selected.dateDebut }} au {{ selected.dateCloture }}</span-->
                 </template>
           </div>
+
+          <div class="col-sm-8 d-flex align-items-center" v-if="showCurrentOrder">
+               <h3>Liste des commandes <strong><u>{{ current_type_commande }}</u></strong> à précharger</h3>
+          </div>
          
           <div class="col-sm-4">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Acceuil</a></li>
-              <li class="breadcrumb-item" :class="!isDetail ? 'active': ''"><a href="#">Préchargement</a></li>
-              <li class="breadcrumb-item active"  v-if="isDetail"><a href="#">Dossier n° {{ selected.id }}</a></li>
+              <template v-if="!showCurrentOrder">
+                    <li class="breadcrumb-item" :class="!isDetail ? 'active': ''"><a href="#">Préchargement</a></li>
+                    <li class="breadcrumb-item active"  v-if="isDetail"><a href="#">Dossier n° {{ selected.id }}</a></li>
+              </template>
+               <template v-if="showCurrentOrder">
+                    <li class="breadcrumb-item" :class="!isDetail ? 'active': ''"><a href="#">Liste des commandes</a></li>
+              </template>
+              
             </ol>
           </div>
         </div>
@@ -26,10 +36,10 @@
         <template v-if="!isDetail">
             <div class="row d-flex align-items-center justify-content-between mb-3">
                 <ul class="legend mt-4 mb-2 pl-3 flex-1">
-                    <li v-for="type in typeCmd" class="d-flex align-items-center">
-                        <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
-                        <label class="m-0 mr-2">{{type.typcmd}}</label>
-                        <label class="m-0 mr-2 badge badge-primary">{{ getNbreCmd(type.id) }}</label>
+                    <li v-for="type in typeCmd" class="d-flex cursor-pointer align-items-center" title="Afficher" @click="showOrders(type)"> 
+                        <span class="etat_T m-0 cursor-pointer mr-1 border-0" :style="{'background': type.tcolor}"></span> 
+                        <label class="m-0 mr-2 cursor-pointer">{{type.typcmd}}</label>
+                        <label class="m-0 mr-2 cursor-pointer badge badge-primary">{{ getNbreCmd(type.id) }}</label>
                     </li>
                 </ul>
                 <div class="mt-2 mr-3">
@@ -140,7 +150,7 @@
                                         <td class="align-middle">
                                             <template v-if="pre.etat==1">
                                                 <span class="badge badge-success">Validé</span>
-                                                <button class="btn btn-default border-0"  @click="reactiver(pre)">
+                                                <button class="btn btn-default border-0" v-if="pre.on_empote==0" @click="reactiver(pre)">
                                                     <i class="fa fa-refresh" aria-hidden="true"></i>
                                                 </button>
                                             </template>
@@ -153,14 +163,21 @@
                                         
                                         <td class="align-middle">  
                                             <div class="w-100 text-right" :class="[pre.etat==1 ? 'text-center' : 'text-right']">
-                                                <a v-if="pre.etat==1" href="#" title="Voir la facture" class="btn btn-circle border btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(pre)" data-toggle="modal" data-target="#openFacture">
+                                                <a v-if="pre.etat==1" href="#" title="Voir la facture" class="btn btn-circle border-0 btn-circle-sm m-1 position-relative bg-danger"  @click="showInvoice(pre)" data-toggle="modal" data-target="#openFacture">
                                                     <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                                 </a>
 
-                                                <button v-if="pre.etat!=1" @click="showDossier(pre)" class="btn btn-info btn-sm">Ouvrir</button>
+                                                <!--button v-if="pre.etat!=1" @click="showDossier(pre)" class="btn btn-info btn-sm">Ouvrir</button-->
 
+                                                
+                                                 <a v-if="pre.etat!=1"@click="showDossier(pre)" title="Ouvrir le dossier" href="#" class="btn m-1 border-primary btn-circle border btn-circle-sm m-1 bg-white">
+                                                    <i class="fa fa-folder-open"></i>
+                                                </a>
+                                                <a v-if="pre.etat!=1" title="Editer" href="#" class="btn m-1 border-primary btn-circle border btn-circle-sm m-1 bg-white" v-on:click="editDossier(pre)" data-toggle="modal" data-target="#newDossier">
+                                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                </a>
                                                 <a v-if="pre.etat==0" title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1 bg-white" v-on:click="deletePre(pre)">
-                                                        <i class="fa fa-close text-danger" aria-hidden="true"></i>
+                                                        <i class="fa fa-trash text-danger" aria-hidden="true"></i>
                                                 </a>
                                             </div>
                                         </td>
@@ -187,16 +204,9 @@
                     <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
                 </button>
             </div>
-            <template v-if="isDetail">
+            <template v-if="isDetail && !showCurrentOrder">
                 <div class="d-flex bg-white rounded justify-content-between d-flex pt-2 justify-content-between border mb-2 px-2 fontSpan">
-                    <div>
-                        <label>Date empotage:</label>
-                        <span class="badge badge-primary">{{ selected.dateDebut }}</span>
-                    </div>
-                    <div class="ml-2">
-                        <label>Date cloture navire:</label>
-                        <span class="badge badge-primary">{{ selected.dateCloture }}</span>
-                    </div>
+                   
                     <div class="ml-2">
                         <label>Booking:</label>
                         <span class="badge badge-primary">{{ selected.booking }}</span>
@@ -209,6 +219,16 @@
                         <label>Terminal retour:</label>
                         <span class="badge badge-primary">{{ selected.termRetour }}</span>
                     </div>
+                </div>
+                <div class="d-flex bg-white rounded justify-content-between d-flex pt-2 justify-content-between border mb-2 px-2 fontSpan">
+                    <div>
+                        <label>Date empotage:</label>
+                        <span class="badge badge-primary">{{ selected.dateDebut }}</span>
+                    </div>
+                    <div class="ml-2">
+                        <label>Date cloture navire:</label>
+                        <span class="badge badge-primary mb-2">{{ selected.dateCloture }}</span>
+                    </div>
                      <div class="ml-2">
                         <label>Date départ:</label>
                         <span class="badge badge-primary">{{ selected.dateDepart }}</span>
@@ -220,14 +240,14 @@
                 </div>
           </template>
            
-            <div class="mb-3">
+            <div class="mb-3" v-if="!showCurrentOrder">
                 <VueScrollFixedNavbar>
                 <table class="table table-bordered bg-white"> 
                 <tr>
                     <th class="text-uppercase thead-blue py-1 w-60">Dossier selectionné  
                         <span class="py-0 px-2 rounded text-lowercase bg-warning" v-if="selected.etat==0">En cours</span>
                     <span class="py-0 px-2 rounded text-lowercase bg-success" v-if="selected.etat==1">Validé</span></th>
-                    <th class="text-uppercase thead-blue py-1">Etat contenaire</th>
+                    <th class="text-uppercase thead-blue py-1">Etat conteneur</th>
                 </tr>
                 <tr>
                     <td class="align-middle">
@@ -272,15 +292,15 @@
             </table>
         </VueScrollFixedNavbar>
             </div>
-            <div class="d-flex justify-content-end align-items-center mr-3 mb-3 sucesss"> 
+            <div class="d-flex justify-content-between align-items-center mr-3 mb-3 sucesss"> 
                 <!--button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
                 <!--div class="h5 m-0">
                     <span class="py-0 px-0 text-uppercase font-weight-bold">{{ selected.typeCmd }} </span> 
                 </div-->
-               
+                <div><typeproduit></typeproduit></div>
                     
                 
-                <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
+                <button v-if="!showCurrentOrder" class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
             </div>
             <hr>
             <!--div class="d-flex justify-content-between align-content-center mb-2">
@@ -346,7 +366,10 @@
                     </template>
                     <template v-else>
                         <tr v-for="dry in reception.data" :key="dry.reidre" class="bg-white">
-                        <td class="p-2 align-middle">{{ dry.reecvr }}</td>
+                        <td class="p-2 align-middle position-relative"> <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div> 
+                            <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)">
+                                {{ dry.reecvr }}
+                            </label></td>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
                         <td class="p-2 align-middle white-space-nowrap">
                                 <template v-if="dry.renbcl > 0">
@@ -382,24 +405,36 @@
                         </td>
                         <td class="p-2 text-right align-middle">
                             <div class="d-flex justify-content-end align-items-center">
+                                 <template v-if="dry.motifID != ''">
+                                        <a title="Commande non chargé" href="#" class="btn btnAction mx-1 btn-circle border btn-circle-sm bg-white" v-on:click="showMotifModal(dry)">
+                                            <i class="fa fa-info" aria-hidden="true"></i>
+                                        </a>
+                                        
+                                    </template>
                                 <a title="Voir les détails" href="#" class="btn mx-1 btn-circle border btn-circle-sm btnAction bg-white mr-1 position-relative" v-on:click="showModal(dry)" data-toggle="modal" data-target="#detailReception">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                     <i :class="{ noFile: dry.hasIncident === null || dry.hasIncident === '' || dry.hasIncident == 0}" class="fa fa-circle position-absolute notif text-danger" aria-hidden="true"></i>
                                 </a>
-                                <span v-if="dry.dossier_id > 0"><i class="fa fa-check-circle"></i></span>
-                                <label class="switch mr-0" :style= "[selected.etat==1 ? {opacity: 0.5} : {opacity: 1}]">
-                                    <template v-if="selected.etat==0">
-                                        <input class="switch-input inputCmd" :disabled="selected.etat==1" :checked="(selected.id == dry.dossier_id || dry.idPre > 0)" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
-                                        <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
-                                        <span class="switch-handle"></span> 
-                                    </template>
-                                    <template v-else>
-                                        <input class="switch-input inputCmd" :disabled="selected.etat==1" :checked="(selected.id == dry.dossier_id)" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
-                                        <span class="switch-label" data-on="OK" data-off="Choisir"></span> 
-                                        <span class="switch-handle"></span> 
-                                    </template>
-                                    
-                                </label>
+                                 <template  v-if="!showCurrentOrder">
+                                    <span v-if="dry.dossier_id > 0"><i class="fa fa-check-circle"></i></span>
+                                    <label class="switch mr-0" :style= "[selected.etat==1 ? {opacity: 0.5} : {opacity: 1}]"> 
+                                        <template v-if="selected.etat==0">
+                                            <input class="switch-input inputCmd" :disabled="selected.etat==1" :checked="(selected.id == dry.dossier_id || dry.idPre > 0)" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
+                                            <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
+                                            <span class="switch-handle"></span> 
+                                        </template>
+                                        <template v-else>
+                                            <input class="switch-input inputCmd" :disabled="selected.etat==1" :checked="(selected.id == dry.dossier_id)" type="checkbox" :value="dry.reidre" v-on:change="preselectionner($event,dry)" /> 
+                                            <span class="switch-label" data-on="OK" data-off="Choisir"></span> 
+                                            <span class="switch-handle"></span> 
+                                        </template>
+                                        
+                                    </label>
+                                </template>
+                                <!--button title="Retourner la commande" @click="selectCmdMotif(dry)" class="btn mx-1 btn-circle border-0 btn-circle-sm btnAction bg-transparent mr-1 position-relative" data-toggle="modal" data-target="#motifModal"><i class="mt-1 fa fa-ban text-danger" style="font-size:26px" aria-hidden="true"></i></button-->
+                                
+                                <button title="Rejet de la commande" @click="showMotifCreationModal(dry)" class="btn mx-1 btn-circle border-0 btn-circle-sm btnAction bg-transparent mr-1 position-relative"><i class="mt-1 fa fa-ban text-danger" style="font-size:26px" aria-hidden="true"></i></button>
+                                
                             </div>
                         </td>
                     </tr>
@@ -433,11 +468,15 @@
                     
                 </div>
                 <hr>
-                <div class="d-flex justify-content-end mr-3 mb-5 sucesss"> 
+                <div class="d-flex justify-content-end mr-3 mb-5 sucesss" v-if="!showCurrentOrder"> 
                     <!--button class="btn btn-lg btn-danger" :disabled = "selected.id == '' || selected.etat == 0" v-on:click="generatePdf()">Générer le fichier PDF</button-->
                     <button class="btn btn-lg btn-primary" :disabled = "(selected.id == '' || selected.etat == 1) || (!reception.data || !reception.data.length)" v-on:click="valider()"><i class="fa fa-check"></i> Valider</button>
                 </div>
         </template>
+
+
+        <creationMotif></creationMotif>
+        
         
         <!-- Modal creation dossier-->
         <div class="modal fade" id="newDossier" tabindex="-1" role="dialog" aria-labelledby="myModalDossier"
@@ -446,7 +485,10 @@
                 <div class="modal-content">
                 
                     <div class="modal-header text-left">
-                        <h4 class="modal-title w-100 font-weight-bold">Nouvel Dossier</h4>
+                        <h4 class="modal-title w-100 font-weight-bold">
+                            <template v-if="!isEdited">Nouvel Dossier</template>
+                            <template v-else>Modification Dossier</template>
+                        </h4>
                         <button type="button" class="close" data-dismiss="modal" v-on:click="closeModalDossier()" aria-label="Close" ref="closePoupDossier">
                           <span aria-hidden="true">&times;</span>
                         </button>
@@ -480,7 +522,10 @@
                                         <div class="md-form w-100">
                                            <label  class="d-block m-0 text-left pr-2 white-space-nowrap">Entrepôt</label>
                                             <select class="form-control" v-model="initChargement.entrepot" :class="{ 'border-danger': submitted_add && !$v.initChargement.entrepot.required }">
-                                                <option value="">Choisir l'entrepôt</option>
+                                                <template v-if="!listEntrepots.length==1">
+                                                    <option value="">Choisir l'entrepôt</option>
+                                                </template>
+                                                
                                                 <option v-for="entrepot in listEntrepots"  :value="entrepot.id">{{entrepot.nomEntrepot}}</option>
                                             </select>
                                         </div>
@@ -490,30 +535,30 @@
                               <div class="row mb-4">
                                 <div class="col-6 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
-                                        <div class="md-form w-100">
+                                        <div class="md-form w-100" :class="{ 'border-danger-date': submitted_add  && !$v.initChargement.dateDebut.required}">
                                             <label for="dateDeb" class="m-0 text-left w-35 pr-2 white-space-nowrap" >Date empotage</label>
 
-                                             <date-picker v-model="initChargement.dateDebut" class="w-100" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add && !$v.initChargement.dateDebut.required }"></date-picker>
+                                             <date-picker v-model="initChargement.dateDebut" class="w-100" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
                                            
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-6 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
-                                        <div class="md-form w-100">
+                                        <div class="md-form w-100" :class="{ 'border-danger-date': submitted_add  && !$v.initChargement.dateCloture.required}">
                                            <label for="dateClo" class="d-block m-0 text-left w-35 pr-2 text-nowrap" >Date cloture navire</label>
                                             <date-picker v-model="initChargement.dateCloture" class="w-100"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add  && !$v.initChargement.dateCloture.required}"></date-picker>
                                         </div>
                                     </div>
                                 </div>
                              </div>
-                             <h5 class="text-primary mb-0 font-weight-bold">Info Navire</h5>
+                             <h5 class="text-primary mb-0 font-weight-bold">Infos Navire</h5>
                              <hr class="mt-1">
                              <div class="row">
                                 <div class="col-4 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                           <label for="numBooking"  class="d-block m-0 text-left pr-2 white-space-nowrap">N° Booking</label>
+                                           <label for="numBooking"  class="d-block m-0 text-left pr-2 white-space-nowrap text-uppercase">N° Booking</label>
                                            <input autocomplete="off" class="form-control mr-2" id="numBooking" v-model="initChargement.numBooking" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.numBooking.required}" />
                                         </div>
@@ -522,7 +567,7 @@
                                 <div class="col-4 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                           <label for="nomNavire"  class="d-block m-0 text-left pr-2 white-space-nowrap">Nom navire</label>
+                                           <label for="nomNavire"  class="d-block m-0 text-left pr-2 white-space-nowrap text-uppercase">Nom navire</label>
                                            <input autocomplete="off" class="form-control mr-2" id="nomNavire" v-model="initChargement.nomNavire" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.nomNavire.required}" />
                                         </div>
@@ -531,7 +576,7 @@
                                  <div class="col-4 my-2 d-flex flex-row align-items-center justify-content-between">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                           <label for="termRetour"  class="d-block m-0 text-left pr-2 white-space-nowrap">Terminal retour</label>
+                                           <label for="termRetour"  class="d-block m-0 text-left pr-2 white-space-nowrap text-uppercase">Terminal retour</label>
                                            <input autocomplete="off" class="form-control mr-2" id="termRetour" v-model="initChargement.termRetour" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.termRetour.required}" />
                                         </div>
@@ -541,7 +586,7 @@
                               <div class="row mb-4">
                                 <div class="col-6 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
-                                        <div class="md-form w-100">
+                                        <div class="md-form w-100" :class="{ 'border-danger-date': submitted_add  && !$v.initChargement.dateDepart.required}">
                                             <label for="dateDeb" class="m-0 text-left w-35 pr-2 white-space-nowrap" >Date départ</label>
 
                                              <date-picker v-model="initChargement.dateDepart" class="w-100" required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add && !$v.initChargement.dateDepart.required }"></date-picker>
@@ -551,9 +596,9 @@
                                 </div>
                                 <div class="col-6 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
-                                        <div class="md-form w-100">
+                                        <div class="md-form w-100" :class="{ 'border-danger-date': submitted_add  && !$v.initChargement.dateArrivee.required}">
                                            <label for="dateClo" class="d-block m-0 text-left w-35 pr-2 text-nowrap" >Date arrivée</label>
-                                            <date-picker v-model="initChargement.dateArrivee" class="w-100"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" :class="{ 'border-danger': submitted_add  && !$v.initChargement.dateArrivee.required}"></date-picker>
+                                            <date-picker v-model="initChargement.dateArrivee" class="w-100"  required valueType="YYYY-MM-DD" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY" ></date-picker>
                                         </div>
                                     </div>
                                 </div>
@@ -561,7 +606,8 @@
 
                              <div class="modal-footer d-flex justify-content-center"> 
                                 <button type="submit" class="btn btn-success d-flex align-items-center">
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" :class="{'d-none': !submitted_circle, 'd-inline-block': submitted_circle && !$v.typeCommande.required}"></span>Créer</button>
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" :class="{'d-none': !submitted_circle, 'd-inline-block': submitted_circle && !$v.typeCommande.required}"></span><template v-if="!isEdited">Créer</template>
+                            <template v-else>Enregister</template></button>  
                                 <button type="button" v-on:click="closeModalDossier()" class="btn btn-warning">Annuler</button>
                             </div>
                         </form>   
@@ -596,6 +642,7 @@
             
           </div>
         </div>
+        <modalMotif></modalMotif>
         <modalDetailsCommande></modalDetailsCommande>
 
     </div>
@@ -606,6 +653,12 @@
     import {VueScrollFixedNavbar} from "vue-scroll-fixed-navbar";
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
     import { PdfMakeWrapper, Table, Img, QR } from 'pdfmake-wrapper';
+
+    import typeproduit from '../../components/modal/typeproduit.vue';
+    import modalMotif from '../../components/modal/motif.vue';
+
+    import creationMotif from '../../components/modal/creationMotif.vue';
+
 
     import { ITable } from 'pdfmake-wrapper/lib/interfaces'; 
 
@@ -633,7 +686,10 @@
         ],  
         components: {
             PageLoader,
-            VueScrollFixedNavbar
+            VueScrollFixedNavbar,
+            typeproduit,
+            modalMotif,
+            creationMotif
           },
         data() { 
             return {
@@ -679,7 +735,6 @@
                     termRetour: null,
                     dateDepart: null,
                     dateArrivee: null,
-                    nomNavire: null,
                     typeCommande: "",
                     entrepot: this.listEntrepots.length==1? this.listEntrepots[0].id:'', // si il y'a un seul 
 
@@ -704,7 +759,10 @@
                 columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis', 'priorite'],
                 sortedColumn: '',
                 order: 'asc',
-                run: false
+                run: false,
+                isEdited: false,
+                showCurrentOrder: false,
+                current_type_commande: ''
             }
 
         },
@@ -793,6 +851,7 @@
                     }
                     return mnt;
                 },
+          
             preselectionner(event, cmd){
                 this.run = true;
                 var ischecked=0;
@@ -852,6 +911,8 @@
                 });
         },
         closeModalDossier(){
+            this.submitted_add = false;
+            this.isEdited = false;
             this.$refs.closePoupDossier.click();
             this.flushFormular();
         },
@@ -967,9 +1028,16 @@
                 }
                
                 this.isLoading = false;
+
+                // get Ŝpecification
+
+                EventBus.$emit('SET_PRODUIT_SPECIFIK', { 
+                    prd: this.reception.data
+                });
             });
         },
         save(){
+
             this.submitted_add = true;
              // stop here if form is invalid
             this.$v.initChargement.$touch();
@@ -978,7 +1046,6 @@
             }
 
             this.submitted_circle=true;
-
 
             var date1 = new Date(this.initChargement.dateDebut);
             var date2 = new Date(this.initChargement.dateCloture);
@@ -1008,8 +1075,10 @@
 
                 return false;
             }
-            
-            axios.post("/gerer/createDossier", {
+
+
+
+            axios.post((this.isEdited?"/gerer/editDossier":"/gerer/createDossier"), {
                 'numdossier'  : this.initChargement.numDossier,
                 'datedebut'   : this.initChargement.dateDebut,
                 'datecloture' : this.initChargement.dateCloture, 
@@ -1028,7 +1097,7 @@
                 if(response.data.code==0){
                     Vue.swal.fire(
                       'succés!',
-                      'Dossier crée avec succés!',
+                      (this.isEdited?'Dossier modifié avec succés':'Dossier crée avec succés!'),
                       'success'
                     );
                     this.submitted_add = false;
@@ -1045,6 +1114,8 @@
                       'error'
                     )
                 }  
+
+                this.isEdited = false;
             });
         },
         currentDateTime() {
@@ -1063,6 +1134,19 @@
                 }
                 
             });
+        },
+        editDossier(pre){
+            this.isEdited = true;
+            this.initChargement.numDossier = pre.id;
+            this.initChargement.dateDebut= pre.dateDebutNatif;
+            this.initChargement.dateCloture= pre.dateClotureNatif;
+            this.initChargement.numBooking= pre.booking;
+            this.initChargement.nomNavire= pre.nomNavire;
+            this.initChargement.termRetour= pre.terminal_retour;
+            this.initChargement.dateDepart= pre.dateDepartNatif;
+            this.initChargement.dateArrivee= pre.dateArriveeNatif;
+            this.initChargement.typeCommande= pre.typecmdId;
+            this.initChargement.entrepot= pre.entrepotID;
         },
         valider(){
             this.commandeSelected = [];
@@ -1083,6 +1167,15 @@
                 Vue.swal.fire(
                       'warning!',
                       'Choisir au moins une commande avant de valider!',
+                      'warning'
+                    );
+                return false;
+            }
+
+            if(this.commandeNoSelected.length > 0){
+                 Vue.swal.fire(
+                      'warning!',
+                      'Veuillez choisir ou rejeter le(s) commande(s) non selectionnée(s)!',
                       'warning'
                     );
                 return false;
@@ -1173,6 +1266,11 @@
             this.initChargement.dateDebut=   null;
             this.initChargement.dateCloture= null;
             this.initChargement.typeCommande= "";
+            this.initChargement.numBooking= '';
+            this.initChargement.nomNavire= '';
+            this.initChargement.termRetour= '';
+            this.initChargement.dateDepart= null;
+            this.initChargement.dateArrivee= null;
 
         },
         convertImgToBase64(url, callback, outputFormat){
@@ -1230,12 +1328,13 @@
                 infoNavire.push([
                     {text: 'Booking: '+ that.selected.booking, fontSize: 12, alignment: 'left', lineHeight: 1},
                     {text: 'Nom navire: '+ that.selected.nomNavire, fontSize: 12, alignment: 'center', lineHeight: 1},
-                    {text: 'Terminal retour: '+ that.selected.termRetour, fontSize: 12, alignment: 'center', lineHeight: 1},
-                    {text: 'Date départ: '+ that.selected.dateDepart, fontSize: 12, alignment: 'center', lineHeight: 1},
-                    {text: 'Date arrivée: '+ that.selected.dateArrivee, fontSize: 12, alignment: 'right', lineHeight: 1}
+                    {text: 'Terminal retour: '+ that.selected.termRetour, fontSize: 12, alignment: 'right', lineHeight: 1},
+                ]); 
+                 infoNavire.push([
+                    {text: 'Date départ: '+ that.selected.dateDepart+' ~ Date arrivée: '+ that.selected.dateArrivee, fontSize: 12, alignment: 'center', lineHeight: 1,colSpan: 3}
                 ]); 
 
-                var navire = new Table(infoNavire).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
+                var navire = new Table(infoNavire).widths('*').margin([0, 0, 0, 7]).end;
                
 
                 var header = new Table(entete).widths('*').layout('noBorders').margin([0, 0, 0, 7]).end;
@@ -1470,6 +1569,7 @@
             this.eventCmdSelected.ischecked = -1;
             this.eventCmdSelected.idcmd = '';
             this.run = false;
+            this.showCurrentOrder = false;
 
            },
            reactiver(pre){
@@ -1522,10 +1622,42 @@
                     idClient: this.idClient
                 });
 
+            },  
+            showMotifCreationModal(dry){
+                EventBus.$emit('VIEW_MOTIF_CREATION', { 
+                    dryMotif: dry
+                }); 
+            },          
+            showMotifModal(dry){
+                EventBus.$emit('VIEW_MOTIF', { 
+                    dryCmd: dry
+                }); 
+            },
+
+             getTypeProduit(produit){
+                   switch(produit){
+                    case 'DEAE': return 'deae text-white'; break;
+                    case 'Précurseur de drogue': return 'precurseur_drogue text-white'; break;
+                    case 'Psychotrope': return 'psychotrope text-white'; break;
+                    case 'Dangereux': return 'dangereux text-white'; break;
+                    case 'Autre': return 'autre text-white'; break;
+                    default: return 'badge-primary'; 
+                }
+            },
+            showOrders(type){
+               this.isDetail = true;
+               this.showCurrentOrder=true;
+               this.selected.typeCommande = type.id;
+               this.current_type_commande = type.typcmd;
+               this.getReception();
             }
         },
         mounted() {
           this.getPrechargement();
+          // Lister reception aprés enregistrement du motif
+          EventBus.$on('LISTER_RECEPTION', (event) => {
+              this.getReception();
+          });
         }
     }
 </script>

@@ -45,6 +45,7 @@ class EmpotageResource extends JsonResource
             "dateDepartEng"     => $this->dateDepart!=null ? $this->dateDepart:'',
             "dateArriveeEng"    => $this->dateArrivee!=null ? $this->dateArrivee: '',
             "document"  =>  isset($this->docs) && !is_null($this->docs)? json_decode($this->docs) : json_decode("[]"),
+            "autre_document" => isset($this->autre_docs) && !is_null($this->autre_docs)? json_decode($this->autre_docs) : json_decode("[]"),
             "declDounae"  =>  isset($this->decldouane) && !is_null($this->decldouane)? json_decode($this->decldouane) : json_decode("[]"),
             "totalContenaire" => $this->nbreContenaireEmpote,
             "numDocim"   => $this->numDocim,

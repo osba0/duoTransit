@@ -38,6 +38,12 @@ class DossierRessource extends JsonResource
             "entrepotID"                => $this->idEntrepot,
             "nbrCmd"                    => $this->total_cmd!=''?$this->total_cmd:0,
             "typeCmd_color"             => isset($this->tcolor)? $this->tcolor : '' ,
+            "dateDebutNatif"            => $this->dateDebut,
+            "dateClotureNatif"          => $this->dateCloture,
+            "dateDepartNatif"           => $this->dateDepart,
+            "dateArriveeNatif"               => $this->dateArrivee,
+            "is_empote"                 => $this->is_empote,
+            "on_empote"                 => $this->on_empote
 
         ];
     }

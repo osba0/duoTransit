@@ -26,6 +26,7 @@ class CreateEmpotagesTable extends Migration
             $table->date('date_depart')->nullable();  
             $table->date('date_arrivee')->nullable();  
             $table->text('complements_document')->nullable(); 
+            $table->text('autres_document')->nullable(); 
             $table->text('declaration_douane')->nullable(); 
             $table->string('numDocim')->nullable(); 
             $table->timestamps();
