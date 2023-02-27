@@ -6,7 +6,7 @@
                      <tr>
                         <th class="p-2 border-right border-white h6">#</th>
                         <th class="p-2 border-right border-white h6">Fournisseur</th>
-                        <th class="p-2 border-right border-white h6">Gestionnaire</th>
+                        <th class="p-2 border-right border-white h6">Interlocuteur</th>
                         <th class="p-2 border-right border-white h6">Telephone</th>
                         <th class="p-2 border-right border-white h6">Email</th>
                         <th class="p-2 border-right border-white h6">Adresse</th>
@@ -144,10 +144,10 @@
 
                                  <div class="col-6 my-2 d-flex flex-column">
                                         <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Gestionnaire
+                                         <label for="inter"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Interlocuteur
                                        </label>
-                                        <input class="w-65 form-control" id="adresse" v-model="fournisseurForm.gestionnaire"/>
+                                        <input class="w-65 form-control" id="inter" v-model="fournisseurForm.gestionnaire"/>
                                     </div>
                                     
                                  </div>
@@ -391,6 +391,7 @@
                 this.fournisseurForm.logo= "";
                 this.fournisseurForm.client= "";
                 this.fournisseurForm.idClients= "";
+                this.fournisseurForm.gestionnaire="";
             },
             getFournisseur(page = 1){
                  this.isLoading=true;
@@ -527,6 +528,7 @@
                 this.fournisseurForm.telephone= fournisseur.telephone;
                 this.fournisseurForm.logo= fournisseur.logo;
                 this.fournisseurForm.email= fournisseur.email;
+                this.fournisseurForm.gestionnaire = fournisseur.gestionnaire;
 
                 if(fournisseur.logo){
                     this.hasImage = true;

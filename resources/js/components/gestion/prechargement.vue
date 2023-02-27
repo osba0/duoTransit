@@ -17,7 +17,7 @@
           <div class="col-sm-8 d-flex align-items-center" v-if="showCurrentOrder">
                <h3>Liste des commandes <strong><u>{{ current_type_commande }}</u></strong> à précharger</h3>
           </div>
-         
+          
           <div class="col-sm-4">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Acceuil</a></li>
@@ -503,7 +503,7 @@
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
                                            <label for="numDoss"  class="d-block m-0 text-left pr-2 white-space-nowrap">N° dossier</label>
-                                           <input autocomplete="off" class="form-control mr-2" id="numDoss" v-model="initChargement.numDossier" 
+                                           <input autocomplete="off" :disabled="isEdited" class="form-control mr-2" id="numDoss" v-model="initChargement.numDossier" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.numDossier.required}" />
                                         </div>
                                     </div>
@@ -512,7 +512,7 @@
                                     <div class="w-49 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
                                            <label  class="d-block m-0 text-left pr-2 white-space-nowrap">Type commande</label>
-                                            <select class="form-control" v-model="initChargement.typeCommande" :class="{ 'border-danger': submitted_add && !$v.initChargement.typeCommande.required }">
+                                            <select :disabled="isEdited" class="form-control" v-model="initChargement.typeCommande" :class="{ 'border-danger': submitted_add && !$v.initChargement.typeCommande.required }">
                                                 <option value="">Choisir le type commande</option>
                                                 <option v-for="type in typeCmd"  :value="type.id">{{type.typcmd}}</option>
                                             </select>
@@ -558,7 +558,7 @@
                                 <div class="col-4 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                           <label for="numBooking"  class="d-block m-0 text-left pr-2 white-space-nowrap text-uppercase">N° Booking</label>
+                                           <label for="numBooking"  class="d-block m-0 text-left pr-2 white-space-nowrap">N° Booking</label>
                                            <input autocomplete="off" class="form-control mr-2" id="numBooking" v-model="initChargement.numBooking" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.numBooking.required}" />
                                         </div>
@@ -567,7 +567,7 @@
                                 <div class="col-4 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                           <label for="nomNavire"  class="d-block m-0 text-left pr-2 white-space-nowrap text-uppercase">Nom navire</label>
+                                           <label for="nomNavire"  class="d-block m-0 text-left pr-2 white-space-nowrap">Nom navire</label>
                                            <input autocomplete="off" class="form-control mr-2" id="nomNavire" v-model="initChargement.nomNavire" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.nomNavire.required}" />
                                         </div>
@@ -576,7 +576,7 @@
                                  <div class="col-4 my-2 d-flex flex-row align-items-center justify-content-between">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                           <label for="termRetour"  class="d-block m-0 text-left pr-2 white-space-nowrap text-uppercase">Terminal retour</label>
+                                           <label for="termRetour"  class="d-block m-0 text-left pr-2 white-space-nowrap">Terminal retour</label>
                                            <input autocomplete="off" class="form-control mr-2" id="termRetour" v-model="initChargement.termRetour" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.termRetour.required}" />
                                         </div>
@@ -1641,7 +1641,7 @@
                     case 'Psychotrope': return 'psychotrope text-white'; break;
                     case 'Dangereux': return 'dangereux text-white'; break;
                     case 'Autre': return 'autre text-white'; break;
-                    default: return 'badge-primary'; 
+                    default: return 'border border-width-2 border-primary'; 
                 }
             },
             showOrders(type){

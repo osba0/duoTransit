@@ -44,10 +44,10 @@
                                 </div>
                                  <div class="w-100 d-flex align-items-center my-2">
                                     <label class="d-block m-0 text-right w-35 pr-2">
-                                        Document spécifique
+                                        Document spécifique 
                                     </label>
                                     <div class="w-65 pl-2 bg-light" >
-                                        <span>{{ viewReception.typeproduit==""? "N/A": viewReception.typeproduit  }}</span>
+                                        <span>{{ viewReception.typeproduit=="" || viewReception.typeproduit==null? "-": viewReception.typeproduit  }}</span>
                                     </div>
                                 </div>
                                 <div class="w-100 my-2 d-flex justify-content-between align-items-center">

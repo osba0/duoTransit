@@ -10,7 +10,7 @@
                     </template>
                 </template>
                 <template v-else>
-                    <h3>Liste des commandes à empoter</h3>
+                    <h3>Liste des commandes <strong><u>{{ current_type_commande }}</u></strong> à empoter</h3>
                 </template>
           </div>
           <div class="col-sm-4">
@@ -31,7 +31,7 @@
                 <div class="col-sm-12">
                     <div class="d-flex align-items-center justify-content-between mb-3">
                          <ul class="legend mt-4 mb-2 pl-0 flex-1">
-                            <li v-for="type in typeCmd" class="d-flex align-items-center cursor-pointer" @click="showOrders(type.id)">
+                            <li v-for="type in typeCmd" class="d-flex align-items-center cursor-pointer" @click="showOrders(type)">
                                 <span class="etat_T m-0 mr-1 border-0 cursor-pointer" :style="{'background': type.tcolor}"></span> 
                                 <label class="m-0 mr-2 cursor-pointer">{{type.typcmd}}</label>
                                 <label class="m-0 mr-2 cursor-pointer badge badge-primary">{{ getNbreCmd(type.id) }}</label>
@@ -234,7 +234,7 @@
             <div :class="[isLoadingContenaire ? 'loader-line' : '']"></div>
                 <template v-if="(!contenaires.data || !contenaires.data.length) && !showCurrentOrder">
                     <hr>
-                    <div class="text-center mt-5">
+                    <div class="text-center mt-5" v-if="!isLoadingContenaire">
                         <div class="d-inline-block position-relative cursor-pointer" data-toggle="modal" data-target="#creerContenaire">
                             <img src="/images/contenaire.png" alt="Conteneur" class="text-center">
                             <label class="badge badge-success position-absolute rounded-circle p-2 border-0 text-white" style="top: -5px;right: -20px;"><i class="fa fa-plus" style="font-size: 20px;"></i></label> 
@@ -987,7 +987,8 @@
                     dateDepart: null,
                     dateArrivee: null
                 },
-                showCurrentOrder: false
+                showCurrentOrder: false,
+                current_type_commande: ''
             }
 
         },
@@ -1058,7 +1059,7 @@
             },
             getColorTypeCmd(id){
                  for(var i=0; i<this.typeCmd.length;i++){
-                    if(this.typeCmd[i].id === id){
+                    if(this.typeCmd[i].id === parseInt(id)){
                         return this.typeCmd[i].tcolor;
                     }
                 }
@@ -2506,7 +2507,8 @@
              showOrders(type){
                this.isDetail = true;
                this.showCurrentOrder=true;
-               this.selected.idCmd=type;
+               this.selected.idCmd=type.id;
+               this.current_type_commande = type.typcmd;
                this.getReception(); 
                
             },

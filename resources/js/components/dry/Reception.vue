@@ -340,13 +340,14 @@
                                     Fournisseur
                                    </label>
                                     <div class="w-65">
-                                       <select class="form-control" v-model="initRecep.fournisseur" :class="{ 'border-danger': submitted && !$v.initRecep.fournisseur.required }" >
+                                       <v-select :class="{ 'border-danger': submitted && !$v.initRecep.fournisseur.required }" v-model="initRecep.fournisseur" :options="optionsFour" :reduce="(option) => option.value" label="title"></v-select> 
+                                       <!--select class="form-control" v-model="initRecep.fournisseur" :class="{ 'border-danger': submitted && !$v.initRecep.fournisseur.required }" >
                                           <option value="">Choisir</option>
                                           
-                                            <option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option>
+                                            <option :value="four.id" v-for="four in listFournisseurs">{{four.fonmfo}}</option> 
                                           
                                             
-                                        </select>
+                                        </select-->
                                     </div>
                                 </div>
 		                 	
@@ -402,6 +403,7 @@
 			                        	Type Commande <span class="red">*</span>
 			                        </label>
 			                        <div class="w-65" >
+                                        
                                         <select
                                             v-model="reception.typeCmd"
                                             class="form-control form-control-sm"  :class="{ 'border-danger': submitted && !$v.reception.typeCmd.required }" >
@@ -707,7 +709,8 @@
                 sortedColumn: '',
                 order: 'asc',
                 group: [],
-                attachmentsFacture: []
+                attachmentsFacture: [],
+                optionsFour: []
             }
             
         },
@@ -1397,6 +1400,12 @@
         mounted() {
 	        this.getDries();
             this.totalFourniseur = this.listFournisseurs.length;
+            // Set option fournisseur select
+            for(var i=0; this.listFournisseurs;i++){
+                var obj = this.listFournisseurs[i];
+                var item =  {title: obj.fonmfo, value: obj.id};
+                this.optionsFour.push(item);
+            }
 
             EventBus.$on('REFRESH_RECEPTION', (event) => {
                this.getDries();

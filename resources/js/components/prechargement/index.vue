@@ -9,14 +9,14 @@
                     </template>
                 </template>
                 <template v-else>
-                    <h2 class="d-inline-block">Liste des commandes à précharger</h2>
+                    <h2 class="d-inline-block">Liste des commandes <strong><u>{{ current_type_commande }}</u></strong> à précharger</h2>
                 </template>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Acceuil</a></li>
               <li class="breadcrumb-item active"  v-if="!showCurrentOrder"><a href="#">Préchargement</a></li>
-              <li class="breadcrumb-item active"  v-if="showCurrentOrder"><a href="#">Liste des commandes à précharger</a></li>
+              <li class="breadcrumb-item active"  v-if="showCurrentOrder"><a href="#">Liste des commandes  à précharger</a></li>
             </ol>
           </div>
         </div>
@@ -28,7 +28,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-4">
 
                             <ul class="legend mt-0 mb-0 pl-0 flex-1">
-                                <li v-for="type in typeCmd" class="d-flex  cursor-pointer  align-items-center" title="Afficher"  @click="showOrders(type.id)">
+                                <li v-for="type in typeCmd" class="d-flex  cursor-pointer  align-items-center" title="Afficher"  @click="showOrders(type)">
                                     <span class="etat_T m-0 mr-1  cursor-pointer border-0" :style="{'background': type.tcolor}"></span> 
                                     <label class="m-0 mr-2  cursor-pointer ">{{type.typcmd}}</label>
                                     <label class="m-0 mr-2  cursor-pointer  badge badge-primary">{{ getNbreCmd(type.id) }}</label>
@@ -566,7 +566,8 @@
                 order: 'asc',
                 run: false,
                 entite:'',
-                showCurrentOrder: false
+                showCurrentOrder: false,
+                current_type_commande: ''
             }
 
         },
@@ -1251,7 +1252,8 @@
             showOrders(type){
                this.isDetail = true;
                this.showCurrentOrder=true;
-               this.selected.typeCommandeID=type;
+               this.selected.typeCommandeID=type.id;
+               this.current_type_commande=type.typcmd;   
                this.getReception();
                
             },

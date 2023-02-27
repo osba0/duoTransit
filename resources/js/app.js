@@ -18,6 +18,8 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 import rate from 'vue-rate'
 import 'vue-rate/dist/vue-rate.css'
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
 Vue.use(rate);
 
@@ -29,6 +31,8 @@ Vue.use(VueToast,{
 Vue.use(Vuelidate);
 
 Vue.use(VueSweetalert2);
+
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -84,6 +88,10 @@ Vue.component('notification-list', require('./components/notification/index.vue'
 Vue.component('choose-entite', require('./components/chooseEntite.vue').default); 
 
 Vue.component('import-commande', require('./components/import/importCommande.vue').default); 
+
+Vue.component("v-select", vSelect);
+
+
    
 /**
  * Next, we will create a fresh Vue application instance and attach it to

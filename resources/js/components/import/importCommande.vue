@@ -187,17 +187,17 @@
                                        <label for="nom"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
                                         Fournisseur
                                        </label>
-                                        <input  class="w-65 form-control" id="nom" v-model="fournisseurForm.nom" 
+                                        <input  class="w-65 form-control" autocomplete="false"  id="nom" v-model="fournisseurForm.nom" 
                                         :class="{ 'border-danger': submitted && !$v.fournisseurForm.nom.required }" />
                                     </div>
                                     
                                  </div>
                                   <div class="col-6 my-2 d-flex flex-column">
                                         <div class="w-100 d-flex align-items-center my-2">
-                                         <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
-                                        Gestionnaire
+                                         <label for="inter"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
+                                        Interlocuteur
                                        </label>
-                                        <input class="w-65 form-control" id="adresse" v-model="fournisseurForm.gestionnaire"/>
+                                        <input class="w-65 form-control" autocomplete="false" id="inter" v-model="fournisseurForm.gestionnaire"/>
                                     </div>
                                     
                                  </div>
@@ -209,7 +209,7 @@
                                          <label for="email"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
                                         Email
                                        </label>
-                                        <input class="w-65 form-control" id="email" v-model="fournisseurForm.email"/>
+                                        <input class="w-65 form-control" autocomplete="false"  id="email" v-model="fournisseurForm.email"/>
                                     </div>
                                  </div>
                                  <div class="col-6 my-2 d-flex flex-column">
@@ -217,7 +217,7 @@
                                          <label for="adresse"  class="d-block m-0 text-right  w-35 pr-2" style='white-space: nowrap;'>
                                         Adresse
                                        </label>
-                                        <input class="w-65 form-control" id="adresse" v-model="fournisseurForm.adresse"/>
+                                        <input class="w-65 form-control" autocomplete="false"  id="adresse" v-model="fournisseurForm.adresse"/>
                                     </div>
                                     
                                  </div>

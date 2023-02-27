@@ -7,6 +7,8 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Fournisseur;
+use App\Models\UserRole;
+use App\Models\Client;
 
 
 
@@ -47,6 +49,46 @@ class CommandesImport implements ToModel, WithHeadingRow
                 'fologo' => '',
                 "foetat" => 1
             ]);
+
+            if($store){
+                // Attribuer le transitaire à l'utilisateur
+                $lastIDFour = Fournisseur::latest('id')->first(); 
+                if(request('slug')!=''){
+                    
+
+                    // Check si c'est le client qui rajoute ou le transitaire
+
+                    if($user->hasRole(UserRole::ROLE_CLIENT)){
+                        $client = Client::where('slug',$this->client['slug'])->get()->first();     
+                    }else{
+                        $client = Client::whereJsonContains('clenti', Auth::getUser()->entites_id)->get()->first();     
+                    }
+
+                    $listfournisseur = $client['clfocl'];
+
+                    if(!is_array($listfournisseur)){
+                        $listfournisseur=[];    
+                    }
+
+                    array_push($listfournisseur, intval($lastIDFour['id']));
+
+                    // update
+
+                    if($user->hasRole(UserRole::ROLE_CLIENT)){
+                         Client::where('slug', $this->client['slug'])
+                        ->update([
+                            "clfocl" => array_unique($listfournisseur)
+                        ]);
+                    }else{
+                         Client::whereJsonContains('clenti', Auth::getUser()->entites_id)
+                        ->update([
+                            "clfocl" => array_unique($listfournisseur)
+                        ]);
+                    }
+
+                   
+                }
+            }
         }
         
         // check if order exist or not

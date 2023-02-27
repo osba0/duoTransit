@@ -153,11 +153,11 @@
                                             </td>
                                             <td>{{ res.date }}</td>
                                             <td>{{ res.user }}</td>
-                                             <td class="p-2 align-middle">
+                                             <td class="p-2 align-middle"> 
                                                 <div class="d-flex justify-content-end align-items-center">
                                                     <a href="#" title="Autres documents" class="btn p-0 m-1 ml-2  position-relative"  @click="showAutreDocument(res)" data-toggle="modal" data-target="#openAutreDocument">
                                                         <i class="fa fa-file-pdf-o mt-2" aria-hidden="true" style="font-size: 22px"></i>
-                                                        <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[getCountDoc(res.autre_document) == 0? 'bg-danger':'']">{{ getCountDoc(res.autre_document) > 9 ? '+9' : getCountDoc(res.autre_document) }}</span>
+                                                        <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[getCountDoc(res.autre_document) == 0? 'bg-secondary':'']">{{ getCountDoc(res.autre_document) > 9 ? '+9' : getCountDoc(res.autre_document) }}</span>
                                                      
                                                     </a>
                                                     <a href="#" title="Liste contenaire" class="btn p-0 m-1 ml-2 position-relative"  @click="showContenaire(res)">

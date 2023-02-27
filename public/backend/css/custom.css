@@ -145,7 +145,9 @@ body table .bgStripe .bg-light-danger{
   }
 }
 
-
+.border-danger .vs__dropdown-toggle{
+    border-color:#e3342f !important;
+}
 .master{
   color:black;
   float:right;
@@ -174,9 +176,7 @@ body table .bgStripe .bg-light-danger{
 .fs-13-px {
   font-size: 13px;
 }
-.fs-13-px b{
-    font-family: Impact;
-}
+
 .fontAnton{
     font-family: Anton;
 }
@@ -952,7 +952,7 @@ body.sidebar-collapse .main-sidebar:hover .nav-item a p{
     margin-bottom: 0;
  }
  .totalSize{
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 700;
     font-style: italic;
  }
