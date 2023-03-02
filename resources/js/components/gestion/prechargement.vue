@@ -558,17 +558,17 @@
                                 <div class="col-4 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
-                                           <label for="numBooking"  class="d-block m-0 text-left pr-2 white-space-nowrap">N° Booking</label>
-                                           <input autocomplete="off" class="form-control mr-2" id="numBooking" v-model="initChargement.numBooking" 
+                                           <label for="numBooking"  class="d-block  m-0 text-left pr-2 white-space-nowrap">N° Booking</label>
+                                           <input autocomplete="off" class="form-control text-uppercase mr-2" id="numBooking" v-model="initChargement.numBooking" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.numBooking.required}" />
                                         </div>
                                     </div>
-                                </div>
+                                </div> 
                                 <div class="col-4 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
                                            <label for="nomNavire"  class="d-block m-0 text-left pr-2 white-space-nowrap">Nom navire</label>
-                                           <input autocomplete="off" class="form-control mr-2" id="nomNavire" v-model="initChargement.nomNavire" 
+                                           <input autocomplete="off" class="form-control text-uppercase mr-2" id="nomNavire" v-model="initChargement.nomNavire" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.nomNavire.required}" />
                                         </div>
                                     </div>
@@ -577,7 +577,7 @@
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
                                            <label for="termRetour"  class="d-block m-0 text-left pr-2 white-space-nowrap">Terminal retour</label>
-                                           <input autocomplete="off" class="form-control mr-2" id="termRetour" v-model="initChargement.termRetour" 
+                                           <input autocomplete="off" class="form-control text-uppercase mr-2" id="termRetour" v-model="initChargement.termRetour" 
                                             :class="{ 'border-danger': submitted_add && !$v.initChargement.termRetour.required}" />
                                         </div>
                                     </div>

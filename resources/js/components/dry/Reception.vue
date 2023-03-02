@@ -340,7 +340,7 @@
                                     Fournisseur
                                    </label>
                                     <div class="w-65">
-                                       <v-select :class="{ 'border-danger': submitted && !$v.initRecep.fournisseur.required }" v-model="initRecep.fournisseur" :options="optionsFour" :reduce="(option) => option.value" label="title"></v-select> 
+                                       <v-select :class="{ 'border-danger': submitted && !$v.initRecep.fournisseur.required }" v-model="initRecep.fournisseur" :options="listFournisseurs" :reduce="(option) => option.id" label="fonmfo"></v-select> 
                                        <!--select class="form-control" v-model="initRecep.fournisseur" :class="{ 'border-danger': submitted && !$v.initRecep.fournisseur.required }" >
                                           <option value="">Choisir</option>
                                           
@@ -1399,13 +1399,16 @@
         
         mounted() {
 	        this.getDries();
+            console.log(this.listFournisseurs);
             this.totalFourniseur = this.listFournisseurs.length;
+
             // Set option fournisseur select
+           /* this.optionsFour=[];
             for(var i=0; this.listFournisseurs;i++){
-                var obj = this.listFournisseurs[i];
-                var item =  {title: obj.fonmfo, value: obj.id};
+                var fournis = this.listFournisseurs[i];
+                var item =  {title: fournis.fonmfo, value: fournis.id};
                 this.optionsFour.push(item);
-            }
+            }*/
 
             EventBus.$on('REFRESH_RECEPTION', (event) => {
                this.getDries();

@@ -247,8 +247,35 @@
                 <hr>
             </template>
         </template>
+
+
+                <!-- Modal Facture-->
+        <div class="modal fade fullscreenModal" id="openFacture" tabindex="-1" role="dialog" aria-labelledby="myModalFacture"
+          aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="document">
+             <div class="modal-content">
+                
+                    <div class="modal-header text-left">
+                        <h4 class="modal-title w-100 font-weight-bold">Facture</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3">
+                         <template v-if="pdfFileModal != null">
+                            <embed :src="'/pdf/prechargementClient/'+pdfFileModal" frameborder="0" width="100%" height="450px">
+                          </template>
+                         <template  v-else> Auncun fichier </template>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" v-on:click="closeModalPdf()" class="btn btn-warning">Fermer</button>
+                  </div>
+             </div>
+            
+          </div>
+        </div>
          
-    <!-- Modal Facture-->    
+     <!-- Modal Facture-->    
      <modalFacture></modalFacture>   
      <modalDetailsCommande></modalDetailsCommande>
     </div>
