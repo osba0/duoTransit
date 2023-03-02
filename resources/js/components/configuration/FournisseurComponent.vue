@@ -366,8 +366,9 @@
                           'Fournisseur enregistré avec succés!',
                           'success'
                         ).then((result) => {
-                            this.getFournisseur();
-                           //window.location.reload();
+                            //this.getFournisseur();
+                            localStorage.setItem('current_page_four', this.page); 
+                            window.location.reload();
                         });
                         
                         
@@ -424,6 +425,7 @@
                                   'Société ajouté avec succés', 
                                   'success'
                                 ).then((result) => {
+                                     localStorage.setItem('current_page_four', this.page); 
                                     window.location.reload();
                                 });
                             }else{
@@ -460,6 +462,7 @@
                                   'Société retiré avec succés', 
                                   'success'
                                 ).then((result) => {
+                                     localStorage.setItem('current_page_four', this.page); 
                                     window.location.reload();
                                 });
                             }else{
@@ -497,6 +500,7 @@
                                   'Fournisseur supprimé avec succés', 
                                   'success'
                                 ).then((result) => {
+                                    localStorage.setItem('current_page_four', this.page); 
                                      window.location.reload();
                                 });
                             }else{
@@ -557,7 +561,7 @@
             }
         },
         mounted() {
-         this.getFournisseur();
+         this.getFournisseur(localStorage.getItem('current_page_four')=== null? this.page : localStorage.getItem('current_page_four'));
         }
     }
 </script>
