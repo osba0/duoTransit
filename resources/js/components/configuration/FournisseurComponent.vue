@@ -275,6 +275,7 @@
                 modeModify: false,
                 isLoading: true,
                 checking: false,
+                page: 1
             }
 
         },
@@ -396,6 +397,7 @@
             },
             getFournisseur(page = 1){
                  this.isLoading=true;
+                 this.page = page;
                 axios.get('/configuration/getFournisseur?slug='+this.slugClient+'&page=' + page + "&paginate=" + this.paginate).then(response => {
                     this.fournisseurs = response.data;
                      if(this.fournisseurs.length > 0){
