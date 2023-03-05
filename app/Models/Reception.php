@@ -72,11 +72,11 @@ class Reception extends Model
         }else{
             $user = Auth::user();
 
-            if($user->hasRole(UserRole::ROLE_CLIENT)){
+          /*  if($user->hasRole(UserRole::ROLE_CLIENT)){
                 $query->orderBy('redali', 'desc');
             }else{
                 $query->orderBy('recrea', 'desc');
-            }
+            }*/
              
            /* if(isset($typeCmd)){
                 $query->where('type_commandes_id', $typeCmd)->where('receptions.clients_id', request('id'))

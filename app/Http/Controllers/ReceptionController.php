@@ -115,6 +115,12 @@ class ReceptionController extends Controller
         }else{
             $dries = $dries->get();
         }
+
+         if($user->hasRole(UserRole::ROLE_CLIENT)){
+                $query->orderBy('redali', 'desc');
+            }else{
+                $query->orderBy('recrea', 'desc');
+            }
       
         return ReceptionResource::collection($dries);
 
