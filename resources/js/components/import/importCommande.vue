@@ -142,7 +142,7 @@
                             {{ cmd.user_import }}
                         </td>
                         <td class="p-2 align-middle">
-                            <label class="badge badge-warning" v-if="cmd.etat_cmd==0">En cours</label>
+                            <label class="badge badge-warning" v-if="cmd.etat_cmd==0">En Attente</label>
                             <label class="badge badge-success" v-if="cmd.etat_cmd==1">Réceptionnée</label>
                         </td>
                          <td class="p-2 align-middle">
