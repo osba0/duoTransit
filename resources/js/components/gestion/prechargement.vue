@@ -431,7 +431,12 @@
                                         
                                     </label>
                                 </template>
-                                <!--button title="Retourner la commande" @click="selectCmdMotif(dry)" class="btn mx-1 btn-circle border-0 btn-circle-sm btnAction bg-transparent mr-1 position-relative" data-toggle="modal" data-target="#motifModal"><i class="mt-1 fa fa-ban text-danger" style="font-size:26px" aria-hidden="true"></i></button-->
+                               <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)">
+                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                    <!--i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i-->
+                                    <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(
+                                        dry.refasc) > 9 ? '+9' : getCountFacture(dry.refasc) }}</span>
+                                </button>
                                 
                                 <button title="Rejet de la commande" @click="showMotifCreationModal(dry)" class="btn mx-1 btn-circle border-0 btn-circle-sm btnAction bg-transparent mr-1 position-relative"><i class="mt-1 fa fa-ban text-danger" style="font-size:26px" aria-hidden="true"></i></button>
                                 
@@ -642,6 +647,8 @@
             
           </div>
         </div>
+         <!-- Modal Facture-->    
+        <modalFacture></modalFacture>   
         <modalMotif></modalMotif>
         <modalDetailsCommande></modalDetailsCommande>
 
@@ -653,6 +660,7 @@
     import {VueScrollFixedNavbar} from "vue-scroll-fixed-navbar";
     import modalDetailsCommande from '../../components/modal/detailsCommande.vue';
     import { PdfMakeWrapper, Table, Img, QR } from 'pdfmake-wrapper';
+    import modalFacture from '../../components/modal/facture.vue';
 
     import typeproduit from '../../components/modal/typeproduit.vue';
     import modalMotif from '../../components/modal/motif.vue';
@@ -689,7 +697,8 @@
             VueScrollFixedNavbar,
             typeproduit,
             modalMotif,
-            creationMotif
+            creationMotif,
+            modalFacture
           },
         data() { 
             return {
@@ -1656,7 +1665,22 @@
                this.selected.typeCommande = type.id;
                this.current_type_commande = type.typcmd;
                this.getReception();
-            }
+            },
+              getCountFacture(doc){
+                if(Array.isArray(doc)){
+                    return doc.length;
+                }
+
+                console.log("TES", doc);
+                return 0;
+            },
+             showFacture(fact){
+                     EventBus.$emit('VIEW_FACT', { 
+                        listeFacture: fact.refasc,
+                        idReception: fact.reidre,
+                        can_modify: false
+                    }); 
+                }
         },
         mounted() {
           this.getPrechargement(localStorage.getItem('current_page_preclient')=== null? this.page : localStorage.getItem('current_page_preclient'));

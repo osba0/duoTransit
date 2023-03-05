@@ -18,7 +18,7 @@
                      	  </template>
                  	     <template  v-else> Auncun fichier </template>
                     </div>
-                    <div class="modal-footer d-flex justify-content-center">
+                    <div class="modal-footer d-flex justify-content-center"> 
                     <button type="button" v-on:click="closeModalPdf()" class="btn btn-warning">Fermer</button>
                   </div>
           	 </div>
@@ -219,6 +219,7 @@ export default {
 
           EventBus.$on('VIEW_FACT', (event) => {
               //this.pdfFile = event.pathFile;
+            
               this.tabFacture = event.listeFacture;
               this.currentReception = event.idReception;
               this.can_modify = event.can_modify

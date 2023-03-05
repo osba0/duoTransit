@@ -436,7 +436,7 @@
                                             <span class="switch-label" data-on="Choisie" data-off="Choisir"></span> 
                                             <span class="switch-handle"></span> 
                                         </template>
-                                        
+                                         
                                     </label>
                                      <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)" data-toggle="modal" data-target="#openFacture">
                                         <i class="fa fa-file-pdf-o" aria-hidden="true"></i>

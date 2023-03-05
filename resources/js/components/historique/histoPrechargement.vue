@@ -226,10 +226,11 @@
                                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                 <i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i>
                             </button-->
-                            <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)" data-toggle="modal" data-target="#openFacture">
+
+                            <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)">
                                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                 <!--i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i-->
-                                <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(dry.refasc) > 9 ? '+9' : getCountFacture(dry.refasc) }}</span>
+                                <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(dry.refasc) > 9 ? '+9' : getCountFacture(JSON.parse(dry.refasc)) }}</span>
                             </button>
                         </td>
                     </tr>
@@ -411,8 +412,9 @@ export default {
              this.$refs.closePoupPdf.click();
         },
        showFacture(fact){
+        console.log("TST", fact.refasc);
                  EventBus.$emit('VIEW_FACT', { 
-                    listeFacture: fact.refasc,
+                    listeFacture: JSON.parse(fact.refasc),
                     idReception: fact.reidre,
                     can_modify: false
                 }); 
@@ -431,11 +433,16 @@ export default {
 
         },
         getCountFacture(doc){
-            if(Array.isArray(doc)){
-                return doc.length;
-            }
-            return 0;
-        },
+           
+                if(Array.isArray(doc)){
+                    return doc.length;
+                }else{
+                    return JSON.parse(doc).length;
+                }
+
+                
+                return 0;
+            },
         getTypeProduit(produit){
                    switch(produit){
                     case 'DEAE': return 'deae text-white'; break;
