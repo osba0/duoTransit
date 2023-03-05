@@ -57,7 +57,7 @@
                         <select
                             class="form-control form-control-sm" v-model="etatCmd">
                             <option value="">Afficher tout</option>
-                            <option value="0">En cours</option>
+                            <option value="0">En Attente</option>
                             <option value="1">Réceptionnée</option>
                         </select>
                     </div>
