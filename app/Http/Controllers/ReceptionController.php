@@ -112,6 +112,7 @@ class ReceptionController extends Controller
           if($user->hasRole(UserRole::ROLE_CLIENT)){
                 $dries->orderBy('redali', 'desc');
             }else{
+                
                 $dries->orderBy('recrea', 'desc');
             }
         
