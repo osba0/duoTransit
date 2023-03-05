@@ -108,6 +108,12 @@ class ReceptionController extends Controller
         if($user->hasRole(UserRole::ROLE_USER)){
              $dries->where("users_id", $user->id);
         }
+
+          if($user->hasRole(UserRole::ROLE_CLIENT)){
+                $dries->orderBy('redali', 'desc');
+            }else{
+                $dries->orderBy('recrea', 'desc');
+            }
         
 
         if(isset($paginate)) {
@@ -116,11 +122,7 @@ class ReceptionController extends Controller
             $dries = $dries->get();
         }
 
-         if($user->hasRole(UserRole::ROLE_CLIENT)){
-                $dries->orderBy('redali', 'desc');
-            }else{
-                $dries->orderBy('recrea', 'desc');
-            }
+
       
         return ReceptionResource::collection($dries);
 
