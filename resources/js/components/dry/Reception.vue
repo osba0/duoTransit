@@ -1166,7 +1166,7 @@
         	flushData(){
 				this.reception.typeCmd = "";
 				this.reception.fournisseur = "";
-				this.reception.entrepot= 1;
+				this.reception.entrepot= this.listEntrepots.length==1? this.listEntrepots[0].id:'';
 				this.reception.numfe= "";
 				this.reception.numecv= "";
 				this.reception.nbrcolis= "";
@@ -1184,7 +1184,7 @@
 
                 this.initRecep.numCommande = "";
                 this.initRecep.numfact= "";
-                this.initRecep.entrepot= "";
+                this.initRecep.entrepot= this.listEntrepots.length==1? this.listEntrepots[0].id:'';
                 this.initRecep.fournisseur= "";
                 this.reception.typeProduit="";
                 this.groupCmds = false;
