@@ -707,7 +707,7 @@
                 // Sort column
                 columns: ['rencmd', 'refere', 'reecvr', 'renufa', 'redali', 'repoid', 'revolu', 'totalColis'],
                 sortedColumn: '',
-                order: 'asc',
+                order: '',
                 group: [],
                 attachmentsFacture: [],
                 optionsFour: []
