@@ -52,8 +52,8 @@ class CreateReceptionsTable extends Migration
             $table->string('dossier_id')->nullable();
             $table->boolean('reinci')->default(0);
             $table->integer('priorite')->default(2);
-            $table->timestamp('recrea');  
-            $table->timestamp('reupda')->default(\DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('recrea')->nullable();  
+            $table->timestamp('reupda')->nullable();
 
 
 
