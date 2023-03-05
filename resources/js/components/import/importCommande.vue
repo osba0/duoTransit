@@ -111,7 +111,8 @@
                         <tr><td colspan="10" class="bg-white text-center" v-if="checking">Aucune commande trouvée!</td></tr>
                     </template>
                       <tr v-for="cmd in commandes.data" class="bg-white" :class="[checkFournisseurExist(cmd.fournisseur) ? '':'bg-light-danger']">
-                        <td class="p-2 align-middle">
+                        <td class="p-2 align-middle position-relative">
+                            <div class="position-absolute typeCmd" v-bind:style="[{'background': getColorType(cmd.id_type_cmd)}]"></div>
                             {{ cmd.id }}
                         </td>
                          <td class="p-2 align-middle">
@@ -529,6 +530,18 @@
             },
             closeModalFour(){
                  this.$refs.closePoupFour.click();
+            },
+            getColorType(id){
+                var color = "#ccc";
+                 for(var i=0; i<this.typeCmd.length; i++){
+                    var obj=this.typeCmd[i];
+                    
+                    if(obj.id==parseInt(id)){
+                        
+                        color = obj.tcolor;
+                    }
+                }
+                return color;
             }
 
         },
