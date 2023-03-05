@@ -68,7 +68,7 @@
     </div>
     <div class="row d-flex align-items-center justify-content-between mb-3">
             <div class="d-flex flex-column">
-                <ul class="legend mt-4 mb-1 pl-3 flex-1">
+                <ul class="legend mt-4 mb-1 pl-3 flex-1"> 
                     <li v-for="type in typeCmd" class="d-flex align-items-center">
                         <span class="etat_T m-0 mr-1 border-0" :style="{'background': type.tcolor}"></span> 
                         <label class="m-0 mr-2">{{type.typcmd}}</label>
@@ -569,7 +569,7 @@
                                 </div>
                                 <div class="col-6 my-2 d-flex flex-column align-items-center"></div>
                             </div>
-                             <div class="row">
+                             <div class="row"> 
                                 <div class="col-6 my-2 d-flex flex-column align-items-center">
                                     <div class="w-100 d-flex align-items-center my-2">
                                         <div class="md-form w-100">
@@ -1047,8 +1047,10 @@
 
     	        axios.post("/"+action, data).then(response => {
 	                console.log('Rep', response.data.code);
-                     this.$refs.file.value = null;
-                     this.reception.file = null;
+                    if(!this.modeModify){
+                         this.$refs.file.value = null;
+                         this.reception.file = null;
+                        }
 	                if(response.data.code==0){
 	                    this.$refs.closePoup.click();
 	                    Vue.swal.fire(
@@ -1184,6 +1186,7 @@
                 this.initRecep.numfact= "";
                 this.initRecep.entrepot= "";
                 this.initRecep.fournisseur= "";
+                this.reception.typeProduit="";
                 this.groupCmds = false;
                 this.group = [];
         	},
@@ -1337,7 +1340,22 @@
                               'Commande déja receptionnée',
                               'warning'
                             );
-                            return false;
+                            Vue.swal.fire({
+                              title:'Attention!',
+                              text: "Cette commande "+this.initRecep.numCommande+" a été  receptionnée. Voulez-vous continuer?",
+                              icon: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: 'rgb(0, 168, 66)',
+                              cancelButtonColor: '#3085d6',
+                              confirmButtonText: 'Oui, continuer!',
+                              cancelButtonText: 'Annuler'
+                            }).then((result) => {
+                              if (result.isConfirmed) {}else{
+                                this.closeModalInit();
+                                 return false;
+                              }
+                            })
+                           
                         }
                         // Set fournisseur
                         this.setFournisseur(resp.fournisseur);

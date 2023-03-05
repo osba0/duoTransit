@@ -1,8 +1,8 @@
 <template>
     <ul class="legend mt-0 mb-2 pl-3 flex-1">
         <li class="align-items-center d-flex" v-for="prd in produitActif">
-            <span class="d-flex type2 etat_T m-0 mr-1 border-0 deae" :class="getTypeProduit(prd)"></span> 
-            <label class="m-0 mr-2">{{ prd }}</label>
+            <span class="d-flex type2 etat_T m-0 mr-1 border-0" :class="getTypeProduit(prd)"></span> 
+            <label class="m-0 mr-2">{{ prd=='' || prd=='null' ?'Normal':prd }}</label>
         </li>
         <!--li class="align-items-center d-none" :class="[exist.includes('Précurseur de drogue')?'d-flex':'d-none']">
             <span class="type2 etat_T m-0 mr-1 border-0 precurseur_drogue"></span> 
@@ -53,8 +53,9 @@
           },
           formatage(){
             for(var i=0; i<this.dries.length; i++){
-               if(!this.produitActif.includes(this.dries[i].typeproduit) && (this.dries[i].typeproduit!="" && this.dries[i].typeproduit!=null)){
+               if(!this.produitActif.includes(this.dries[i].typeproduit) && (this.dries[i].typeproduit!="" && this.dries[i].typeproduit!=null && this.dries[i].typeproduit!='null')){
                 this.produitActif.push(this.dries[i].typeproduit);
+               
               }
             }
           }

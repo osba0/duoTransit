@@ -762,7 +762,8 @@
                 run: false,
                 isEdited: false,
                 showCurrentOrder: false,
-                current_type_commande: ''
+                current_type_commande: '',
+                page: 1
             }
 
         },
@@ -937,6 +938,7 @@
         getPrechargement(page = 1){
             this.isLoading=true;
             this.selected.currentPage=page;
+            this.page = page;
             axios.get('/gerer/dossier/list/'+this.idClient+"/"+this.idEntite+'?page=' + page + "&paginate=" + this.paginate+ "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&etatFiltre="+this.etatFiltre).then(response => {
                 this.prechargement = response.data;
                 var that = this;
@@ -966,6 +968,7 @@
                               'success'
                             ).then((result) => {
                                             // reload   
+                                            localStorage.setItem('current_page_preclient', this.page);  
                                             location.reload();
                                         });
                              /*this.modeModify = false;
@@ -1224,7 +1227,8 @@
                                       'validé avec succés!',
                                       'success'
                                     ).then((result) => {
-                                        // redirection   
+                                        // redirection  
+                                        localStorage.setItem('current_page_preclient', this.page);   
                                         location.reload();
                                     });   
                                   
@@ -1562,14 +1566,16 @@
 
            },
            back(){
-            this.getPrechargement(this.selected.currentPage);
+            /*this.getPrechargement(this.selected.currentPage);
             this.isDetail = false;
             this.commandeSelected = [];
             this.commandeNoSelected = [];
             this.eventCmdSelected.ischecked = -1;
             this.eventCmdSelected.idcmd = '';
             this.run = false;
-            this.showCurrentOrder = false;
+            this.showCurrentOrder = false;*/
+             localStorage.setItem('current_page_preclient', this.page);  
+                location.reload();
 
            },
            reactiver(pre){
@@ -1653,7 +1659,8 @@
             }
         },
         mounted() {
-          this.getPrechargement();
+          this.getPrechargement(localStorage.getItem('current_page_preclient')=== null? this.page : localStorage.getItem('current_page_preclient'));
+
           // Lister reception aprés enregistrement du motif
           EventBus.$on('LISTER_RECEPTION', (event) => {
               this.getReception();

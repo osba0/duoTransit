@@ -385,7 +385,7 @@ class ReceptionController extends Controller
                 'rencmd' => request('numCommande'),
                 'renbpl' => request('nbrpalette'),
                 'recomt' => request('commentaire'),
-                'refasc' => $filename,
+                //'refasc' => $filename, Remplacer par un poup
                 "reetat" => true
 
           ]);
@@ -406,12 +406,22 @@ class ReceptionController extends Controller
         $user = Auth::user();
         $cmd =  Reception::where('reidre','=',request('id'))->firstOrFail(); 
         Reception::setIDClient(request('idClient'), $user->entites_id);
+       
+        // Update table import commande
+        $impo =  ImportCommandes::where('commandes','=',$cmd["rencmd"])->first(); 
+
+        if($impo){
+            $impo->update([
+                "etat_cmd" => 0
+            ]);
+        }
+
         $cmd->delete();
 
-          return response([
+        return response([
                 "code" => 0,
                 "message" => "OK"
-            ]);
+        ]);
     }
 
     public function setRate(Request $request)

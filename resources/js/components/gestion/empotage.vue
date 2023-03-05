@@ -199,7 +199,7 @@
         <template v-else>
             <div class="mb-3 d-flex justify-content-between align-items-center">
                 <button class="btn btn-primary mb-2 mr-3" @click="back()">
-                    <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i> Retour 
                 </button>
                 <div class="w-100 overflow-auto" v-if="!showCurrentOrder">
                     <div class="d-flex flex-row align-items-center justify-content-end outlineBtn">
@@ -988,7 +988,8 @@
                     dateArrivee: null
                 },
                 showCurrentOrder: false,
-                current_type_commande: ''
+                current_type_commande: '',
+                page: 1
             }
 
         },
@@ -1123,6 +1124,7 @@
             getEmpotage(page = 1){
                 this.isLoading=true;    
                 axios.get('/empotage/list/'+this.idClient+"/"+this.idEntite+'?page=' + page + "&paginate=" + this.paginate+ "&typeCmd=" + this.selectedTypeCmd+"&keysearch="+this.search+"&etatFiltre="+this.etatFiltre).then(response => {
+                    this.page = page;
                     this.empotage = response.data;
                     var self = this;
                     setTimeout(function(){
@@ -1287,6 +1289,7 @@
                                           'success'
                                         ).then((result) => {
                                             // redirection   
+                                            localStorage.setItem('current_page_empotage', this.page);  
                                             location.reload();
                                         });   
                                       
@@ -1695,7 +1698,7 @@
 
                },
                back(){
-                this.getEmpotage(this.selected.currentPage);
+                /*this.getEmpotage(this.selected.currentPage);
                 this.isDetail = false;
                 this.isLoadingContenaire = false;
                 this.commandeSelected = [];
@@ -1704,7 +1707,9 @@
                 this.eventCmdSelected.idcmd = '';
                 this.run = false;
                 this.reception = {}; 
-                this.showCurrentOrder=false;
+                this.showCurrentOrder=false;*/
+                localStorage.setItem('current_page_empotage', this.page);  
+                location.reload();
 
                },
                 getResults() {
@@ -1895,7 +1900,8 @@
                                 'succés!',
                                 'Empotage enregistré avec succés!',
                                 'success').then((result) => {
-                                // redirection   
+                                // redirection  
+                                localStorage.setItem('current_page_empotage', this.page);   
                                 location.reload();
                             }); 
 
@@ -2056,6 +2062,7 @@
                                       'success'
                                     ).then((result) => {
                                         // redirection   
+                                        localStorage.setItem('current_page_empotage', this.page);  
                                         location.reload();
                                     }); 
                                  }else{
@@ -2164,6 +2171,7 @@
                                     'success'
                                 ).then((result) => {
                                     // redirection   
+                                    localStorage.setItem('current_page_empotage', this.page);  
                                     location.reload();
                                 });   
                             });
@@ -2527,7 +2535,7 @@
             },
         },
         mounted() {
-          this.getEmpotage();
+          this.getEmpotage(localStorage.getItem('current_page_empotage')=== null? this.page : localStorage.getItem('current_page_empotage'));
           // Lister reception aprés enregistrement du motif
           EventBus.$on('LISTER_RECEPTION', (event) => {
               this.getReception();

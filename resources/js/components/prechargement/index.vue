@@ -567,7 +567,8 @@
                 run: false,
                 entite:'',
                 showCurrentOrder: false,
-                current_type_commande: ''
+                current_type_commande: '',
+                page: 1
             }
 
         },
@@ -753,11 +754,13 @@
             });
         },
         back(){
-            this.getPrechargement(this.selected.currentPage);
+            /*this.getPrechargement(this.selected.currentPage);
             this.isDetail = false;
             this.run = false;
             this.dries = {};
-            this.showCurrentOrder=false;
+            this.showCurrentOrder=false;*/
+            localStorage.setItem('current_page_client_pre', this.page);  
+            location.reload();
            },
         valider(){
         
@@ -828,7 +831,8 @@
                                       'validé avec succés!',
                                       'success'
                                     ).then((result) => {
-                                        // redirection   
+                                        // redirection  
+                                         localStorage.setItem('current_page_client_pre', this.page);   
                                         location.reload();
                                     });   
                                   
@@ -1214,7 +1218,8 @@
                                       'Dossier Préchargement cloturé.',
                                       'success'
                                     ).then((result) => {
-                                        // redirection   
+                                        // redirection  
+                                         localStorage.setItem('current_page_client_pre', this.page);   
                                         location.reload();
                                     }); 
                                     
@@ -1273,7 +1278,7 @@
 
         }, 
         mounted() {
-          this.getPrechargement();
+          this.getPrechargement(localStorage.getItem('current_page_client_pre')=== null? this.page : localStorage.getItem('current_page_client_pre'));
         }
     }
 </script>
