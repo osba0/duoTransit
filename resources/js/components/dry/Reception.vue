@@ -148,11 +148,11 @@
                         <th class="text-nowrap cursor-pointer p-2 border-right border-white h6" v-on:click="sortByColumn(columns[4])">Nbre Jour <i class="fa fa-sort" aria-hidden="true" ></i></th>
                         <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true"></i></th>
                         <th class="text-nowrap p-2 border-right border-white h6">Agent</th>
-                        <th class="text-right p-2 border-right border-white h6">Action</th>
+                        <th class="text-center p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
 
-                <tbody class="bgStripe" :class="[isLoading ? 'loader-line' : '']">
+                <tbody class="bgStripe size-14" :class="[isLoading ? 'loader-line' : '']">
                 	<template v-if="!dries.data || !dries.data.length">
                 		<tr><td colspan="14" class="bg-white text-center" v-if="checking">Aucune donnée!</td></tr>
                     </template>

@@ -208,6 +208,9 @@ body{
     padding: 0 !important;
     background: #f4f6f9 !important;
 }
+.size-14{
+    font-size: 14px !important;
+}
 .breadcrumb {
     margin-bottom: 15px;
 }
