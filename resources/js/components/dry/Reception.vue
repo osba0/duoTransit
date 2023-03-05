@@ -147,7 +147,7 @@
                         <!--th class="text-right p-2 border-right border-white h6">Montant Facture</th-->
                         <th class="text-nowrap cursor-pointer p-2 border-right border-white h6" v-on:click="sortByColumn(columns[4])">Nbre Jour <i class="fa fa-sort" aria-hidden="true" ></i></th>
                         <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap" v-on:click="sortByColumn(columns[4])">Date livraison <i class="fa fa-sort" aria-hidden="true"></i></th>
-                        <th class="text-nowrap p-2 border-right border-white h6">Utilisateur</th>
+                        <th class="text-nowrap p-2 border-right border-white h6">Agent</th>
                         <th class="text-right p-2 border-right border-white h6">Action</th>
                     </tr>
                 </thead>
@@ -198,7 +198,8 @@
                         <!--td class="p-2 align-middle text-right">{{ dry.revafa }}</td-->
                         <td class="p-2 align-middle white-space-nowrap">{{ dry.nbreJour }}</td>
                         <td class="p-2 align-middle white-space-nowrap">{{ dry.redali }}</td>
-                        <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.reuser}}</td>
+                        <td class="p-2 align-middle text-nowrap">
+                            <span class="initial text-uppercase elevation-1" :title="dry.reuser">{{ dry.reuser.substring(0, 2)}}</span></td>
                         <td class="p-2 text-right align-middle">
                             <div class="d-flex justify-content-end">
                                  <template v-if="dry.motifID != ''">
