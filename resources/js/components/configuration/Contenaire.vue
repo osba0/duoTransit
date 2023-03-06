@@ -49,7 +49,7 @@
                 @pagination-change-page="getContenaire"
             ></pagination>
         </div>
-         <!-- Modal Contenaire-->
+         <!-- Modal Conteneur-->
         <div class="modal fade" id="newContenaire" tabindex="-1" role="dialog" aria-labelledby="myModalContenaire"
           aria-hidden="true"  data-backdrop="static" data-keyboard="false">
           <div class="modal-dialog modal-lg" role="document">
@@ -57,8 +57,8 @@
                 
                     <div class="modal-header text-left">
                         <h4 class="modal-title w-100 font-weight-bold">
-                            <template v-if="modeModify">Modification Contenaire</template>
-                        <template v-else>Nouveau Contenaire</template>
+                            <template v-if="modeModify">Modification Conteneur</template>
+                        <template v-else>Nouveau Conteneur</template>
                         
                         </h4>
                         <button type="button" class="close" data-dismiss="modal" v-on:click="closeModal()" aria-label="Close" ref="closePoup">
@@ -198,7 +198,7 @@
                         this.flushData();
                         Vue.swal.fire(
                           'succés!',
-                          'Contenaire enregistré avec succés!',
+                          'Conteneur enregistré avec succés!',
                           'success'
                         )
                         
@@ -240,7 +240,7 @@
                             console.log(response);
                              Vue.swal.fire(
                               'Supprimé!',
-                              'Contenaire supprimé avec succés.',
+                              'Conteneur supprimé avec succés.',
                               'success'
                             );
                              this.modeModify = false;

@@ -404,7 +404,7 @@ $currentEntite = request()->route('currententite');
             <!-- To the right -->
             <div class="float-right d-flex align-items-center">
                 <img src="{{ asset('images/itransit-logo.png') }}" alt="Logo"
-                    class="brand-image" height="20"> <span>{{ $config['appName'] }} v2.0</span>
+                    class="brand-image" height="20"> <span>{{ $config['appName'] }} v3.0</span>
             </div>
             <!-- Default to the left -->
             <strong>&copy; {{ now()->year }} <a href="#">{{ config('app.name', 'Laravel') }}</a>.</strong> All rights

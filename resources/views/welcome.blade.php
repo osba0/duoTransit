@@ -411,7 +411,7 @@
                         <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                           <dl class="mb-0">
                             <dt class="fs-3 fw-bold">{{ $totalContenaire}}</dt>
-                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Contenaires</dd>
+                            <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">Conteneurs</dd>
                           </dl>
                           <div class="item item-rounded-lg bg-primary">
                             <i class="fa fa-cubes text-white h2 m-0" aria-hidden="true"></i>
