@@ -413,8 +413,15 @@ export default {
         },
        showFacture(fact){
         console.log("TST", fact.refasc);
-                 EventBus.$emit('VIEW_FACT', {                  
-                    listeFacture: fact.refasc, 
+        var facture = fact.refasc;
+        if(Array.isArray(fact.refasc)){
+                    facture = fact.refasc;
+                }else{
+                    if(doc!=null)
+                    facture = JSON.parse(fact.refasc); 
+                }
+                 EventBus.$emit('VIEW_FACT', {               
+                    listeFacture: facture, 
                     idReception: fact.reidre,
                     can_modify: false
                 }); 
@@ -437,6 +444,7 @@ export default {
                 if(Array.isArray(doc)){
                     return doc.length;
                 }else{
+                    if(doc!=null)
                     return JSON.parse(doc).length; 
                 }
 
