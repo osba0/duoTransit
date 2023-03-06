@@ -31,10 +31,17 @@
                      <td style="padding: 0 15px; font-size: 14px">{{ $commande->nom }}</td> 
                      <td style="padding: 0 15px; font-size: 14px">{{ $commande->recrea }}</td> 
                      <td style="padding: 0 15px; font-size: 14px">
+                        @php $factures =  (isset($commande->refasc) && !is_null($commande->refasc) && $commande->refasc!='')? is_array($commande->refasc)?$commande->refasc: json_decode($commande->refasc) : json_decode("[]") @endphp
 
-                         @foreach($commande->refasc as $key=>$fact)
-                              <a href="{{ env('APP_URL') }}/assets/factures/{{ $fact }}">Fact. n°{{$key}}</a>
+                        @php  $var = json_decode($commande->refasc, TRUE); echo $var[0]; @endphp
+
+                        @if(is_array($factures))
+                           @foreach($factures as $fact)
+                              <a href="{{ env('APP_URL') }}/assets/factures/{{ $fact }}">Fact. n°</a>
                            @endforeach
+                           @else
+                           -
+                        @endif
                         
                         
                      </td>
