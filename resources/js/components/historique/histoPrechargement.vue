@@ -417,7 +417,7 @@ export default {
         if(Array.isArray(fact.refasc)){
                     facture = fact.refasc;
                 }else{
-                    if(doc!=null)
+                    if(facture!=null)
                     facture = JSON.parse(fact.refasc); 
                 }
                  EventBus.$emit('VIEW_FACT', {               
