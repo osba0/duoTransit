@@ -10,7 +10,7 @@
 
                                <label class="mr-3  text-left w-100 mb-0">Date Début</label>
                                 <date-picker v-model="filtre.dateDebut" required valueType="YYYY-MM-DD"  :disabled-date="disabledFutureDate" input-class="form-control" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
-                            </div>
+                            </div> 
                             <div class="mr-3 text-left" style="width: 230px">
                                   <label class="text-left w-100 mb-0">Date Fin</label>
                                   <date-picker v-model="filtre.dateFin" required valueType="YYYY-MM-DD" input-class="form-control w-100" placeholder="dd/mm/yyyy" format="DD/MM/YYYY"></date-picker>
@@ -230,7 +230,7 @@
                             <button :disabled="dry.refasc === null || dry.refasc === ''" title="Voir la facture" class="btn btn-circle btnAction border btn-circle-sm mx-1 position-relative bg-white" v-on:click="showFacture(dry)">
                                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                                 <!--i :class="{ noFile: dry.refasc === null || dry.refasc === ''}" class="fa fa-circle position-absolute notif" aria-hidden="true"></i-->
-                                <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(dry.refasc) > 9 ? '+9' : getCountFacture(JSON.parse(dry.refasc)) }}</span>
+                                <span :class="{ 'bg-light2': getCountFacture(dry.refasc) == 0, 'bg-green2' : getCountFacture(dry.refasc) > 0}" class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountFacture(dry.refasc) > 9 ? '+9' : getCountFacture(dry.refasc) }}</span>
                             </button>
                         </td>
                     </tr>
@@ -437,7 +437,7 @@ export default {
                 if(Array.isArray(doc)){
                     return doc.length;
                 }else{
-                    return JSON.parse(doc).length;
+                    return JSON.parse(doc).length; 
                 }
 
                 
