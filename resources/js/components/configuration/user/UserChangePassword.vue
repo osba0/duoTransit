@@ -10,7 +10,7 @@
                     <h4 class="modal-title w-100 font-weight-bold">Changement de mot de passe</h4>
                     <button type="button" class="close" data-dismiss="modal" v-on:click="closeModal()" aria-label="Close" ref="closePoup">
                       <span aria-hidden="true">&times;</span>
-                    </button>
+                    </button> 
                 </div>
                 <div class="modal-body mx-3">
                      <form @submit.prevent="savePwd" enctype="multipart/form-data" key=1 >
@@ -115,12 +115,12 @@ export default {
                 data.append('passwordactual', this.userForm.passwordactual);
                 data.append('password', this.userForm.password);
 
-                axios.post("/configuration/modifPwd/", data).then(response => {
+                axios.post("/configuration/modifPwd", data).then(response => { 
                   
                     if(response.data.code==0){
                         this.$refs.closePoup.click();
                         this.flushData();
-                        Vue.swal.fire(
+                        Vue.swal.fire( 
                           'Succés!',
                           'Mot de passe modifié crée avec succés!',
                           'success'
