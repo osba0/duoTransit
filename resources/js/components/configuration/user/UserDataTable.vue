@@ -658,7 +658,7 @@
                 data.append('password', this.userAccess.password);
                 data.append('id', this.userAccess.id); 
 
-                axios.post("/configuration/modifAccess/", data).then(response => {
+                axios.post("/configuration/modifAccess", data).then(response => {
                   
                     if(response.data.code==0){
                        this.closeModalPwd();
