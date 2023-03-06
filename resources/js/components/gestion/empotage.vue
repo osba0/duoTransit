@@ -345,8 +345,9 @@
                                 <th class="p-2 border-right border-white h6">Emballage</th>
                                 <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                 <th class="p-2 border-right border-white h6">N°Dossier</th>
                                 <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
-                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture (&euro;)</th>
                                 <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])"><i class="fa fa-calendar" aria-hidden="true"></i> Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <!--th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th-->
                                 <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->
@@ -378,7 +379,7 @@
                             </td>
                             <td class="p-2 align-middle text-right">{{ dry.repoid }}</td>
                             <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
-                            
+                            <td class="p-2 align-middle text-right"><label class="badge badge-primary w-100 d-inline-block">{{ dry.dossier_id }}</label></td>
                             <td class="p-2 align-middle">{{ dry.renufa }}</td>
                             <td class="p-2 align-middle">{{ format_nbr(dry.revafa) }}</td>
                             <td class="p-2 align-middle white-space-nowrape">{{ dry.redali }}</td>
@@ -459,8 +460,9 @@
                                 <th class="p-2 border-right border-white h6">Emballage</th>
                                 <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[6])">Volume (m<sup>3</sup>) <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                 <th class="p-2 border-right border-white h6">N°Dossier</th>
                                 <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°Facture</th>
-                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture (&nbsp;)</th>
                                 <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[4])"><i class="fa fa-calendar" aria-hidden="true"></i> Date livraison <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <!--th class="text-nowrap p-2 border-right border-white h6 cursor-pointer white-space-nowrap">Crée par</th-->
                                 <!--th class="p-2 border-right border-white text-left h6">Préchargé par le client?</th-->

@@ -31,8 +31,11 @@
                      <td style="padding: 0 15px; font-size: 14px">{{ $commande->nom }}</td> 
                      <td style="padding: 0 15px; font-size: 14px">{{ $commande->recrea }}</td> 
                      <td style="padding: 0 15px; font-size: 14px">
-                        @if($commande->refasc !='')
-                        <a href="{{ env('APP_URL') }}/assets/factures/{{ $commande->refasc }}">Voir</a>
+                        @if(is_array($commande->refasc))
+
+                           @foreach($commande->refasc as $key=>$fact)
+                              <a href="{{ env('APP_URL') }}/assets/factures/{{ $fact }}">Fact. n°{{$key}}</a>
+                           @endforeach
                         @else -
                         @endif
                         

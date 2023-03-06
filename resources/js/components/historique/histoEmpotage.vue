@@ -311,16 +311,22 @@
                     <thead class="thead-blue hasborder">
                          <tr>
                             <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[2])"><div class='d-flex align-items-center'><span>N°ECV / BBE</span><i class="fa fa-sort" aria-hidden="true" ></i></div></th> 
+                            <template v-if="userRole=='client' || userRole=='consultation'">
+                                <th class="p-2 border-right border-white h6">N° CMD</th>
+                            </template>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
                             <th class="p-2 border-right border-white h6">Emballage</th>
-                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[5])"><div class='d-flex align-items-center'><span>Poids</span> <i class="fa fa-sort" aria-hidden="true" ></i></div></th>
-                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[6])"><div class='d-flex align-items-center'><span>Volume</span> <i class="fa fa-sort" aria-hidden="true" ></i></div></th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[5])"><div class='d-flex align-items-center'><span>Poids(KG)</span> <i class="fa fa-sort" aria-hidden="true" ></i></div></th>
+                            <th class="text-right p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[6])"><div class='d-flex align-items-center'><span>Volume(m<sup>3</sup>)</span> <i class="fa fa-sort" aria-hidden="true" ></i></div></th>
                             <th class="text-nowrap p-2 border-right border-white h6">Factures</th>
-                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture</th>
+                            <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Mnt Facture(&euro;)</th>
                             <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Dépalettisation</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Douanes</th>
                             <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[4])"><div class='d-flex align-items-center'><span>Date livraison</span> <i class="fa fa-sort" aria-hidden="true" ></i></div></th>
-                            <th class="text-nowrap p-2 border-right border-white h6">Crée par?</th>
+                            <template v-if="userRole!='client' && userRole!='consultation'">
+                                <th class="text-nowrap p-2 border-right border-white h6">Crée par?</th>
+                            </template>
+                            
                             <th class="p-2 border-right border-white text-left h6">Validé par?</th>
                             
                             <th class="text-right p-2 border-right border-white h6">Action</th>
@@ -335,6 +341,9 @@
                          <td class="p-2 align-middle position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>  <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)">
                                 {{ dry.reecvr }}
                             </label></td>
+                         <template v-if="(userRole=='client' || userRole=='consultation')">
+                            <td class="p-2 align-middle text-uppercase">{{ dry.rencmd }}</td>
+                        </template>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
                         <td class="p-2 align-middle">
                                 <template v-if="dry.renbcl > 0">
@@ -360,9 +369,11 @@
                              {{dry.douane}}
                         </td>
                         <td class="p-2 align-middle">{{ dry.redali }}</td>
-                        <td class="p-2 align-middle text-nowrap">{{ dry.user_created}}</td>
+                        <template v-if="(userRole!='client' && userRole!='consultation')">
+                            <td class="p-2 align-middle text-nowrap">{{ dry.user_created}}</td>
+                        </template>
                         <td class="p-2 align-middle">
-                            {{dry.prechargeur}}
+                             <span class="initial text-uppercase elevation-1" :title="dry.prechargeur">{{ dry.prechargeur.substring(0, 2)}}</span>
                         </td>
                         <td class="p-2 text-right">
                             <div class='d-flex align-items-center'>

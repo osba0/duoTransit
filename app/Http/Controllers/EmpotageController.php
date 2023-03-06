@@ -390,6 +390,19 @@ class EmpotageController extends Controller
             ]);
         }
 
+        // Verifier s'l y'a des commandes à empoter en cours 
+
+        $check2 = Reception::where("dossier_id", request('id_dossier'))->where("type_commandes_id", request('typeCmd'))->where(function($query){
+                            $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '')->orWhere('dossier_empotage_id', '0');
+                        })->get()->count();
+
+          if($check2 > 0){
+             return response([
+                "code" => 1,
+                "message" => "Avant de cloturer, valider ou rejeter le(s) commandes(s) en cours."
+            ]);
+        }
+
         // Verifier s'il y'a des complement de dossier
 
         $check = Empotage::where("id", request('id'))->where(function($query){

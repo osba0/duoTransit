@@ -611,7 +611,7 @@
              </div>
             
           </div>
-        </div>
+        </div> 
 	</div>
 </template>
 <script type="text/ecmascript-6">
@@ -1190,6 +1190,7 @@
                 this.reception.typeProduit="";
                 this.groupCmds = false;
                 this.group = [];
+                this.attachmentsFacture = []
         	},
         	getClient(){
 	        	axios.get('/client/'+this.idClient).then(response => {
