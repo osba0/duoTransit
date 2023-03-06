@@ -414,7 +414,7 @@ export default {
        showFacture(fact){
         console.log("TST", fact.refasc);
                  EventBus.$emit('VIEW_FACT', { 
-                    listeFacture: fact.refasc,
+                    listeFacture: fact.refasc, 
                     idReception: fact.reidre,
                     can_modify: false
                 }); 
