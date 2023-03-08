@@ -291,12 +291,12 @@
                                             <input type="checkbox" :checked="groupCmds" v-model="groupCmds" id="groupeCmd">
                                             <label for="groupeCmd" class="text-primary cursor-pointer">Commandes groupées</label>
                                         </div>
-                                             <input class="form-control" autocomplete="off" v-model="initRecep.numCommande" type="text" id="numCommande" :class="{ 'border-danger': submitted && !$v.initRecep.numCommande.required }" >
+                                             <input class="form-control" @blur="checkCmd(0)" autocomplete="off" v-model="initRecep.numCommande" type="text" id="numCommande" :class="{ 'border-danger': submitted && !$v.initRecep.numCommande.required }" >
                                          </div>
                                          <template v-if="groupCmds">
                                              <button type="button" class="btn btn-primary ml-1" @click="addCmd()"><i class="fa fa-plus"></i></button>
                                          </template>
-                                          <button type="button" :disabled="initRecep.numCommande=='' || initRecep.numCommande==null" title="Check commande" class="btn btn-info ml-1" @click="checkCmd()"><i class="fa fa-search"></i></button>
+                                          <button type="button" :disabled="initRecep.numCommande=='' || initRecep.numCommande==null" title="Check commande" class="btn btn-info ml-1" @click="checkCmd()" ><i class="fa fa-search"></i></button>
                                             
                                         </div>
                                        
@@ -1328,10 +1328,13 @@
                 }
                 this.group = tampon;
             },
-            checkCmd(){
+            checkCmd(action=1){
+                if(action==0){
+                    if(this.groupCmds) return false;
+                }
                 const data = new FormData();
                 data.append('cmd', this.initRecep.numCommande);
-                data.append('idClient', this.idClient);
+                data.append('idClient', this.idClient); 
 
                 axios.post('/checkCommandeImport', data).then(response => {
                     var resp = response.data.commande;
@@ -1370,6 +1373,7 @@
                               'Commande non importée',
                               'warning'
                             );
+                         this.initRecep.fournisseur = "";
                     }
                     
                 });

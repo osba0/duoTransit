@@ -31,22 +31,39 @@
                      <td style="padding: 0 15px; font-size: 14px">{{ $commande->nom }}</td> 
                      <td style="padding: 0 15px; font-size: 14px">{{ $commande->recrea }}</td> 
                      <td style="padding: 0 15px; font-size: 14px">
-                        @php $factures =  (isset($commande->refasc) && !is_null($commande->refasc) && $commande->refasc!='')? is_array($commande->refasc)?$commande->refasc: json_decode($commande->refasc) : json_decode("[]") @endphp
-
-                        @php  $var = json_decode($commande->refasc, TRUE); echo $var[0]; @endphp
-
-                        @if(is_array($factures))
-                           @foreach($factures as $fact)
-                              <a href="{{ env('APP_URL') }}/assets/factures/{{ $fact }}">Fact. n°</a>
-                           @endforeach
+                        
+                        @if(isset($commande->refasc) && !is_null($commande->refasc))
+                           @if(strpos($commande->refasc,'\"') > 1)
+                              @php 
+                                 $format = json_decode($commande->refasc); 
+                                 $factures = json_decode($format); 
+                              @endphp 
                            @else
-                           -
+                              @php $factures = json_decode($commande->refasc); 
+                              @endphp
+                           @endif
+                        @else
+                           @php $factures = []; @endphp
                         @endif
+
+                      
+                      @if(count((array) $factures) > 0) 
                         
-                        
+                           @foreach((array) $factures as $key=>$fact)
+                              @if($fact != "[]") 
+                                 <a href="{{ env('APP_URL') }}/assets/factures/{{ $fact }}"> n°{{$key+1}} </a>, 
+                              @else
+                              -
+                              @endif
+                           @endforeach
+                      @else
+                      -
+                      @endif
+                       
                      </td>
                  </tr>
              @endforeach
+         
          </tbody>
       </table>
       <br/><br/>
