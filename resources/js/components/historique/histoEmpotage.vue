@@ -1451,12 +1451,21 @@ export default {
             },
             formateName(file){
                 var fileTab = file.split("~");
+
+                if(fileTab.length > 0){
                 var correct = fileTab[0]+'.'+fileTab[1].split(".")[1];
-                return correct;
+                    return correct;
+                }else{
+                    return file
+                }
             },
             extractUser(file){
                 var fileTab = file.split("~");
-                return fileTab[1].split(".")[0];
+                if(fileTab.length > 0){
+                    return fileTab[1].split(".")[0];
+                }else{
+                    return file
+                }
             }
     },
     mounted() {
