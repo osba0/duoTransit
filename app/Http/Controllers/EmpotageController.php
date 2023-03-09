@@ -607,6 +607,7 @@ class EmpotageController extends Controller
     }
 
     public function saveDoc(Request $request){
+
         try{   
                 $filename = '';
                 $allFileName=[];
@@ -656,6 +657,7 @@ class EmpotageController extends Controller
 
 
     public function saveOtherDoc(Request $request){
+         $user = Auth::user();
         try{   
                 $filename = '';
                 $allFileName=[];
@@ -670,10 +672,10 @@ class EmpotageController extends Controller
                         $current_date_time = Carbon::now()->toDateTimeString();
                         $paseDate = explode(' ', $current_date_time);
                         $file     = $request->file('files'.$x); 
-                        $filename = 'autre_doc'.'_'.request('idEmpotage').'_'.($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
+                        $filename = 'autre_doc'.'_'.request('idEmpotage').'_'.($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]);
 
-                        $file->move("assets/documents/", $filename);
-                        array_push($allFileName, $filename);
+                        $file->move("assets/documents/", $filename.'.'.$file->getClientOriginalExtension());
+                        array_push($allFileName, $filename.'~'.$user->username.'.'.$file->getClientOriginalExtension());
                       
                     }
                } 
@@ -828,23 +830,23 @@ class EmpotageController extends Controller
     public function removeOtherDoc(Request $request){
         try{   
 
-                $allFileName=[];
-                $docs = explode(",", $request->Document[0]);
-         
-                for($i=0; $i<sizeof($docs); $i++){
-                    if($docs[$i]!='' && $docs[$i]!=$request->nameFile){
-                        array_push($allFileName, $docs[$i]); 
-                    } 
-                }
-        
-                Empotage::where('id', request('idEmpotage'))
-                  ->update([
-                    "autres_document" => json_encode($allFileName)
-                ]);
+            $allFileName=[];
+            $docs = explode(",", $request->Document[0]);
+     
+            for($i=0; $i<sizeof($docs); $i++){
+                if($docs[$i]!='' && $docs[$i]!=$request->nameFileOriginal){
+                    array_push($allFileName, $docs[$i]); 
+                } 
+            }
+    
+            Empotage::where('id', request('idEmpotage'))
+              ->update([
+                "autres_document" => json_encode($allFileName)
+            ]);
 
-                // delete file
+            // delete file
 
-                File::delete("assets/documents/".$request->nameFile);
+            File::delete("assets/documents/".$request->nameFile);
                 
 
         }catch(\Exceptions $e){

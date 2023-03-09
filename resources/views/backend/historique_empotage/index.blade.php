@@ -12,7 +12,7 @@
                 @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ADMIN))  
                     <h2>Historique Empotage </h2>
                 @else
-                    <h2>Historique DOCIM </h2>
+                    <h2>Historique DOCIM  </h2>
                 @endif
             </div>
             <historique-empotage :list-fournisseurs = "{{ json_encode($fournisseurs) }}" 
@@ -21,6 +21,7 @@
                 :list-entrepots="{{ json_encode($entrepots) }}"
                 user-role="{{ auth()->user()->roles[0] }}"
                 gestion-docim="0"
+                username="{{ auth()->user()->username }}" 
                 :id-entite="{{  auth()->user()->getIDEntite(request()->route('currententite')) }}"
                 ></historique-empotage>
             

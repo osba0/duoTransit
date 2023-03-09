@@ -503,13 +503,13 @@
                 
                     <div class="modal-header text-left align-items-center">
                         <h4 class="modal-title font-weight-bold">Autre documents</h4>
-                        <template v-if="userRole=='admin'">
+                        <!--template v-if="userRole=='admin'"-->
                             <div class="flex-1 text-center">
                                 <label class="mb-0">Ajout un fichier</label>
                                 <input type="file" id="fileAutre" name="fileAutre" multiple ref="fileAutreDoc" v-on:change="handleFileUploadOtherDoc()"/>
                                 <button class="btn btn-success" v-on:click="saveAutreDocs()">Enregister</button>
                             </div>
-                        </template>
+                        <!--/template-->
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupAutreDoc" v-on:click="search(currentPage)">
                           <span aria-hidden="true">&times;</span>
                         </button>
@@ -520,11 +520,14 @@
                             <div>
                                 <div class="d-flex flex-column">
                                     <template v-for="doc, index in tabAutreDoc">
-                                        <div class="position-relative">
-                                            <button v-on:click="getAutreDoc(index)" class="btn rounded-circle  btn-default mb-2" :class="index==currentIndexAutre ? 'bg-light':''">
-                                                <span class="h1"><i class="fa fa-file"></i></span>
-                                            </button>
-                                            <template v-if="userRole=='admin'">
+                                        <div class="position-relative mb-3">
+                                            <div>
+                                                <button v-on:click="getAutreDoc(index)" class="btn rounded-circle  btn-default mb-2" :class="index==currentIndexAutre ? 'bg-light':'opacity-7'">
+                                                    <span class="h1"><i class="fa fa-file"></i></span>
+                                                </button>
+                                                <span :title="'Par '+username" class="badge  position-absolute w-100 left-0 bottom-0 reduceText" :class="[username==extractUser(doc)? 'badge-primary':'badge-secondary']">{{ extractUser(doc) }}</span>
+                                            </div>
+                                            <template v-if="(userRole=='admin' && username==extractUser(doc)) || (userRole=='client' && username==extractUser(doc))">
                                                 <button style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="removeAutreDoc(doc)"><i class="fa fa-times"></i></button>
                                             </template>
                                         </div>
@@ -533,7 +536,7 @@
                                 </div>
                             </div>
                              <template v-if="tabAutreDoc.length > 0">
-                                <embed :src="'/assets/documents/'+tabAutreDoc[currentIndexAutre]" frameborder="0" width="95%" height="450px">
+                                <embed :src="'/assets/documents/'+formateName(tabAutreDoc[currentIndexAutre])" frameborder="0" width="95%" height="450px">
                               </template>
                              <template v-else>
                                 <div class="w-100 text-center">Aucun document </div> 
@@ -671,7 +674,8 @@ export default {
             'listEntrepots',
             'userRole',
             'gestionDocim',
-            'idEntite'
+            'idEntite',
+            'username'
     ],
      components: {
         modalDetailsCommande,
@@ -1030,7 +1034,7 @@ export default {
         removeAutreDoc(nameDoc){
             Vue.swal.fire({
               title: 'Confirmez la suppression du document',
-              text: nameDoc,
+              text: this.formateName(nameDoc),
               icon: 'warning',
               showCancelButton: true,
               confirmButtonColor: '#d33',
@@ -1041,8 +1045,9 @@ export default {
                    // remove Doc
                    const data = new FormData();
 
-                    data.append('Document[]', this.tabDoc); 
-                    data.append('nameFile', nameDoc); 
+                    data.append('Document[]', this.tabAutreDoc); 
+                    data.append('nameFile', this.formateName(nameDoc)); 
+                    data.append('nameFileOriginal', nameDoc); 
 
                     axios.post("/removeAutreDocs/"+this.currentEmpotage, data,  {
                                 headers: {
@@ -1443,6 +1448,15 @@ export default {
                     case 'Autre': return 'autre text-white'; break;
                     default: return 'border border-width-2 border-primary'; 
                 }
+            },
+            formateName(file){
+                var fileTab = file.split("~");
+                var correct = fileTab[0]+'.'+fileTab[1].split(".")[1];
+                return correct;
+            },
+            extractUser(file){
+                var fileTab = file.split("~");
+                return fileTab[1].split(".")[0];
             }
     },
     mounted() {

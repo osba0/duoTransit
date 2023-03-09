@@ -16,6 +16,7 @@
                 :client-current="{{ json_encode($client) }}"
                 :list-entrepots="{{ json_encode($entrepots) }}"
                 user-role="{{ auth()->user()->roles[0] }}"
+                username="{{ auth()->user()->username }}"
                 gestion-docim="1"
                 :id-entite="{{  auth()->user()->getIDEntite(request()->route('currententite')) }}"
                 ></historique-empotage>
