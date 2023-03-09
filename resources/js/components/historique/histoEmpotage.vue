@@ -525,7 +525,7 @@
                                                 <button v-on:click="getAutreDoc(index)" class="btn rounded-circle  btn-default mb-2" :class="index==currentIndexAutre ? 'bg-light':'opacity-7'">
                                                     <span class="h1"><i class="fa fa-file"></i></span>
                                                 </button>
-                                                <span :title="'Par '+username" class="badge  position-absolute w-100 left-0 bottom-0 reduceText" :class="[username==extractUser(doc)? 'badge-primary':'badge-secondary']">{{ extractUser(doc) }}</span>
+                                                <span v-if="extractUser(doc)" :title="'Par '+username" class="badge  position-absolute w-100 left-0 bottom-0 reduceText" :class="[username==extractUser(doc)? 'badge-primary':'badge-secondary']">{{ extractUser(doc) }}</span>
                                             </div>
                                             <template v-if="(userRole=='admin' && username==extractUser(doc)) || (userRole=='client' && username==extractUser(doc))">
                                                 <button style="top: -3px; right: -3px;" class="badge badge-danger position-absolute rounded-circle  border-0" v-on:click="removeAutreDoc(doc)"><i class="fa fa-times"></i></button>
@@ -1450,21 +1450,29 @@ export default {
                 }
             },
             formateName(file){
-                var fileTab = file.split("~");
-
-                if(fileTab.length > 0){
-                var correct = fileTab[0]+'.'+fileTab[1].split(".")[1];
-                    return correct;
+                if(file.search("~") != -1){
+                    var fileTab = file.split("~");
+                    if(fileTab.length > 1){
+                       var correct = fileTab[0]+'.'+fileTab[1].split(".")[1];
+                        return correct;
+                    }else{
+                        return fileTab[0];
+                    }
                 }else{
-                    return file
+                   return file;
                 }
             },
             extractUser(file){
-                var fileTab = file.split("~");
-                if(fileTab.length > 0){
-                    return fileTab[1].split(".")[0];
+                if(file.search("~") != -1){
+                    var fileTab = file.split("~");
+                  
+                    if(fileTab.length > 1){
+                        return fileTab[1].split(".")[0];
+                    }else{
+                        return false;
+                    }
                 }else{
-                    return file
+                    return false
                 }
             }
     },
