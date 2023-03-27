@@ -218,9 +218,12 @@ class ReceptionController extends Controller
                if ($request->hasFile('files'.$x)) 
                 {
                     $current_date_time = Carbon::now()->toDateTimeString();
+                    // Format Num facture
+                    $numFact = preg_replace('/[^a-zA-Z0-9 ]/m', '', request('numfact'));
+                    $numFactFormat = str_replace(' ', '', $numFact);
                     $paseDate = explode(' ', $current_date_time);
                     $file     = $request->file('files'.$x); 
-                    $filename = 'fact_'.request('numfact')."_".($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
+                    $filename = 'fact_'.$numFactFormat."_".($x+1).'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
 
                     $file->move("assets/factures/", $filename);
                     array_push($allFileName, $filename);
@@ -363,7 +366,11 @@ class ReceptionController extends Controller
             $current_date_time = Carbon::now()->toDateTimeString();
             $paseDate = explode(' ', $current_date_time);
 
-            $filename = 'fact_'.explode('.', $request->file('file')->getClientOriginalName())[0].'_'.request('numfact').'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
+            // Format Num facture
+            $numFact = preg_replace('/[^a-zA-Z0-9 ]/m', '', request('numfact'));
+            $numFactFormat = str_replace(' ', '', $numFact);
+
+            $filename = 'fact_'.explode('.', $request->file('file')->getClientOriginalName())[0].'_'.$numFactFormat.'_'.$paseDate[0].'_'.str_replace(":","-",$paseDate[1]).'.'.$file->getClientOriginalExtension();
            
             $request->file->move("assets/factures/", $filename);
         }else{
