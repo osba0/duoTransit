@@ -340,7 +340,7 @@
                              <tr>
                                 <!--th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th-->
-                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="p-2 border-right border-white h6">Fournisseur</th>
                                 <th class="p-2 border-right border-white h6">Emballage</th>
                                 <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
@@ -365,7 +365,7 @@
                             <!--td class="p-2 align-middle">{{ dry.rencmd }}</td>
                             <td class="p-2 align-middle">{{ dry.refere }}</td-->
                             <td class="p-2 align-middle position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>  <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)">
-                                {{ dry.reecvr }}
+                                {{ dry.refere }}
                             </label></td>
                             <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
                             <td class="p-2 align-middle white-space-nowrap">
@@ -455,7 +455,7 @@
                              <tr>
                                 <!--th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[0])">N°CDE <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th-->
-                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[2])">N°ECV / BBE <i class="fa fa-sort" aria-hidden="true" ></i></th>
+                                <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">N°FE <i class="fa fa-sort" aria-hidden="true" ></i></th>
                                 <th class="p-2 border-right border-white h6">Fournisseur</th>
                                 <th class="p-2 border-right border-white h6">Emballage</th>
                                 <th class="text-right p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[5])">Poids (KG) <i class="fa fa-sort" aria-hidden="true" ></i></th>
