@@ -63,7 +63,7 @@ class empotageCommandesTransitaire extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new empoCommandesTransitaireMail($this->transitaire, $this->societe, $this->commandes, $this->numeroDossier, $this->numtc, $this->typetc, $this->plomb, $this->typeCommande))->to($this->emails)->attach(public_path() . '/' .$this->pathFile)->subject('Rapport d\'empotage   n° dossier: '.$this->numeroDossier);
+        return (new empoCommandesTransitaireMail($this->transitaire, $this->societe, $this->commandes, $this->numeroDossier, $this->numtc, $this->typetc, $this->plomb, $this->typeCommande))->to($notifiable->email)->attach(public_path() . '/' .$this->pathFile)->subject('Rapport d\'empotage   n° dossier: '.$this->numeroDossier);
     }
 
     /**

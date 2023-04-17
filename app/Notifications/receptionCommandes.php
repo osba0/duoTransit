@@ -47,7 +47,7 @@ class receptionCommandes extends Notification
      */
     public function toMail($notifiable)
     {
-         return (new receptionCommandesMail($this->commandes))->to($this->emails)->subject('Commande(s) ajouté(s)');
+         return (new receptionCommandesMail($this->commandes))->to($notifiable->email)->subject('Commande(s) ajouté(s)');
        
     }
 

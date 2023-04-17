@@ -55,7 +55,7 @@ class prechargementCommandesClient extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new preCommandesClientMail($this->transitaire, $this->societe, $this->commandes, $this->numeroPre, '/' .$this->pathFile))->to($this->emails)/*->attach(public_path() . '/' .$this->pathFile)*/->subject('Nouveau préchargement  n° '.$this->numeroPre);  
+        return (new preCommandesClientMail($this->transitaire, $this->societe, $this->commandes, $this->numeroPre, '/' .$this->pathFile))->to($notifiable->email)/*->attach(public_path() . '/' .$this->pathFile)*/->subject('Nouveau préchargement  n° '.$this->numeroPre);  
     }
 
     /**
