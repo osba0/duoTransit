@@ -102,7 +102,7 @@ class UserController extends Controller
 
         $profilSelected='';
 
-        if(request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION){
+        if(request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION || request('profil')==UserRole::ROLE_AUXILIAIRE){
             $profilSelected = json_decode(request('entiteClients'));
         }else{
             if(request('slugClient')!=''){
@@ -126,7 +126,7 @@ class UserController extends Controller
                 "roles"     => array(request('profil')),
                 "password"  => Hash::make(request('password')),
                 "entites_id"=> $profilSelected, //$user->entites_id,
-                "client_supervisor" => ((request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION)?json_decode(request('clientsAuth')):'')    
+                "client_supervisor" => ((request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION || request('profil')==UserRole::ROLE_AUXILIAIRE)?json_decode(request('clientsAuth')):'')    
             ]);
         }catch(\Exceptions $e){
               return response([
@@ -224,7 +224,7 @@ class UserController extends Controller
 
         $profilSelected='';
 
-        if(request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION){
+        if(request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION || request('profil')==UserRole::ROLE_AUXILIAIRE){
             $profilSelected = json_decode(request('entiteClients'));
         }else{
             $profilSelected = array((int) request('entite'));
@@ -236,7 +236,7 @@ class UserController extends Controller
                 "email"      => request('email'),
                 "roles"      => array(request('profil')),
                 "entites_id" => $profilSelected,
-                "client_supervisor" => ((request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION)?json_decode(request('clientsAuth')):'')    
+                "client_supervisor" => ((request('profil')==UserRole::ROLE_CLIENT || request('profil')==UserRole::ROLE_CONSULTATION  || request('profil')==UserRole::ROLE_AUXILIAIRE)?json_decode(request('clientsAuth')):'')    
 
           ]);
 

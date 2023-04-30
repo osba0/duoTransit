@@ -172,9 +172,9 @@
                                                      <a v-if="pre.etat==0" title="Supprimer" href="#" class="btn m-1 border-danger btn-circle border btn-circle-sm m-1 bg-white" v-on:click="deletePre(pre)">
                                                         <i class="fa fa-close text-danger" aria-hidden="true"></i>
                                                     </a>
-                                                     <a title="Cloturer" class="btn m-1  border border-success bg-success text-white btn-circle border btn-circle-sm m-1 ml-3 bg-white" v-on:click="cloturer(pre)">
+                                                    <!--a title="Cloturer" class="btn m-1  border border-success bg-success text-white btn-circle border btn-circle-sm m-1 ml-3 bg-white" v-on:click="cloturer(pre)">
                                                             <i class="fa fa-check" aria-hidden="true"></i>
-                                                        </a>
+                                                    </a-->
                                                 
                                                 </div>
                                             </td>
@@ -222,9 +222,9 @@
                                          <tr>
                                             <th>Nb CDE: {{ format_nbr(selected.nbrCmd) }}</th>
                                             <th>Nb colis: {{ format_nbr(selected.nbrColis) }}</th>
-                                            <th>Poids: {{ format_nbr(selected.poids) }} KG</th>
-                                            <th>Volume: {{ format_nbr(selected.volume) }} m<sup>3</sup></th>
-                                            <th>Mnt fact: {{ format_nbr(selected.mntFact) }} &euro;</th>
+                                            <th>Poids: {{ format_dec(selected.poids) }} KG</th>
+                                            <th>Volume: {{ format_dec(selected.volume) }} m<sup>3</sup></th>
+                                            <th>Mnt fact: {{ format_dec(selected.mntFact) }} &euro;</th>
 
                                         </tr>
                                   
@@ -1006,9 +1006,9 @@
                     }
                 }).end;
 
-                // totaux
+                // totaux 
                 var totaux = [[{text: 'Total commande', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Nb Colis total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Poids total', fontSize: 10, bold: true, alignment: 'center'}, {text: 'Volume total', fontSize: 10, bold: true, alignment: 'center'} ]];
-                totaux.push([{text: that.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.poids, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.volume, fontSize: 10, bold: true, alignment: 'center'} ]);
+                totaux.push([{text: that.checkedCommandes.length, fontSize: 10, bold: true, alignment: 'center'}, {text: that.selected.nbrColis, fontSize: 10, bold: true, alignment: 'center'}, {text: that.format_dec(that.selected.poids), fontSize: 10, bold: true, alignment: 'center'}, {text: that.format_dec(that.selected.volume), fontSize: 10, bold: true, alignment: 'center'} ]);
 
                 var tabtotaux= new Table(totaux).widths(['20%', '20%', '20%', '20%']).layout({
                     color(columnIndex){
@@ -1158,6 +1158,9 @@
             },
             format_nbr(mnt){
                 return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            },
+            format_dec(mnt){
+                return mnt.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             },
             showModal(dry){
 

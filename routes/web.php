@@ -136,6 +136,10 @@ Route::middleware(['role:' . UserRole::ROLE_CONSULTATION])->group(function () {
     Route::get('/{currententite}/consultation/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('consultation');
  });
 
+Route::middleware(['role:' . UserRole::ROLE_AUXILIAIRE])->group(function () {
+    Route::get('/{currententite}/historique_docim/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('consultation');
+ });
+
 /* Route::middleware(['auth'])->group(function () {
       Route::middleware(['roles:' . UserRole::ROLE_CONSULTATION.','. UserRole::ROLE_CLIENT])->group(function () {
         Route::get('/historique-docim/{id}', [HistoActionController::class, 'historiqueEmpotage'])->name('historique-docim');

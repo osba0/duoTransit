@@ -431,11 +431,11 @@
                 });
             },
             onProfil(){
-                if(this.userForm.profil=='Client' || this.userForm.profil=='Consultation'){
+                if(this.userForm.profil=='Client' || this.userForm.profil=='Consultation' || this.userForm.profil=='Auxiliaire'){
                     this.noClientRole = false;
                 }else{
                     this.noClientRole = true;
-
+ 
                 }
             },
             removeImage(){
@@ -473,7 +473,7 @@
 
 
 
-                 if((this.userForm.profil=='Client' || this.userForm.profil=='Consultation') && this.userForm.entiteClients.length == 0  ){
+                 if((this.userForm.profil=='Client' || this.userForm.profil=='Consultation' || this.userForm.profil=='Auxiliaire') && this.userForm.entiteClients.length == 0  ){
                    
                     Vue.swal.fire(
                           'Warning!',
@@ -483,7 +483,7 @@
                    return false;
                 }
 
-                 if((this.userForm.profil=='Client' || this.userForm.profil=='Consultation') && this.userForm.idClientAuth.length == 0 ){
+                 if((this.userForm.profil=='Client' || this.userForm.profil=='Consultation' || this.userForm.profil=='Auxiliaire') && this.userForm.idClientAuth.length == 0 ){
                     Vue.swal.fire(
                           'Warning!',
                           'Choisir une société autorisée!',
@@ -587,7 +587,7 @@
                 this.userForm.password  = '******';
                 this.userForm.confirmPassword  = '******';
                 this.userForm.profil = user.roles[0].substr(0,1).toUpperCase()+user.roles[0].substr(1); 
-                if(this.userForm.profil=="Client" || this.userForm.profil=="Consultation"){
+                if(this.userForm.profil=="Client" || this.userForm.profil=="Consultation" || this.userForm.profil=="Auxiliaire"){
                     this.noClientRole = false;
                     var selected = [];
                     for(var i=0; i< user.client_supervisor.length; i++){

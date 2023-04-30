@@ -483,6 +483,8 @@ class GestionController extends Controller
         try{
 
             Notification::route('mail', [])->notify(new prechargementCommandesTransitaire($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_dossier'), request('date_debut'), request('date_fin'))); 
+
+           
             $res = [
                 "code" => 0,
                 "result" => "OK"

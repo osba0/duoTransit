@@ -19,7 +19,7 @@
                             <div class="logoCl text-center p-1 position-relative" style="background: transparent;">
                                 <template v-if = "client.logo">
                                    <img :src="'/images/logo/'+client.logo" style="height: 80px" class="elevation-2 border bg-white inline-block" :alt="client.nom">
-                                </template>
+                                </template> 
                                 <template v-else>
                                   No image
                                 </template>
@@ -34,6 +34,11 @@
                                 </template>
                                 <template v-if="roleUser == 'consultation'">
                                      <a :href="'/'+slugEntite+'/consultation/'+client.slug" class="btn text-white">
+                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i> Ourvir
+                                    </a>
+                                </template>
+                                <template v-if="roleUser == 'auxiliaire'">
+                                     <a :href="'/'+slugEntite+'/numdocim/'+client.slug" class="btn text-white">
                                         <i class="fa fa-folder-open-o" aria-hidden="true"></i> Ourvir
                                     </a>
                                 </template>

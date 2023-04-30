@@ -415,7 +415,7 @@ class PrechargementController extends Controller
 
         $rep = [
             "code" => 0,
-            "message" => "OK 2022"
+            "message" => "OK"
         ];
 
         return response($rep);

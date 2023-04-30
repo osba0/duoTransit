@@ -96,6 +96,7 @@ class Reception extends Model
         $query->where(function ($query) use ($term) {
             $query->where('reecvr', 'like', $term)
                 ->orWhere('renufa', 'like', $term)
+                ->orWhere('refere', 'like', $term)
                 ->orWhere('repoid', 'like', $term)
                 ->orWhere('rencmd', 'like', $term)
                 ->orWhere('revolu', 'like', $term)

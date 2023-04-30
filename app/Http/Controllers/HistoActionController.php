@@ -55,7 +55,7 @@ class HistoActionController extends Controller
 
         $user = Auth::user();
 
-        if(!($user->hasRole(UserRole::ROLE_CLIENT))){
+        if(!($user->hasRole(UserRole::ROLE_CLIENT)) && !($user->hasRole(UserRole::ROLE_AUXILIAIRE))){
             abort(401);
         }
 
@@ -129,7 +129,7 @@ class HistoActionController extends Controller
                 'type_commandes.typcmd as typecmd',
                 'type_commandes.tcolor as tcolor',
                 'type_commandes.id as typecmdID',
-                /*'contenaires.nom as contenaire'*/)->where('empotages.reetat', true)->where('empotages.clients_id', request('id'));
+                /*'contenaires.nom as contenaire'*/)/*->where('empotages.reetat', true)*/->where('empotages.clients_id', request('id'));
 
             if(request('isDocim') == 1){
                  $req = $req->where("empotages.is_close", false);

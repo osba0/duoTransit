@@ -58,7 +58,7 @@ class prechargementCommandesTransitaire extends Notification
      */
     public function toMail($notifiable)
     {
-         return (new preCommandesTransitaireMail($this->transitaire, $this->societe, $this->commandes, $this->numeroDossier, $this->dateDebut, $this->datecloture))->to($notifiable->email)->attach(public_path() . '/' .$this->pathFile)->subject('Nouveau dossier de préchargement  n° '.$this->numeroDossier.' du '.$this->dateDebut.' au '.$this->datecloture);
+         return (new preCommandesTransitaireMail($this->transitaire, $this->societe, $this->commandes, $this->numeroDossier, $this->dateDebut, $this->datecloture))->to($this->emails)->attach(public_path() . '/' .$this->pathFile)->subject('Nouveau dossier de préchargement n° '.$this->numeroDossier.' du '.$this->dateDebut.' au '.$this->datecloture); 
     }
 
     /**

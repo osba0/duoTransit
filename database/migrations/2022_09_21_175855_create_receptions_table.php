@@ -43,7 +43,7 @@ class CreateReceptionsTable extends Migration
             $table->text('regroup')->nullable(); // Group cmd
             $table->text('recomt')->nullable(); // Commentaires
             $table->string('douane')->nullable(); // N douane 
-            $table->string('depalettisation')->nullable(); //Depaletisation 
+            $table->text('depalettisation')->nullable(); //Depaletisation 
             $table->string('numero_contenaire')->nullable(); // N douane   
             $table->boolean('isPreLoad')->default(0);
             $table->boolean('isLoad')->default(0);

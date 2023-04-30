@@ -5,7 +5,7 @@
 @endphp
 
 @if(is_null(request()->route('currententite')))
-    @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))
+    @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE))
         @php $entite = $slug  ; @endphp
     @else
         @php $entite = auth()->user()->getEntite(auth()->user()->entites_id)[0]['slug'] @endphp
@@ -113,7 +113,7 @@
                     <div class="d-flex align-items-center justify-content-center">
                         <img src="{{ asset('images/itransit-logo.png') }}" style="height: 40px">
                         <h1 class="text-center h4 py-2 px-2 m-0" style="color: #0692cc;"><b>{{ config('app.name') }}</b></h1>
-                         @if((auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION)) && $slug !='')
+                         @if((auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE) ) && $slug !='')
                             <div class="dropdown ml-3">
                                   <button class="btn btn-default dropdown-toggle box-shadow-none" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     @foreach(auth()->user()->entiteList() as $enti)
@@ -152,7 +152,7 @@
           <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-start py-2">
             <div class="mb-1 mb-md-0 pr-3">
               <h1 class="h3 fw-bold mb-2 white-space-nowrap ">
-                @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))
+                @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE))
                     Tableau de bord
                 @else
                     Accueil
@@ -164,7 +164,7 @@
             </div>
             <div class="mt-3 mt-md-0 ms-md-3 space-x-1">
                 @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT))
-                @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))
+                @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE) )
                     <div class="d-flex align-items-center">
                         <div class="">
                             <choose-entite :list-entite="{{ json_encode(auth()->user()->entiteList()) }}" config-mode='small' slug-entite="{{$slug}}"></choose-entite>

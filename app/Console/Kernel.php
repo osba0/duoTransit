@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\JournalCommandes;
+use App\Console\Commands\JournalRetourCommandes;
 
 class Kernel extends ConsoleKernel
 {
@@ -15,6 +16,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\JournalCommandes::class,//
+        Commands\JournalRetourCommandes::class
     ];
 
     /**
@@ -26,6 +28,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command(JournalCommandes::class)->daily();
+        $schedule->command(JournalRetourCommandes::class)->daily();
         // $schedule->command('inspire')->hourly();
 
       /*  $schedule

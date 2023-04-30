@@ -1277,6 +1277,9 @@ table .bgStripe .rowActif{
     filter: grayscale(100%);
     opacity: .7;
 }
+.cursor-wait{
+    cursor: wait !important;
+}
 .outlineBtn button{
     outline: none!important;
     box-shadow: none !important;

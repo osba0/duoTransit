@@ -72,7 +72,7 @@ $currentEntite = request()->route('currententite');
                      @else
                        <div class="d-flex align-items-center">
                            <strong class="d-none text-primary color-white px-2 fontAnton"><u>{{ auth()->user()->getEntiteBySlug(request()->route('currententite'))['nom'] }}</u></strong>
-                           @if((auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION)))
+                           @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE))
                             <div class="dropdown ml-3">
                                   <button class="px-0 btn btn-default dropdown-toggle box-shadow-none" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     @foreach(auth()->user()->entiteList() as $enti)
@@ -130,7 +130,7 @@ $currentEntite = request()->route('currententite');
                         <li class="nav-item">
                             <a href="{{route('home')}}" class="nav-link {{ (request()->is('/')) ? 'active' : '' }}">
                                 <i class="fa fa-tachometer nav-icon"></i>
-                                @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
+                                @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) || auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE))  
                                   <p>Accueil</p>
                                 @else
                                  <p>Tableau de bord</p>
@@ -141,8 +141,9 @@ $currentEntite = request()->route('currententite');
                         @if (\Request::is($currentEntite.'/reception/*') or \Request::is('activity/*') or \Request::is($currentEntite.'/precharger/*') or (\Request::is('incidents/*')) or 
                         \Request::is($currentEntite.'/numdocim/*') or (\Request::is('incidents/*')) or \Request::is('chargement-list/*') or \Request::is('chargement/*') or \Request::is($currentEntite.'/prechargement/*') or \Request::is('empotage/*') or  \Request::is('historique/*') or \Request::is($currentEntite.'/gerer/*') or \Request::is($currentEntite.'/historique-empotage/*') or \Request::is($currentEntite.'/historique-docim/*') or 
                         \Request::is($currentEntite.'/importCommande/*') or 
-                        \Request::is($currentEntite.'/consultation/*') or \Request::is($currentEntite.'/historique-prechargement/*') or \Request::is($currentEntite.'/notifications/*'))  
-                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
+                        \Request::is($currentEntite.'/consultation/*') or 
+                        \Request::is($currentEntite.'/historique_docim/*') or \Request::is($currentEntite.'/historique-prechargement/*') or \Request::is($currentEntite.'/notifications/*'))  
+                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE))  
                             <li class="nav-item">
                                 <a href="/{{$currentEntite}}/reception/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/reception/*') ? 'active' : '' }}"><i class="nav-icon fa fa-sign-in"></i> <p>Réceptionner</p></a>
                             </li>
@@ -179,7 +180,13 @@ $currentEntite = request()->route('currententite');
                                 </a>
                             </li>
                             @endif
+                            
+                            @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE))  
 
+                            <li class="nav-item">
+                                <a href="/{{$currentEntite}}/numdocim/{{$client['slug']?? ''}}" class="nav-link {{ request()->is($currentEntite.'/numdocim/*') ? 'active' : '' }}"><i class="nav-icon fa fa-tags"></i> <p>Gestion DOCIM</p></a>
+                            </li>
+                            @endif
 
                             @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION))  
 
@@ -191,7 +198,19 @@ $currentEntite = request()->route('currententite');
                             </li>
                             @endif
 
-                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
+                            @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE))  
+
+                            <li class="nav-item">
+                                <a href="{{ route('consultation', ['id' => $client['slug']?? '', $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/historique_docim/*')) ? 'active' : '' }}">
+                                  <i class="fa  fa-clock-o nav-icon"></i>
+                                  <p>Histo DOCIM</p>
+                                </a>
+                            </li>
+                            @endif
+
+                            
+
+                            @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE)  && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                                 @if(auth()->user()->hasRole(\App\Models\UserRole::ROLE_ADMIN || auth()->user()->hasRole(\App\Models\UserRole::ROLE_ROOT)))  
                                 <li class="nav-item {{ request()->is($currentEntite.'/gerer/prechargement/*') || request()->is($currentEntite.'/gerer/empotage/*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link">
@@ -221,7 +240,7 @@ $currentEntite = request()->route('currententite');
                                   </li>
                                   @endif
                               @endif
-                              @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER)) 
+                              @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER)) 
                                <li class="nav-item">
                                 <a href="{{ route('historique-empotage', ['id' => $client['slug']?? '', 'currententite' => $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/historique-empotage/*')) ? 'active' : '' }}">
                                   <i class="fa  fa-clock-o nav-icon"></i>
@@ -229,7 +248,7 @@ $currentEntite = request()->route('currententite');
                                 </a>
                               </li>
                               @endif
-                               @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && false)  
+                               @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && false)  
                                 <li class="dropdown-submenu  nav-item {{ (request()->is('chargement-list/*') or \Request::is('chargement/*') or \Request::is('prechargement/*') or Request::is('empotage/*') or  \Request::is('historique/*')) ? 'menu-open' : '' }}">
                                 <a href="/chargement-list/{{$client['slug']?? ''}}" class="nav-link {{ request()->is('chargement-list/*')? 'active' : '' }}">
                                   <i class="nav-icon fa fa-download"></i>
@@ -243,7 +262,7 @@ $currentEntite = request()->route('currententite');
                                       <p>Préchargement</p>
                                     </a>
                                   </li>
-                                  @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION)) 
+                                  @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE)) 
                                    <li class="nav-item">
                                     <a href="/empotage/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('empotage/*')) ? 'active' : '' }}">
                                       <i class="fa fa-cube nav-icon"></i>
@@ -251,7 +270,7 @@ $currentEntite = request()->route('currententite');
                                     </a>
                                   </li>
                                   @endif
-                                  @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION)) 
+                                  @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE) ) 
                                    <li class="nav-item">
                                         <a href="/historique/{{$client['slug']?? ''}}" class="nav-link {{ (request()->is('historique/*')) ? 'active' : '' }}">
                                           <i class="fa  fa-clock-o nav-icon"></i>
@@ -266,7 +285,7 @@ $currentEntite = request()->route('currententite');
                             @endif
                         @endif
 
-                        @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
+                        @if(!auth()->user()->hasRole(\App\Models\UserRole::ROLE_CLIENT) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_CONSULTATION)  && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_AUXILIAIRE) && !auth()->user()->hasRole(\App\Models\UserRole::ROLE_USER))  
                             @if (!\Request::is('configuration/*'))
                                  <li class="nav-item">
                                     <a href="{{ route('listNotif', ['client' => $client['slug']?? '', $currentEntite]) }}" class="nav-link {{ (request()->is($currentEntite.'/notifications/*')) ? 'active' : '' }}">

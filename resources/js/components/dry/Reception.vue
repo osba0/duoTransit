@@ -24,7 +24,7 @@
                     <h4 class="mb-0">{{ format_nbr(nbrCommande) }}</h4>
                   </div>
                 </div>
-            </div>
+            </div> 
         </div>
         <div class="col">
             <div class="tb-block block-rounded mb-2">
@@ -170,7 +170,7 @@
                             <div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>
                         	 <!--label class="badge badge-primary mr-1 numCmdLab w-100">{{ dry.rencmd }}</label-->
                              
-                            <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)" v-if="!Array.isArray(dry.listgroup) || dry.listgroup.length==0">
+                            <label class="numCmd badge" :class="getTypeProduit(dry.typeproduit)" v-if="!Array.isArray(dry.listgroup) || dry.listgroup.length==0">
                                 {{ dry.rencmd }}
                             </label> 
                             <label v-else v-for="c in dry.listgroup" class="badge mr-2" :class="getTypeProduit(dry.typeproduit)">

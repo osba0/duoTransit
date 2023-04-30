@@ -12,12 +12,13 @@ class UserRole
     const ROLE_USER = 'user';
     const ROLE_CLIENT = 'client';
     const ROLE_CONSULTATION = 'consultation';
+    const ROLE_AUXILIAIRE = 'auxiliaire';
 
     /**
      * @var array
      */
     protected static $roleHierarchy = [
-        self::ROLE_ROOT => ['*'],
+        self::ROLE_ROOT   => ['*'],
         self::ROLE_ADMIN  => [
             self::ROLE_USER,
             //self::ROLE_CLIENT,
@@ -25,7 +26,8 @@ class UserRole
 
         self::ROLE_USER   => [],
         self::ROLE_CLIENT => [],
-        self::ROLE_CONSULTATION => []
+        self::ROLE_CONSULTATION => [],
+        self::ROLE_AUXILIAIRE => []
     ];
 
     /**
@@ -47,11 +49,12 @@ class UserRole
     public static function getRoleList()
     {
         return [
-            static::ROLE_ROOT  => 'Root',
-            static::ROLE_ADMIN  => 'Admin',
-            static::ROLE_USER   => 'User',
-            static::ROLE_CLIENT => 'Client',
-            static::ROLE_CONSULTATION => 'Consultation'
+            static::ROLE_ROOT         => 'Root',
+            static::ROLE_ADMIN        => 'Admin',
+            static::ROLE_USER         => 'User',
+            static::ROLE_CLIENT       => 'Client',
+            static::ROLE_CONSULTATION => 'Consultation',
+            static::ROLE_AUXILIAIRE   => 'Auxiliaire'
         ];
     }
 

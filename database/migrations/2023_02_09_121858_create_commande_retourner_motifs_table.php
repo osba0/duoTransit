@@ -15,7 +15,7 @@ class CreateCommandeRetournerMotifsTable extends Migration
     {
         Schema::create('commande_retourner_motifs', function (Blueprint $table) {
             $table->id();
-            $table->string('motif')->nullable();
+            $table->text('motif')->nullable();
             $table->string('username')->nullable(); // utilisateur qui a crée la commande
             $table->string('user')->nullable(); // utilisateur qui a retourné la commande
             $table->string('datecmd')->nullable();  

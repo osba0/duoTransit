@@ -47,7 +47,7 @@
                                         <label class="text-left w-100 mb-0">N° Facture</label>
                                         <input type="text" class="form-control"  v-model="filtre.numfact">
                                     </div>
-                                    <template v-if="userRole=='client' || userRole=='consultation'">
+                                    <template v-if="userRole=='client' || userRole=='consultation' || userRole=='auxiliaire'">
                                         <div class="mr-3 text-left" style="width: 180px">
                                             <label class="text-left w-100 mb-0">N° DOCIM</label>
                                             <input type="text" class="form-control"  v-model="filtre.docim">
@@ -104,7 +104,7 @@
                             <table class="table">
                                 <thead class="thead-blue" :class="[isloading ? '' : 'hasborder']">
                                      <tr>
-                                        <template v-if="userRole=='client' || userRole=='consultation'">
+                                        <template v-if="userRole=='client' || userRole=='consultation' || userRole=='auxiliaire' ">
                                         <th class="p-2 border-right border-white h6 bg-primary">N° DOCIM</th>
                                         </template>
                                         <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumnSearch(columnsSearch[0])">
@@ -125,18 +125,26 @@
                                     </template>
                                     <template v-else>
                                         <tr v-for="res in result.data" :key="res.id" class="bg-white position-relative">
-                                            <template v-if="userRole=='client' || userRole=='consultation'">
+                                            <template v-if="userRole=='client' || userRole=='consultation' || userRole=='auxiliaire'">
                                                 <td class="position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> 
-                                                  
-                                                    <button v-if="res.numDocim == '' || res.numDocim == null" class="position-relative badge border-0 badge-info" v-on:click="addNumDocim(res)">Ajouter <span class="position-absolute text-danger" style="top:-5px; right:-5px">●</span></button>
-                                                     <span v-else class="text-primary font-weight-bold cursor-pointer"  v-on:click="addNumDocim(res, res.numDocim)">
-                                                        {{res.numDocim}} 
-                                                        <i v-if="gestionDocim==1" class="fa fa-pencil"></i>
-                                                    </span>  
-                                                   
+                                                   <template v-if="userRole=='auxiliaire'">
+                                                       <span class="text-primary font-weight-bold">{{(res.numDocim == '' || res.numDocim == null)? '***** / ****': res.numDocim}}</span>
+                                                   </template>
+                                                   <template v-else>
+                                                        <template v-if="res.etat==1">
+                                                            <button v-if="res.numDocim == '' || res.numDocim == null" class="position-relative badge border-0 badge-info" v-on:click="addNumDocim(res)">Ajouter <span class="position-absolute text-danger" style="top:-5px; right:-5px">●</span></button>
+                                                             <span v-else class="text-primary font-weight-bold cursor-pointer"  v-on:click="addNumDocim(res, res.numDocim)">
+                                                                {{res.numDocim}} 
+                                                                <i v-if="gestionDocim==1" class="fa fa-pencil"></i>
+                                                            </span>  
+                                                        </template>
+                                                        <template v-else>
+                                                            <span class="text-primary font-weight-bold">{{(res.numDocim == '' || res.numDocim == null)? '***** / ****': res.numDocim}}</span>
+                                                        </template>
+                                                   </template>
                                                 </td>
                                             </template>
-                                            <td class="position-relative"><div v-if="userRole!='client' && userRole!='consultation'" class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> {{ res.reference }}</td>
+                                            <td class="position-relative"><div v-if="userRole!='client' && userRole!='consultation' && userRole!='auxiliaire'" class="position-absolute typeCmd" v-bind:style="[true ? {'background': res.typeCmd_color} : {'background': '#ccc'}]"></div> {{ res.reference }}</td>
                                             <td class="p-2 align-middle">
                                                {{ res.dateDepart }}
                                             </td>
@@ -145,41 +153,74 @@
                                             </td>
                                             
                                             <td>
-                                                 <template v-if="(userRole=='client' || userRole=='consultation') && res.is_close==0">
+                                                 <template v-if="(userRole=='client' || userRole=='consultation' || userRole=='auxiliaire') && res.is_close==0">
                                                      <span v-if="res.etat==1" class="badge badge-success">Validé</span>
+                                                     <span v-if="res.etat==0" class="badge badge-warning">En Cours</span>
                                                  </template>
-                                                <span v-if="res.is_close==1 || (res.etat==1 && userRole=='admin')" class="badge badge-primary">Cloturé</span>
+                                                 <template v-else>
+                                                    <span v-if="res.is_close==1 || (res.etat==1 && userRole=='admin')" class="badge badge-primary">Cloturé</span>
+                                                    <span v-if="(res.etat==0)" class="badge badge-warning">En Cours</span>
+                                                 </template>
                                                
                                             </td>
                                             <td>{{ res.date }}</td>
                                             <td>{{ res.user }}</td>
                                              <td class="p-2 align-middle"> 
                                                 <div class="d-flex justify-content-end align-items-center">
-                                                    <a href="#" title="Autres documents" class="btn p-0 m-1 ml-2  position-relative"  @click="showAutreDocument(res)" data-toggle="modal" data-target="#openAutreDocument">
+                                                    <a href="#" title="Autres documents" class="btn p-0 m-1 ml-2  position-relative"  @click="showAutreDocument(res)" data-toggle="modal" data-target="#openAutreDocument" v-if="res.etat==1">
                                                         <i class="fa fa-file-pdf-o mt-2" aria-hidden="true" style="font-size: 22px"></i>
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[getCountDoc(res.autre_document) == 0? 'bg-secondary':'']">{{ getCountDoc(res.autre_document) > 9 ? '+9' : getCountDoc(res.autre_document) }}</span>
                                                      
                                                     </a>
-                                                    <a href="#" title="Liste contenaire" class="btn p-0 m-1 ml-2 position-relative"  @click="showContenaire(res)">
+                                                    <a href="#" v-if="res.totalContenaire > 0" title="Liste contenaire" class="btn p-0 m-1 ml-2 position-relative"  @click="showContenaire(res)">
                                                         <img src="/images/contenaire.png" alt="Contenaire" height="30">
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{res.totalContenaire}}</span>
+                                                    </a>
+                                                    <a v-else title="Aucun Chargement" class="cursor-wait btn p-0 m-1 ml-2 position-relative" >
+                                                        <img src="/images/contenaire.png" class="imageGrey" alt="Contenaire" height="30">
+                                                        <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre bg-light text-dark">{{res.totalContenaire}}</span>
                                                     </a>
                                                     <a v-if="res.etat==1" href="#" title="Complément de document" class="btn p-0 m-1 position-relative ml-2"  @click="showDocument(res)" data-toggle="modal" data-target="#openDocument">
                                                         <img src="/images/document_compl.png" alt="Documents" height="30">
                                                         <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDoc(res.document) > 9 ? '+9' : getCountDoc(res.document) }}</span>
                                                      
                                                     </a>
+                                                    <template v-else>
+                                                        <a v-if="getCountDoc(res.document) > 0" href="#" title="Complément de document" class="btn p-0 m-1 position-relative ml-2" data-toggle="modal" data-target="#openDocument">
+                                                            <img src="/images/document_compl.png" alt="Documents" height="30">
+                                                            <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDoc(res.document) > 9 ? '+9' : getCountDoc(res.document) }}</span>
+                                                        </a>
+                                                        <a v-else title="Complément de document" class="cursor-wait btn p-0 m-1 position-relative ml-2">
+                                                            <img src="/images/document_compl.png" class="imageGrey"  alt="Documents" height="30">
+                                                            <span class="position-absolute bg-light d-flex align-items-center justify-content-center rounded-circle iconenbre text-dark">{{ getCountDoc(res.document) > 9 ? '+9' : getCountDoc(res.document) }}</span>
+                                                        </a>
+                                                    </template>
+                                                   
 
-                                                    <template v-if="userRole=='client' || userRole=='consultation'">
+                                                    <template v-if="userRole=='client' || userRole=='consultation' || userRole=='auxiliaire'">
                                                         
-                                                         <a v-if="res.etat==1" href="#" title="Déclaration Douane" class="btn p-0 m-1 ml-2 position-relative"  @click="showDeclarationDouane(res)" data-toggle="modal" data-target="#openDeclarationDouane">
-                                                            <img src="/images/douane.png" alt="Documents" height="30">
-                                                            <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[getCountDeclDouane(res.declDounae) == 0? 'bg-danger':'']">{{ getCountDeclDouane(res.declDounae) > 9 ? '+9' : getCountDeclDouane(res.declDounae) }}</span>
-                                                         
-                                                        </a>
-                                                        <a title="Cloturer" v-if="gestionDocim==1" class="btn m-1  border border-success bg-success text-white btn-circle border btn-circle-sm m-1 ml-3 bg-white" v-on:click="cloturer(res)">
-                                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                                        </a>
+                                                        
+                                                        <template v-if="res.etat==1">
+                                                            <a v-if="res.etat==1" href="#" title="Déclaration Douane" class="btn p-0 m-1 ml-2 position-relative"  @click="showDeclarationDouane(res)" data-toggle="modal" data-target="#openDeclarationDouane">
+                                                                <img src="/images/douane.png" alt="Documents" height="30">
+                                                                <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white" :class="[getCountDeclDouane(res.declDounae) == 0? 'bg-danger':'']">{{ getCountDeclDouane(res.declDounae) > 9 ? '+9' : getCountDeclDouane(res.declDounae) }}</span>
+                                                             
+                                                            </a>
+                                                            <a title="Cloturer" v-if="gestionDocim==1" class="btn m-1  border border-success bg-success text-white btn-circle border btn-circle-sm m-1 ml-3 bg-white" v-on:click="cloturer(res)">
+                                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                                            </a>
+                                                        </template>
+                                                        <template v-else>
+                                                             <button title="" disabled class="cursor-wait btn p-0 m-1 ml-2 position-relative">
+                                                                <img src="/images/douane.png" alt="Documents"  class="imageGrey" height="30">
+                                                                <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-dark" :class="[getCountDeclDouane(res.declDounae) == 0? 'bg-light':'']">{{ getCountDeclDouane(res.declDounae) > 9 ? '+9' : getCountDeclDouane(res.declDounae) }}</span>
+                                                            </button>
+                                                            <button title="" disabled class="btn m-1 cursor-wait border border-light text-dark btn-circle border btn-circle-sm m-1 ml-3 bg-light">
+                                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                                            </button>
+                                                        </template>
+                                                        
+
                                                     </template>
 
 
@@ -311,7 +352,7 @@
                     <thead class="thead-blue hasborder">
                          <tr>
                             <th class="p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[2])"><div class='d-flex align-items-center'><span>N°ECV / BBE</span><i class="fa fa-sort" aria-hidden="true" ></i></div></th> 
-                            <template v-if="userRole=='client' || userRole=='consultation'">
+                            <template v-if="userRole=='client' || userRole=='consultation' || userRole=='auxiliaire'">
                                 <th class="p-2 border-right border-white h6">N° CMD</th>
                             </template>
                             <th class="p-2 border-right border-white h6">Fournisseur</th>
@@ -323,7 +364,7 @@
                             <th class="p-2 border-right border-white h6 cursor-pointer white-space-nowrap"  v-on:click="sortByColumn(columns[1])">Dépalettisation</th>
                             <th class="text-nowrap p-2 border-right border-white h6">Douanes</th>
                             <th class="text-nowrap p-2 border-right border-white h6 cursor-pointer" v-on:click="sortByColumn(columns[4])"><div class='d-flex align-items-center'><span>Date livraison</span> <i class="fa fa-sort" aria-hidden="true" ></i></div></th>
-                            <template v-if="userRole!='client' && userRole!='consultation'">
+                            <template v-if="userRole!='client' && userRole!='consultation' && userRole!='auxiliaire'">
                                 <th class="text-nowrap p-2 border-right border-white h6">Crée par?</th>
                             </template>
                             
@@ -341,7 +382,7 @@
                          <td class="p-2 align-middle position-relative"><div class="position-absolute typeCmd" v-bind:style="[true ? {'background': dry.typeCmd_color} : {'background': '#ccc'}]"></div>  <label class="numCmd badge w-100" :class="getTypeProduit(dry.typeproduit)">
                                 {{ dry.reecvr }}
                             </label></td>
-                         <template v-if="(userRole=='client' || userRole=='consultation')">
+                         <template v-if="(userRole=='client' || userRole=='consultation' || userRole=='auxiliaire')">
                             <td class="p-2 align-middle text-uppercase">{{ dry.rencmd }}</td>
                         </template>
                         <td class="p-2 align-middle text-uppercase">{{ dry.fournisseurs }}</td>
@@ -369,7 +410,7 @@
                              {{dry.douane}}
                         </td>
                         <td class="p-2 align-middle">{{ dry.redali }}</td>
-                        <template v-if="(userRole!='client' && userRole!='consultation')">
+                        <template v-if="(userRole!='client' && userRole!='consultation' && userRole!='auxiliaire')">
                             <td class="p-2 align-middle text-nowrap">{{ dry.user_created}}</td>
                         </template>
                         <td class="p-2 align-middle">
@@ -686,8 +727,8 @@ export default {
         return {
 
             filtre: {
-                dateDebut: new Date(new Date().getTime() - 168*60*60*1000).toISOString().slice(0,10), // 1 semaine 24 * 7 = 148
-                dateFin: new Date().toISOString().slice(0,10),
+                dateDebut: new Date(new Date().getTime() - 2016*60*60*1000).toISOString().slice(0,10), // 3 mois ((24 * 7) * 4) * 3 = 2016 
+                dateFin: new Date().toISOString().slice(0,10), 
                 typeCmd: '',
                 fournisseur: '',
                 dossier: '',
@@ -1172,6 +1213,7 @@ export default {
             this.isloading = true;
             this.currentPage = page;
             this.reinit();
+            //this.reception = {};
             axios.post('/search/histoEmpotage/'+this.clientCurrent.id+'/'+this.idEntite+"?column="+this.sortedColumnSearch+"&order="+this.orderSearch+"&isDocim="+this.gestionDocim,{
                 page: page,
                 paginate: this.paginate,

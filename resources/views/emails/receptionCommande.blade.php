@@ -51,7 +51,7 @@
                         
                            @foreach((array) $factures as $key=>$fact)
                               @if($fact != "[]") 
-                                 <a href="{{ env('APP_URL') }}/assets/factures/{{ $fact }}"> n°{{$key+1}} </a>, 
+                                 <a href="{{url('')}}/assets/factures/{{ $fact }}"> n°{{$key+1}} </a>, 
                               @else
                               -
                               @endif
