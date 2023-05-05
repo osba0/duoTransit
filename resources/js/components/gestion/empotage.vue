@@ -2335,6 +2335,7 @@
                 this.currentIndexDoc = index;
             },
             format_dec(mnt){
+                mnt = parseFloat(mnt.replaceAll(' ',''));
                 return mnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             },
             editDepaletissation(dry){
