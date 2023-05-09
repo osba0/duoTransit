@@ -202,7 +202,12 @@ class GestionController extends Controller
         if (isset($paginate)) {
 
             $pre = DB::table('chargement_creations')
-            ->leftJoin('receptions', 'receptions.dossier_id', '=', 'chargement_creations.numdossier')
+            //->leftJoin('receptions', 'receptions.dossier_id', '=', 'chargement_creations.numdossier')
+            ->leftJoin('receptions', function($join)
+            {
+                $join->on('receptions.dossier_id', '=', 'chargement_creations.numdossier');
+                $join->on('receptions.type_commandes_id','=', 'chargement_creations.type_commandes_id');
+            })
             ->leftJoin('users', 'chargement_creations.users_id', '=', 'users.id')
             ->leftJoin('type_commandes', 'chargement_creations.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('entrepots', 'chargement_creations.entrepots_id', '=', 'entrepots.id')
