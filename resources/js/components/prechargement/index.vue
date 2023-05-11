@@ -144,7 +144,7 @@
                                             <td class="p-2 align-middle">
                                             {{ pre.nbrCmd }}
                                             </td>
-                                            <td class="p-2 align-middle">{{ pre.total_colis }} {{pre.total_palette}}</td>
+                                            <td class="p-2 align-middle">{{ parseInt(pre.total_colis) + parseInt(pre.total_pallette) }}</td>
                                             <td class="p-2 align-middle">{{ pre.total_poids }}</td>
                                             <td class="p-2 align-middle">{{ pre.total_volume }}</td>
                                             <td class="p-2 align-middle">{{ pre.entite }}</td>
@@ -359,7 +359,7 @@
                             <td class="p-2 align-middle text-right">{{ dry.revolu }}</td>
                             
                             <td class="p-2 align-middle text-right">{{ dry.renufa }}</td>
-                            <td class="p-2 align-middle"><i class="fa fa-calendar" aria-hidden="true"></i> {{ dry.redali }}</td>
+                            <td class="p-2 align-middle">{{ dry.redali }}</td>
                             <td class="p-2 align-middle text-nowrap"><i class="fa fa-user" aria-hidden="true"></i> {{ dry.reuser}}</td>
                             <td class="p-2 align-middle rateCenter position-relative" @click="setID(dry.reidre)">
 
@@ -641,7 +641,7 @@
             this.isDetail = true;
             this.selected.id         = pre.id;
             this.selected.nbrCmd     = pre.nbrCmd;
-            this.selected.nbrColis   = pre.total_colis;
+            this.selected.nbrColis   = parseInt(pre.total_colis==null ? 0 : pre.total_colis) + parseInt(pre.total_pallette==null ? 0 : pre.total_pallette);
             this.selected.poids      = pre.total_poids;
             this.selected.volume     = pre.total_volume;
             this.selected.mntFact    = pre.total_mnt;
