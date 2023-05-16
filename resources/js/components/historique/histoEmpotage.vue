@@ -3,7 +3,7 @@
         <template v-if="!isDetail"> 
             <form v-on:submit.prevent="search">
             <div class="row justify-content-center histoform">
-                <div class="col-md-12">
+                <div class="col-md-12"> 
                     <div class="d-inline-block">
                         <div class="border p-3 bg-white justify-content-center rounded">
                             <div class="filtreTireur">
@@ -186,11 +186,11 @@
                                                      
                                                     </a>
                                                     <template v-else>
-                                                        <a v-if="getCountDoc(res.document) > 0" href="#" title="Complément de document" class="btn p-0 m-1 position-relative ml-2" data-toggle="modal" data-target="#openDocument">
+                                                        <a v-if="getCountDoc(res.document) > 0" href="#" title="Complément de document" @click="showDocument(res)" class="btn p-0 m-1 position-relative ml-2" data-toggle="modal" data-target="#openDocument">
                                                             <img src="/images/document_compl.png" alt="Documents" height="30">
                                                             <span class="position-absolute d-flex align-items-center justify-content-center rounded-circle iconenbre text-white">{{ getCountDoc(res.document) > 9 ? '+9' : getCountDoc(res.document) }}</span>
                                                         </a>
-                                                        <a v-else title="Complément de document" class="cursor-wait btn p-0 m-1 position-relative ml-2">
+                                                        <a v-else @click="showDocument(res)" title="Complément de document" class="cursor-wait btn p-0 m-1 position-relative ml-2">
                                                             <img src="/images/document_compl.png" class="imageGrey"  alt="Documents" height="30">
                                                             <span class="position-absolute bg-light d-flex align-items-center justify-content-center rounded-circle iconenbre text-dark">{{ getCountDoc(res.document) > 9 ? '+9' : getCountDoc(res.document) }}</span>
                                                         </a>
