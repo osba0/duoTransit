@@ -254,9 +254,10 @@
                                 
                                      <template v-if="selected.photos.length > 0">
                                         <p class="position-relative d-inline-block pr-4">
-                                        <span v-for="(photo, index) in selected.photos" class="border mr-1 mb-2 position-absolute shadow-sm " :style="{top:0.5*index-5+ 'px', left: 2*index+ 'px'}">  
-                                            <a class="badge badge-primary position-absolute rounded border-0 text-white" style="top: -5px;right: -13px;"><i class="fa fa-eye"></i></a> 
-                                            <img :src="'/assets/photos_chargement/'+photo" width="30" height="30" class="">  
+                                        <span v-for="(photo, index) in selected.photos" class="mr-1 mb-2 position-absolute shadow-sm " :style="{top:0.5*index-5+ 'px', left: 2*index+ 'px'}">  
+                                            <a class="badge badge-primary position-absolute rounded border-0 text-white" style="top: -8px;right: -15px;">{{selected.photos.length}}</i></a> 
+                                            <!--img :src="'/assets/photos_chargement/'+photo" width="30" height="30" class=""--> 
+                                            <img src="/images/icone-photo.png" height="30" > 
                                         </span></p>
                                       
                                     </template>
