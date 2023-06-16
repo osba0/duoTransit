@@ -16,8 +16,8 @@ class CreateReceptionsTable extends Migration
          Schema::create('receptions', function (Blueprint $table) {
             $table->id('reidre');
 
-            $table->double('refere'); // Reference FE
-            $table->double('reecvr'); // Reference ECV
+            $table->text('refere'); // Reference FE
+            $table->text('reecvr'); // Reference ECV
             $table->string('renufa'); // Numero facture
             $table->double('revafa'); // Valeur facture
             $table->text('refasc')->nullable(); // Facture Scanné

@@ -1184,14 +1184,16 @@
                 return false;
             }
 
-            if(this.commandeNoSelected.length > 0){
+            // Lever le 16 / 06 / 2023 
+
+           /* if(this.commandeNoSelected.length > 0){
                  Vue.swal.fire(
                       'warning!',
                       'Veuillez choisir ou rejeter le(s) commande(s) non selectionnée(s)!',
                       'warning'
                     );
                 return false;
-            }
+            } */
 
 
             Vue.swal.fire({
