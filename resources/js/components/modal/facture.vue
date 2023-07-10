@@ -137,6 +137,8 @@ export default {
 
             data.append('Document[]', this.tabFacture); 
 
+             console.log("SEND>>>", this.tabFacture); 
+
             axios.post("/updateFacture/"+this.currentReception, data,  {
                         headers: {
                             'Content-Type': 'multipart/form-data'
@@ -162,7 +164,9 @@ export default {
                         )
                     }
                    
-                });
+                }).catch((error) => {
+  console.error('Error >>>>:', error.response.status);
+});
         },
         removeFacture(fact){
 
