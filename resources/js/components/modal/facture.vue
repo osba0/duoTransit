@@ -134,7 +134,7 @@ export default {
                 return false;
             }
 
-            console.log("TEST22", this.attachmentsFacture); 
+            console.log("TEST333", this.attachmentsFacture); 
             
             data.append('file[]', this.attachmentsFacture);
 
@@ -148,9 +148,9 @@ export default {
             data.append('Document[]', this.tabFacture); 
 
             axios.post("/updateFacture/"+this.currentReception, data,  {
+                 withCredentials: true,
                         headers: {
-                            'Content-Type': 'multipart/form-data',
-                             'ContentType': "file/pdf",
+                            'Content-Type': 'file/pdf'
                         } 
                 }).then(response => {
                    
