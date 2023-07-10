@@ -140,9 +140,7 @@ export default {
              console.log("SEND>>>", this.tabFacture); 
 
             axios.post("/updateFacture/"+this.currentReception, data,  {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        } 
+                       
                 }).then(response => {
                    
                     this.$refs.fileFactInput.value = null;
