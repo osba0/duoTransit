@@ -148,7 +148,7 @@ export default {
             data.append('Document[]', this.tabFacture); 
 
              const config = {
-                    headers: { 'content-type': 'multipart/form-data' }
+                    headers: { 'content-type': 'multipart/form-data; boundary=${formData.getBoundary()}' }
                 }
 
             axios.post("/updateFacture/"+this.currentReception, data, config).then(response => {
