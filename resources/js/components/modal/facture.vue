@@ -149,7 +149,8 @@ export default {
 
             axios.post("/updateFacture/"+this.currentReception, data,  {
                         headers: {
-                            'Content-Type': 'multipart/form-data'
+                            'Content-Type': 'multipart/form-data',
+                             'ContentType': "file/pdf",
                         } 
                 }).then(response => {
                    
