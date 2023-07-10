@@ -134,7 +134,7 @@ export default {
                 return false;
             }
 
-            console.log("TEST111", this.attachmentsFacture); 
+            console.log("TEST22", this.attachmentsFacture); 
             
             data.append('file[]', this.attachmentsFacture);
 
@@ -172,7 +172,11 @@ export default {
                         )
                     }
                    
-                });
+                }).catch(function (error) {
+
+                    console.log("error >>>", error);
+
+                });;
         },
         removeFacture(fact){
 
