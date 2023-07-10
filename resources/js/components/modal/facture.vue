@@ -147,12 +147,11 @@ export default {
 
             data.append('Document[]', this.tabFacture); 
 
-            axios.post("/updateFacture/"+this.currentReception, data,  {
-                 withCredentials: true,
-                        headers: {
-                            'Content-Type': 'application/pdf'
-                        } 
-                }).then(response => {
+             const config = {
+                    headers: { 'content-type': 'multipart/form-data' }
+                }
+
+            axios.post("/updateFacture/"+this.currentReception, data, config).then(response => {
                    
                     this.$refs.fileFactInput.value = null;
                     if(response.data.code==0){
