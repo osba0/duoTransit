@@ -34,21 +34,11 @@
                     <div class="modal-header text-left align-items-center">
                         <h4 class="modal-title font-weight-bold">Facture(s)</h4>
                         <template v-if="can_modify">
-                            <form @submit.prevent="updateFacture()" enctype="multipart/form-data">
                             <div class="flex-1 text-center">
                                 <label class="mb-0">Ajout une facture</label>
                                 <input type="file" id="fileFact" name="fileFact" multiple ref="fileFactInput" v-on:change="handleFileUploadFactureUp()"/>
-                                <!--button class="btn btn-success" v-on:click="updateFacture()">Enregister</button-->
-
-                                 <button class="btn btn-success" type="submit">Enregister</button>
-                                
-                            </div>
-                        </form>
-                            <!--div class="flex-1 text-center">
-                                <label class="mb-0">Ajout une facture</label>
-                                <input type="file" id="fileFact" name="fileFact" multiple ref="fileFactInput" v-on:change="handleFileUploadFactureUp()"/>
                                 <button class="btn btn-success" v-on:click="updateFacture()">Enregister</button>
-                            </div-->
+                            </div>
                         </template>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
                           <span aria-hidden="true">&times;</span>
@@ -134,7 +124,7 @@ export default {
                 return false;
             }
 
-            console.log("TEST33344", this.attachmentsFacture); 
+            console.log("TEST", this.attachmentsFacture); 
             
             data.append('file[]', this.attachmentsFacture);
 
@@ -147,11 +137,11 @@ export default {
 
             data.append('Document[]', this.tabFacture); 
 
-             const config = {
-                    headers: { 'content-type': 'multipart/form-data; boundary=${formData.getBoundary()}' }
-                }
-
-            axios.post("/updateFacture/"+this.currentReception, data, config).then(response => {
+            axios.post("/updateFacture/"+this.currentReception, data,  {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        } 
+                }).then(response => {
                    
                     this.$refs.fileFactInput.value = null;
                     if(response.data.code==0){
@@ -172,11 +162,7 @@ export default {
                         )
                     }
                    
-                }).catch(function (error) {
-
-                    console.log("error >>>", error);
-
-                });;
+                });
         },
         removeFacture(fact){
 
