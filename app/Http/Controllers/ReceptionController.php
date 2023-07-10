@@ -36,7 +36,7 @@ class ReceptionController extends Controller
 {
     public function __construct()
     {
-        //$this->middleware('auth'); //If user is not logged in then he can't access this page
+        $this->middleware('auth'); //If user is not logged in then he can't access this page
     }
    
     public function index(){

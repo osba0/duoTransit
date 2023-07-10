@@ -297,7 +297,7 @@ Route::get('/configuration/getUser', [UserController::class, 'list'])->middlewar
 
 Route::delete('/deleteReception/{id}/{idClient}', [ReceptionController::class, 'delete'])->middleware(['auth']);
 
-Route::post('/updateFacture/{idReception}', [ReceptionController::class, 'updateFacture']);
+Route::post('/updateFacture/{idReception}', [ReceptionController::class, 'updateFacture'])->middleware(['auth']);
 
 
 Route::post('/prechargementClient/valider/{id}/{entite}', [PrechargementController::class, 'valider'])->middleware(['auth']);    
