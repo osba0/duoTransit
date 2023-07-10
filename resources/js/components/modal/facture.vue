@@ -137,7 +137,7 @@ export default {
 
             data.append('Document[]', this.tabFacture); 
 
-             console.log("SEND>>>", this.tabFacture); 
+             console.log("SEND 2>>>", this.tabFacture); 
 
             axios.post("/updateFacture/"+this.currentReception, data,  {
                        
