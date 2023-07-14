@@ -37,7 +37,10 @@
                             <div class="flex-1 text-center">
                                 <label class="mb-0">Ajout une facture</label>
                                 <input type="file" id="fileFact" name="fileFact" multiple ref="fileFactInput" v-on:change="handleFileUploadFactureUp()"/>
-                                <button class="btn btn-success" v-on:click="updateFacture()">Enregister</button>
+                                <button class="btn btn-success" v-on:click="updateFacture()">
+                                 <template v-if="showSpin">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            </template>Enregister</button>
                             </div>
                         </template>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupPdf">
@@ -95,7 +98,8 @@ export default {
            tabFacture: [],
            attachmentsFacture: [],
            currentReception: '',
-           can_modify: false
+           can_modify: false,
+           showSpin: false
         }
       },
       methods: {
@@ -113,9 +117,11 @@ export default {
             }
         },
         updateFacture(){
+            this.showSpin = true;
             const data = new FormData();
 
             if(!this.attachmentsFacture.length > 0){
+                this.showSpin = false;
                 Vue.swal.fire(
                       '',
                       'Ajouter une facture avant de valider!',
@@ -147,6 +153,7 @@ export default {
                     if(response.data.code==0){
                          this.tabFacture = response.data.file;
                          this.currentIndex = 0;
+                         this.showSpin = false;
                         Vue.swal.fire(
                           'succés!',
                           'Facture(s) ajouté(s) avec succés!',
@@ -155,6 +162,7 @@ export default {
                         EventBus.$emit('REFRESH_RECEPTION', {});         
 
                     }else{
+                        this.showSpin = false;
                          Vue.swal.fire(
                           'error!',
                           response.data.message,
