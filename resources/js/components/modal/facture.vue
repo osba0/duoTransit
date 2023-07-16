@@ -33,7 +33,7 @@
                 
                     <div class="modal-header text-left align-items-center">
                         <h4 class="modal-title font-weight-bold">Facture(s)</h4>
-                        <template v-if="can_modify">
+                        <template v-if="can_modify || true">
                             <div class="flex-1 text-center">
                                 <label class="mb-0">Ajout une facture</label>
                                 <input type="file" id="fileFact" name="fileFact" multiple ref="fileFactInput" v-on:change="handleFileUploadFactureUp()"/>
