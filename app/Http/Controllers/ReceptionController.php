@@ -59,7 +59,7 @@ class ReceptionController extends Controller
 
         $fournis = Fournisseur::whereIn('id',$client->clfocl)->where("foetat", true)->get(); 
 
-        $idsEntrepot = Entite::select('entrepots_id')->get()->first();  //osba 30/08/2023
+        $idsEntrepot = Entite::select('entrepots_id')->where("id", Auth::getUser()->entites_id)->get()->first();  //osba 30/08/2023
 
         //var_dump($idsEntrepot['entrepots_id']); die();
 

@@ -78,7 +78,12 @@ class GestionController extends Controller
                         })->where("dossier_prechargements.reetat", true)
                  ->get();  
 
-        $entrepots = Entrepot::get(); 
+        $idsEntrepot = Entite::select('entrepots_id')->where("id", $entite->id)->get()->first();  //osba 30/08/2023
+
+
+        $entrepots = Entrepot::whereIn('id',$idsEntrepot['entrepots_id'])->get();  //osba 30/08/2023
+
+        //$entrepots = Entrepot::get(); 
 
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
