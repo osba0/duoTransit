@@ -642,7 +642,9 @@ class GestionController extends Controller
         // Update column Prechargement
         Reception::where("reidre", request('idreception'))->update([
             "dossier_prechargements_id" => "",
-            "dossier_id" => "0"
+            "dossier_id" => "0",
+            "dossier_empotage_id" => "", // ajouté le 13/09/2023 by OSBA
+            "numero_contenaire" => "" // ajouté le 13/09/2023 by OSBA
         ]);
         
         $resp = commandeRetournerMotif::create([
