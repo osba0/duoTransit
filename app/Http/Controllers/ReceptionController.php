@@ -112,7 +112,7 @@ class ReceptionController extends Controller
         // Profil User lister que ses receptions
 
         if($user->hasRole(UserRole::ROLE_USER)){
-             $dries->where("users_id", $user->id);
+            // $dries->where("users_id", $user->id); Afficher les commandes du user uniquement 
         }
 
           if($user->hasRole(UserRole::ROLE_CLIENT)){
