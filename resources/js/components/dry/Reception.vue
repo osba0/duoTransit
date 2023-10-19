@@ -1012,7 +1012,6 @@
                     data.append('files' + i, this.attachmentsFacture[i]);
                 }
 
-
                 data.append('TotalFiles', this.attachmentsFacture.length);
 				//data.append('file', this.reception.file);
 				data.append('type_commande', this.reception.typeCmd);
@@ -1063,7 +1062,7 @@
                         );
                         this.sortedColumn = "";
 	                    this.getDries();
-	                    this.flushData();
+	                    this.flushData(); 
 	                    this.show = true;
 
                         //this.sendNotification(response.data.message);
