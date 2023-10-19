@@ -517,12 +517,14 @@
                   </div>
                   <div class="modal-footer d-flex justify-content-center">
                   	<template v-if="modeModify">
-		                    <button type="submit" class="btn btn-success">Modifier</button>
+		                    <button type="submit" class="btn btn-success"><template v-if="isRun">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            </template>Modifier</button>
 		                    <button type="button" v-on:click="closeModal()" class="btn btn-warning">Annuler la modification</button>
                   	</template>
                   	<template v-else>
               			<button type="button" class="btn btn-default border" v-on:click="show = !show">
-					        Précédent
+					        Précédent 
 					    </button>
 	                    <button type="submit" class="btn btn-success" :disabled="isRun?true:false">
                             <template v-if="isRun">
@@ -638,7 +640,7 @@
             typeproduit
           },
 		data() { 
-            return {
+            return { 
                 nowDate: new Date().toISOString().slice(0,10),
             	totalPoids: 0,
             	totalVolume: 0,
@@ -658,7 +660,7 @@
                 nameFacture:'',
 				reception : {
 					typeCmd : '',
-					entrepot: 1,
+					entrepot: '',
 					fournisseur: '',
 					numfe: "",
 					numecv: "",
@@ -816,7 +818,7 @@
                 for (let i = 0; i < this.attachments.length; i++) {
                 data.append('files' + i, this.attachments[i]);
                 }
-                data.append('TotalFiles', this.attachments.length);
+                data.append('TotalFiles', this.attachments.length); 
 
                 let action = "createIncident";
 
@@ -1218,14 +1220,13 @@
                 }); 
             },
         	editDry(dry){
-
         		this.modeModify = true;
         		this.show = false;
 				this.submitted = false;
                 this.reception.reidre = dry.reidre;
         		this.reception.typeCmd = dry.id_commandes;
 				this.reception.fournisseur = dry.id_fournisseurs;
-				this.reception.entrepot= 1;
+				this.reception.entrepot= dry.entrepots_id;
 				this.reception.numfe= dry.refere;
 				this.reception.numecv= dry.reecvr;
 				this.reception.nbrcolis= dry.renbcl;
@@ -1239,6 +1240,7 @@
 				this.reception.commentaire = dry.recomt; 
                 this.reception.groupList = dry.listgroup;
                 this.reception.typeProduit = dry.typeproduit;
+
                 if(dry.refasc==null || dry.refasc==''){
                    
                     this.hasPdf=false;
