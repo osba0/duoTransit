@@ -395,7 +395,7 @@ class ReceptionController extends Controller
                 "fournisseurs_id" => request('fournisseur'),
                 "type_commandes_id" => request('type_commande'),
                 "clients_id" => request('client'),
-                "entrepots_id" => request('entrepot'),
+                //"entrepots_id" => request('entrepot'),
                 'users_id' => $user->id,
                 "repoid" => request('poidstotal'),
                 "revolu" => request('volumetotal'),
