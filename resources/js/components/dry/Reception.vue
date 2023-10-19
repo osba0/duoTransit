@@ -384,7 +384,7 @@
                                     Fournisseur
                                    </label>
                                    <div class="w-65" >                                     
-                                       <select class="form-control" v-model="reception.fournisseur" readonly>
+                                       <select class="form-control" v-model="reception.fournisseur" disabled readonly>
 
                                             <option :value="four.id" v-for="four in listFournisseurs" v-if = "reception.fournisseur == four.id">{{four.fonmfo}}</option>
                                             
@@ -393,7 +393,7 @@
                                 </div>
                                 <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
                                     <label for="numfact" class="d-block m-0 text-right w-35 pr-2" >N° Facture</label>
-                                    <input autocomplete="off" class="w-65 form-control" v-model="reception.numfact" readonly type="text" id="numfact">
+                                    <input autocomplete="off" class="w-65 form-control" v-model="reception.numfact" disabled readonly type="text" id="numfact">
                                 </div>
                                  <div class="md-form w-100 d-flex my-2 justify-content-between align-items-center">
                                     <label for="montfact" class="d-block m-0 text-right w-35 pr-2" >Montant Facture (&euro;)</label>
@@ -468,7 +468,7 @@
                                         Entrepot
                                     </label>
                                     <div class="w-65" >
-                                       <select class="form-control" v-model="reception.entrepot" readonly>
+                                       <select class="form-control" v-model="reception.entrepot" disabled readonly>
                                             <option value="">Choisir</option>
                                             <option :value="entrepot.id"  v-for="entrepot in listEntrepots">{{entrepot.nomEntrepot}}</option>
                                         </select>
