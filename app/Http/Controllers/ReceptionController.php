@@ -392,10 +392,10 @@ class ReceptionController extends Controller
                 "reecvr" => request('ecv'),
                 "renufa" => request('numfact'),
                 "revafa" => request('montfact'),
-                "fournisseurs_id" => request('fournisseur'),
+                //"fournisseurs_id" => request('fournisseur'),
                 "type_commandes_id" => request('type_commande'),
                 "clients_id" => request('client'),
-                "entrepots_id" => request('entrepot'),
+                //"entrepots_id" => request('entrepot'), verifiez le request apres reactivation 20/10/2023
                 'users_id' => $user->id,
                 "repoid" => request('poidstotal'),
                 "revolu" => request('volumetotal'),
