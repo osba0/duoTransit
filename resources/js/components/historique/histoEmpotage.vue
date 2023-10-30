@@ -1386,15 +1386,17 @@ export default {
        }
        ,
        closePoupDocDounane(){
-        this.$refs.closePoupDocDounane.click();
+            this.currentIndexDouane = 0;
+            this.$refs.closePoupDocDounane.click();
             this.search(this.currentPage);
-       }
-       ,
+       },
         closeModalDoc(){
+            this.currentIndex = 0;
             this.$refs.closePoupDoc.click();
             this.search(this.currentPage);
         },
         closeModalAutreDoc(){
+            this.currentIndexAutre = 0;
             this.$refs.closePoupAutreDoc.click();
             this.search(this.currentPage);
         },
