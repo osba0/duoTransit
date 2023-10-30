@@ -650,7 +650,9 @@
                         <div class="flex-1 text-center" v-if="gestionDocim==1">
                             <label class="mb-0">Ajout un fichier</label>
                             <input type="file" id="file" name="file" multiple ref="fileDouane" v-on:change="handleFileUploadDouane()"/>
-                            <button class="btn btn-success" v-on:click="saveDocsDouane()">Enregister</button>
+                            <button class="btn btn-success" v-on:click="saveDocsDouane()">Enregister <template v-if="isRun">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            </template></button>
                         </div>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="closePoupDocDounane" v-on:click="search(currentPage)">
                           <span aria-hidden="true">&times;</span>
@@ -725,6 +727,7 @@ export default {
     },
     data() {
         return {
+            isRun: false,
 
             filtre: {
                 dateDebut: new Date(new Date().getTime() - 2016*60*60*1000).toISOString().slice(0,10), // 3 mois ((24 * 7) * 4) * 3 = 2016 
@@ -930,6 +933,7 @@ export default {
                         )   
                 return false;
             }
+            this.isRun = true;
             
             data.append('file[]', this.attachmentsDouane);
 
@@ -947,6 +951,8 @@ export default {
                             'Content-Type': 'multipart/form-data'
                         } 
                 }).then(response => {
+
+                    this.isRun = false;
                    
                     this.$refs.fileDouane.value = null;
                     if(response.data.code==0){
