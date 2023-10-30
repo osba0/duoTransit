@@ -672,7 +672,7 @@
                                 </div>
                             </div>
                              <template v-if="tabDeclaration.length > 0">
-                                <embed :src="'/assets/declarationsDouane/'+tabDeclaration[currentIndex]" frameborder="0" width="95%" height="450px">
+                                <embed :src="'/assets/declarationsDouane/'+tabDeclaration[currentIndexDouane]" frameborder="0" width="95%" height="450px">
                               </template>
                              <template v-else>
                                 <div class="w-100 text-center">Aucun document </div> 
