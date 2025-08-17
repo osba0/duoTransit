@@ -100,11 +100,11 @@ class ReceptionController extends Controller
         }
 
         $dries = $dries->where('receptions.clients_id', request('id'))->where('receptions.entites_id', request('entite'))->where(function($query){
-                $query->orWhere('dossier_id', NULL)->orWhere('dossier_id', 0);
+                $query->orWhere('dossier_id', NULL)->orWhere('dossier_id', '0');
             })->where(function($query){
-                $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', 0);
+                $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '0');
             })->where(function($query){
-                $query->orWhere('dossier_prechargements_id', NULL)->orWhere('dossier_prechargements_id', 0);
+                $query->orWhere('dossier_prechargements_id', NULL)->orWhere('dossier_prechargements_id', '0');
             })->leftJoin('users', 'receptions.users_id', '=', 'users.id')
             ->leftJoin('commande_retourner_motifs', 'receptions.reidre', '=', 'commande_retourner_motifs.idReception')
             ->select('receptions.*','commande_retourner_motifs.idReception','users.username as user_created', 'users.entites_id as user_entite')->groupBy('receptions.reidre');
@@ -112,16 +112,16 @@ class ReceptionController extends Controller
         // Profil User lister que ses receptions
 
         if($user->hasRole(UserRole::ROLE_USER)){
-            // $dries->where("users_id", $user->id); Afficher les commandes du user uniquement 
+            // $dries->where("users_id", $user->id); Afficher les commandes du user uniquement
         }
 
           if($user->hasRole(UserRole::ROLE_CLIENT)){
                 $dries->orderBy('redali', 'desc');
             }else{
-                
+
                 $dries->orderBy('recrea', 'desc');
             }
-        
+
 
         if(isset($paginate)) {
             $dries = $dries->paginate($paginate);
@@ -130,7 +130,7 @@ class ReceptionController extends Controller
         }
 
 
-      
+
         return ReceptionResource::collection($dries);
 
     }
@@ -142,15 +142,15 @@ class ReceptionController extends Controller
         $keyword = request('keysearch');
 
         if($keyword!=''){
-            $recep = $recep->search($keyword); 
+            $recep = $recep->search($keyword);
         }
 
         $recep = $recep->where(function($query){
-                $query->orWhere('dossier_id', NULL)->orWhere('dossier_id', 0);
+                $query->orWhere('dossier_id', NULL)->orWhere('dossier_id', '0');
             })->where(function($query){
-                $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', 0);
+                $query->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '0');
             })->where(function($query){
-                $query->orWhere('dossier_prechargements_id', NULL)->orWhere('dossier_prechargements_id', 0);
+                $query->orWhere('dossier_prechargements_id', NULL)->orWhere('dossier_prechargements_id', '0');
             })->where('reetat', true)->get();
       
 

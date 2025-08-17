@@ -73,17 +73,17 @@ class GestionController extends Controller
         $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])->where("receptions.entites_id", $entite->id)->leftJoin('dossier_prechargements', 'receptions.dossier_prechargements_id', '=', 'dossier_prechargements.id')
                  ->select('receptions.type_commandes_id', DB::raw('count(*) as total'))
                  ->groupBy('receptions.type_commandes_id')->whereNotNull('dossier_prechargements_id')->where(function($query){
-                        $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
-                        
+                        $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', '0')->orWhere('dossier_id', NULL);
+
                         })->where("dossier_prechargements.reetat", true)
-                 ->get();  
+                 ->get();
 
         $idsEntrepot = Entite::select('entrepots_id')->where("id", $entite->id)->get()->first();  //osba 30/08/2023
 
 
         $entrepots = Entrepot::whereIn('id',$idsEntrepot['entrepots_id'])->get();  //osba 30/08/2023
 
-        //$entrepots = Entrepot::get(); 
+        //$entrepots = Entrepot::get();
 
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
@@ -94,8 +94,8 @@ class GestionController extends Controller
         activity(TypActivity::LISTER)->performedOn($client)->log('Affichage validation préchargement');
         $lastID = LogActivity::latest('id')->first();
         $query = LogActivity::where("id", $lastID['id'])->update(["subject_type" => $entite->id]);
-        
-        
+
+
         return  view('backend.gestion.prechargement', $data);
     }
 
@@ -105,15 +105,15 @@ class GestionController extends Controller
          // Check num dossier exist or not
 
         $check = ChargementCreation::where('numDossier', request('numdossier'))->where('type_commandes_id', request('typeCmd'))->get();
-        
+
         if(sizeof($check) > 0){
             return response([
                 "code" => 1,
                 "message" => "Numéro dossier existe déja!"
             ]);
         }
-        try{    
-            ChargementCreation::setIDClient(request('clientID'), request('entiteID')); 
+        try{
+            ChargementCreation::setIDClient(request('clientID'), request('entiteID'));
 
             $store = ChargementCreation::create([
                 "numDossier"           => request('numdossier'),
@@ -132,7 +132,7 @@ class GestionController extends Controller
                 "is_empote"            => false,
                 "on_empote"            => false,
                 "reetat"               => false
-            ]); 
+            ]);
 
         }catch(\Exceptions $e){
               return response([
@@ -153,16 +153,16 @@ class GestionController extends Controller
             ]);
         }
 
-        
+
     }
 
      public function editDossier(Request $request)
     {
         $user = Auth::user();
 
-        $dossier =  ChargementCreation::where('numDossier','=',request('numdossier'))->where('type_commandes_id','=',request('typeCmd'))->firstOrFail(); 
+        $dossier =  ChargementCreation::where('numDossier','=',request('numdossier'))->where('type_commandes_id','=',request('typeCmd'))->firstOrFail();
 
-        if($dossier){ 
+        if($dossier){
             $dossier->update([
                 "numDossier"           => request('numdossier'),
                 "dateDebut"            => request('datedebut'),
@@ -185,7 +185,7 @@ class GestionController extends Controller
                 "message" => "Dossier introuvable"
             ]);
         }
-          
+
     }
 
      /**
@@ -217,15 +217,15 @@ class GestionController extends Controller
             ->leftJoin('type_commandes', 'chargement_creations.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('entrepots', 'chargement_creations.entrepots_id', '=', 'entrepots.id')
             ->groupBy('chargement_creations.id')
-            ->select('receptions.dossier_id', 
-                DB::raw('SUM(receptions.repoid) as total_poids'), 
-                DB::raw('SUM(receptions.revolu) as total_volume'), 
-                DB::raw('SUM(receptions.renbcl) as total_colis'), 
-                DB::raw('SUM(receptions.renbpl) as total_palette'), 
-                DB::raw('count(receptions.rencmd) as total_cmd'), 
-                'chargement_creations.id', 
-                'chargement_creations.numdossier', 
-                'chargement_creations.users_id', 
+            ->select('receptions.dossier_id',
+                DB::raw('SUM(receptions.repoid) as total_poids'),
+                DB::raw('SUM(receptions.revolu) as total_volume'),
+                DB::raw('SUM(receptions.renbcl) as total_colis'),
+                DB::raw('SUM(receptions.renbpl) as total_palette'),
+                DB::raw('count(receptions.rencmd) as total_cmd'),
+                'chargement_creations.id',
+                'chargement_creations.numdossier',
+                'chargement_creations.users_id',
                 'chargement_creations.dateDebut',
                 'chargement_creations.dateCloture',
                 'chargement_creations.dateDepart',
@@ -238,7 +238,7 @@ class GestionController extends Controller
                 'chargement_creations.reetat as etat',
                 'chargement_creations.created_at as creation_dos',
                 'users.username as user',
-                'entrepots.nomEntrepot as nomEntrepot', 
+                'entrepots.nomEntrepot as nomEntrepot',
                 'entrepots.id as idEntrepot',
                 'type_commandes.id as idTypeCmd',
                 'type_commandes.tcolor as tcolor',
@@ -259,15 +259,15 @@ class GestionController extends Controller
 
             $pre = $pre->where('chargement_creations.entites_id', intval(request('entite')));
 
-            
+
             $pre = $pre->paginate($paginate);
         }else{
-          
+
         }
 
-        
-      
-      
+
+
+
         return DossierRessource::collection($pre);
     }
 
@@ -278,7 +278,7 @@ class GestionController extends Controller
         $paginate = request('paginate');
 
         $keyword = request('keysearch');
-        
+
         $sort = request('column');
 
         $filtreRate = request('filtreRate');
@@ -289,15 +289,15 @@ class GestionController extends Controller
                 if(request('etat')==1 && request('idPre')!=''){
                     $query->where('dossier_id', request('idPre'));
                 }else{
-                    $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
+                    $query->orWhere('dossier_id', request('idPre'))->orWhere('dossier_id', '0')->orWhere('dossier_id', NULL);
                 }
-                
+
                 })
             ->leftJoin('dossier_prechargements', 'dossier_prechargements.id', '=', 'receptions.dossier_prechargements_id')
             ->leftJoin('users as a', 'dossier_prechargements.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
             ->leftJoin('commande_retourner_motifs', 'receptions.reidre', '=', 'commande_retourner_motifs.idReception')
-            ->select('receptions.*','b.username as user_created','a.username as prechargeur', 'commande_retourner_motifs.idReception')->groupBy('receptions.reidre')->where("dossier_prechargements.reetat", true)->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entites_id', intval(request('entite'))); 
+            ->select('receptions.*','b.username as user_created','a.username as prechargeur', 'commande_retourner_motifs.idReception')->groupBy('receptions.reidre')->where("dossier_prechargements.reetat", true)->where('receptions.type_commandes_id', request('typecmd'))->where('receptions.entites_id', intval(request('entite')));
 
             if(request('idEntrepot') != ""){
                 $dries = $dries->where('receptions.entrepots_id', request('idEntrepot'));
@@ -309,23 +309,23 @@ class GestionController extends Controller
 
             if($filtreRate!=''){
 
-                $dries = $dries->filtreRate($filtreRate); 
+                $dries = $dries->filtreRate($filtreRate);
             }
 
             if($sort!=''){
                 $order = request('order');
-              
+
                 $dries = $dries->orderBy(strval($sort), $order);
             }else{
-                $dries = $dries->orderBy("receptions.redali", "DESC"); 
+                $dries = $dries->orderBy("receptions.redali", "DESC");
             }
-            
+
             $dries = $dries->paginate($paginate);
 
         }else{
            // $dries = Reception::where('clients_id', request('id'))->orderBy('redali', 'asc')->get();
         }
-      
+
         return ReceptionResource::collection($dries);
 
     }
@@ -337,7 +337,7 @@ class GestionController extends Controller
         if(request('ischecked')==1){
             $value=request('idPrehargement');
         }
-        
+
 
         Reception::whereIn('reidre', request('listCmdNoSelect'))
           ->update([
@@ -349,7 +349,7 @@ class GestionController extends Controller
             "dossier_id" => $value
         ]);
 
-        
+
 
 
         $results = DB::table('receptions')->select(DB::raw("SUM(repoid) as total_poids")
@@ -361,8 +361,8 @@ class GestionController extends Controller
 
             $details=[];
 
-         
-      
+
+
         foreach ($results as $key) {
             $details[] = (object) [
               'total_poids'   => $key->total_poids,
@@ -370,7 +370,7 @@ class GestionController extends Controller
               'total_palette'  => $key->total_palette,
               'total_colis'    => $key->total_colis,
              // 'total_cmd'      => $key->total_cmd
-            ];         
+            ];
         }
         if(sizeof($details)==0){
             $details[] = (object) [
@@ -378,7 +378,7 @@ class GestionController extends Controller
               'total_volume'   => 0,
               'total_palette'  => 0,
               'total_colis'    => 0
-            ];         
+            ];
         }
         return response([
             "code" => 0,
@@ -386,11 +386,11 @@ class GestionController extends Controller
         ]);
     }
     public function getCommande(){
-        $results = Reception::where('dossier_id',request('id'))->where('type_commandes_id', request('typecommande'))->get(); 
+        $results = Reception::where('dossier_id',request('id'))->where('type_commandes_id', request('typecommande'))->get();
         $details=[];
 
         foreach ($results as $key) {
-           
+
            $details[] = (object) ['refere'         => $key->refere,
                                   'reecvr'         => $key->reecvr,
                                   'rencmd'         => $key->rencmd,
@@ -402,7 +402,7 @@ class GestionController extends Controller
                                   'renufa'         => $key->renufa,
                                   'priorite'       => $key->priorite,
                                   'fournisseurs'   => $key->fournisseur->fonmfo];
-   
+
         }
         return response([
             "code" => 0,
@@ -435,7 +435,7 @@ class GestionController extends Controller
 
         }
 
-        
+
 
         if($response){
             if(sizeof(request('ignored')) > 0){
@@ -464,7 +464,7 @@ class GestionController extends Controller
 
     public function notifier(){
         $user = Auth::user();
-        
+
         $base64_pdf = trim(request('base64_file_pdf'), "data:application/pdf;base64,");
         $base64_decode = base64_decode($base64_pdf);
         $pathFile = 'pdf/prechargement/dossier-'.request('id_dossier').'_'.request('typeCmd').'_du_'.request('date_debut').'_au_'.request('date_fin').'.pdf';
@@ -472,7 +472,7 @@ class GestionController extends Controller
         fwrite($pdf, $base64_decode);
         fclose($pdf);
 
-       
+
         // Notification
 
         $transitaire = Entite::where('id', intval(request('entite')))->get()->first();
@@ -492,9 +492,9 @@ class GestionController extends Controller
 
         try{
 
-            Notification::route('mail', [])->notify(new prechargementCommandesTransitaire($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_dossier'), request('date_debut'), request('date_fin'))); 
+            Notification::route('mail', [])->notify(new prechargementCommandesTransitaire($transitaire, $societe, $emailSent, $commandes, $pathFile, request('id_dossier'), request('date_debut'), request('date_fin')));
 
-           
+
             $res = [
                 "code" => 0,
                 "result" => "OK"
@@ -505,12 +505,12 @@ class GestionController extends Controller
                 "code" => 1,
                 "result" => $e->getMessage()
             ];
-            
+
         }
 
         return response($res);
 
-       
+
     }
 
     public function deletePre(Request $request)
@@ -521,7 +521,7 @@ class GestionController extends Controller
 
         foreach($res as $item){
             $ids[] = $item['id'];
-            
+
         }
 
         Reception::whereIn('dossier_empotage_id', $ids)->update([
@@ -535,12 +535,12 @@ class GestionController extends Controller
 
 
 
-        $dossier =  ChargementCreation::where('numDossier','=',request('id'))->where('type_commandes_id', request('typeCmd'))->firstOrFail(); 
+        $dossier =  ChargementCreation::where('numDossier','=',request('id'))->where('type_commandes_id', request('typeCmd'))->firstOrFail();
 
-        ChargementCreation::setIDClient(request('clientID'), intval(request('entite'))); 
+        ChargementCreation::setIDClient(request('clientID'), intval(request('entite')));
 
         $dossier->delete();
-    
+
 
         return response([
             "code" => 0,
@@ -549,10 +549,10 @@ class GestionController extends Controller
     }
     public function reactiver(){
         $user = Auth::user();
-        
-        $dossier =  ChargementCreation::where('id','=',request('identifiant'))->firstOrFail(); 
-        
-        ChargementCreation::setIDClient(request('clientID'), intval(request('entite'))); 
+
+        $dossier =  ChargementCreation::where('id','=',request('identifiant'))->firstOrFail();
+
+        ChargementCreation::setIDClient(request('clientID'), intval(request('entite')));
 
         $rep = $dossier->update(["reetat" => false]);
 
@@ -589,20 +589,20 @@ class GestionController extends Controller
         $client = Client::where('slug', request('id'))->whereJsonContains('clenti',$entite->id)->get()->first();
         if(!$client)  abort(404);
 
-        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get(); 
+        $typeCmd = TypeCommande::whereIn('id',$client->cltyco)->where("etat", true)->get();
 
-        $fournis = Fournisseur::whereIn('id',$client->clfocl)->get(); 
+        $fournis = Fournisseur::whereIn('id',$client->clfocl)->get();
 
         $contenaires = Contenaire::whereIn('id', (array) $entite->contenaires_id)->get();  //json_decode($entite->contenaires_id, true)
 
-        $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
+        $defaultContenaire = Contenaire::get()->where("isdefault", true)->first();
 
-        $entrepots = Entrepot::get(); 
+        $entrepots = Entrepot::get();
 
         $listeDossier =  DB::table('chargement_creations')->where('chargement_creations.entites_id',$entite->id)
             ->leftJoin('empotages as empo', function($join){
                 $join->on('empo.reference', '=', 'chargement_creations.numdossier');
-                $join->on('empo.type_commandes_id','=','chargement_creations.type_commandes_id');    
+                $join->on('empo.type_commandes_id','=','chargement_creations.type_commandes_id');
             })->select('*','chargement_creations.type_commandes_id as type_commandes', 'chargement_creations.entrepots_id as entrepots', 'chargement_creations.id as idpre')->where(function($query){
                 $query->orWhereNull('empo.reference')->orWhereNull('empo.type_commandes_id')->orWhereNull('empo.entrepots_id');
 
@@ -611,7 +611,7 @@ class GestionController extends Controller
         $listeDossierEnCours =  DB::table('chargement_creations')->where('chargement_creations.entites_id',$entite->id)
             ->leftJoin('empotages as empo', function($join){
                 $join->on('empo.reference', '=', 'chargement_creations.numdossier');
-                $join->on('empo.type_commandes_id','=','chargement_creations.type_commandes_id');    
+                $join->on('empo.type_commandes_id','=','chargement_creations.type_commandes_id');
             })->select('*','chargement_creations.type_commandes_id as type_commandes', 'chargement_creations.entrepots_id as entrepots', 'chargement_creations.id as idpre')->where('chargement_creations.on_empote', true)->where('chargement_creations.is_empote', false)->get();
 
         $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])->where("receptions.entites_id", $entite->id)->leftJoin('chargement_creations', function($join){
@@ -620,7 +620,7 @@ class GestionController extends Controller
                          })
                  ->select('receptions.type_commandes_id', DB::raw('count(*) as total'))
                  ->groupBy('receptions.type_commandes_id')->whereNotNull('numDossier')->where(function($query){
-                            $query->orWhere('dossier_empotage_id', 0)->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '');
+                            $query->orWhere('dossier_empotage_id', '0')->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '');
                         })->where("chargement_creations.reetat", true)->where('chargement_creations.is_empote', false)
                  ->get();  
 

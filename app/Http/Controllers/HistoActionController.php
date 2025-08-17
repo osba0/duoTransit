@@ -373,7 +373,7 @@ class HistoActionController extends Controller
         // Verifier s'il a inserer un numero de docim
 
         $check = Empotage::where("id", request('id'))->where(function($query){
-                        $query->orWhere('numDocim', 0)->orWhere('numDocim', NULL)->orWhere('numDocim', '');
+                        $query->orWhere('numDocim', '0')->orWhere('numDocim', NULL)->orWhere('numDocim', '');
                     })->get()->count();
        
         if($check > 0){

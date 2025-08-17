@@ -70,24 +70,24 @@ class PrechargementController extends Controller
         $nbrCmdACharger =  DB::table('receptions')->where('receptions.clients_id', $client['id'])->where("entites_id", $entite->id)
                  ->select('type_commandes_id', DB::raw('count(*) as total'))
                  ->groupBy('type_commandes_id')->where(function($query){
-                        $query->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL);
-                        
+                        $query->orWhere('dossier_id', '0')->orWhere('dossier_id', NULL);
+
                         })->where(function($query){
-                        $query->orWhere('dossier_prechargements_id', 0)->orWhere('dossier_prechargements_id', NULL);
-                        
+                        $query->orWhere('dossier_prechargements_id', '0')->orWhere('dossier_prechargements_id', NULL);
+
                         })
-                 ->get();  
+                 ->get();
 
-        
 
-        $entrepots = Entrepot::get(); 
+
+        $entrepots = Entrepot::get();
 
         if(is_null($client)){
             $data = ['logo' => '', 'id_client' => ''];
         }else{
             $data = ['logo' => $client->cllogo, 'id_client' => $client->id, 'client' => $client , 'typeCmd' => $typeCmd, 'fournisseurs' => $fournis, 'defaultContenaire' => $defaultContenaire, 'listContenaire' => $contenaires, "entite" => $entite, "entrepots" => $entrepots, 'nbrCmdACharger' => $nbrCmdACharger];
         }
-        
+
         return  view('backend.prechargement.index', $data);
     }
 
@@ -99,11 +99,11 @@ class PrechargementController extends Controller
     public function create(Request $request)
     {
         // get default contenaire
-        $defaultContenaire = Contenaire::get()->where("isdefault", true)->first(); 
-        
+        $defaultContenaire = Contenaire::get()->where("isdefault", true)->first();
+
         if($defaultContenaire['id']){
-            try{   
-                  
+            try{
+
                 $store = DossierPrechargement::create([
                     "contenaires_id"    => $defaultContenaire['id'],
                     "reetat"            => 0,
@@ -112,7 +112,7 @@ class PrechargementController extends Controller
                     "type_commandes_id" => request('typeCmd'),
                     "entites_id"        => request('entite'),
                     "is_close"          => 0
-                ]); 
+                ]);
                 return response([
                     "code" => 0,
                     "message" => ""
@@ -130,7 +130,7 @@ class PrechargementController extends Controller
                     "message" => "Pas de contenaire par defaut trouvé"
                 ]);
         }
-        
+
     }
 
      /**
@@ -159,17 +159,17 @@ class PrechargementController extends Controller
             ->leftJoin('type_commandes', 'dossier_prechargements.type_commandes_id', '=', 'type_commandes.id')
             ->leftJoin('contenaires', 'dossier_prechargements.contenaires_id', '=', 'contenaires.id')
             ->leftJoin('entites', 'dossier_prechargements.entites_id', '=', 'entites.id')
-            ->select('receptions.dossier_prechargements_id', 
-                DB::raw('SUM(receptions.repoid) as total_poids'), 
-                DB::raw('SUM(receptions.revolu) as total_volume'), 
-                DB::raw('SUM(receptions.renbcl) as total_colis'), 
-                DB::raw('SUM(receptions.renbpl) as total_palette'), 
-                DB::raw('count(receptions.rencmd) as total_cmd'), 
+            ->select('receptions.dossier_prechargements_id',
+                DB::raw('SUM(receptions.repoid) as total_poids'),
+                DB::raw('SUM(receptions.revolu) as total_volume'),
+                DB::raw('SUM(receptions.renbcl) as total_colis'),
+                DB::raw('SUM(receptions.renbpl) as total_palette'),
+                DB::raw('count(receptions.rencmd) as total_cmd'),
                 DB::raw("count( ( CASE WHEN receptions.douane != '' THEN receptions.douane END ) ) AS nbreCmdEmpote"),
-                DB::raw('SUM(receptions.revafa) as total_mnt'), 
-                'dossier_prechargements.nbreContenaire', 
-                'dossier_prechargements.id as idPre', 
-                'dossier_prechargements.users_id', 
+                DB::raw('SUM(receptions.revafa) as total_mnt'),
+                'dossier_prechargements.nbreContenaire',
+                'dossier_prechargements.id as idPre',
+                'dossier_prechargements.users_id',
                 'dossier_prechargements.created_at as created_at_pre',
                 'dossier_prechargements.reetat as etat',
                 'dossier_prechargements.is_close as isclose',
@@ -200,13 +200,13 @@ class PrechargementController extends Controller
             $query = $query->where('dossier_prechargements.entites_id', request('entite'));
 
             $query = $query->orderBy('dossier_prechargements.id','DESC');
-            
+
             $query = $query->paginate($paginate);
 
         }else{
-           
+
         }
-      
+
         return DossierPrechargementResource::collection($query);
     }
 
@@ -226,25 +226,25 @@ class PrechargementController extends Controller
         $keyword = request('keysearch');
 
         $filtreRate = request('rate');
-        
+
         $sort = request('column');
-        
+
 
         if (isset($paginate)) {
 
             $dries = Reception::where('clients_id', request('id'))->where(function($query2){
 
-                    $query2->orWhere('dossier_id', 0)->orWhere('dossier_id', NULL)->orWhere('dossier_prechargements_id', request('idPre'));
+                    $query2->orWhere('dossier_id', '0')->orWhere('dossier_id', NULL)->orWhere('dossier_prechargements_id', request('idPre'));
                 })->where('type_commandes_id', request('typecmd'))->where('entites_id', request('entite'))->leftJoin('commande_retourner_motifs', 'receptions.reidre', '=', 'commande_retourner_motifs.idReception')
             ->select('receptions.*','commande_retourner_motifs.idReception')->groupBy('receptions.reidre'); //request('entiteID')
 
             if(request('etatSelected')==true){
 
-                $dries = $dries->where('dossier_prechargements_id', request('idPre')); 
+                $dries = $dries->where('dossier_prechargements_id', request('idPre'));
 
             }else{
-                $dries = $dries ->where(function($query){   
-                    $query->orWhere('dossier_prechargements_id', request('idPre'))->orWhere('dossier_prechargements_id', 0)->orWhere('dossier_prechargements_id', NULL);
+                $dries = $dries ->where(function($query){
+                    $query->orWhere('dossier_prechargements_id', request('idPre'))->orWhere('dossier_prechargements_id', '0')->orWhere('dossier_prechargements_id', NULL);
                 }); 
             }
 

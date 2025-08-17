@@ -187,19 +187,19 @@ class EmpotageController extends Controller
         if (isset($paginate)) {
 
             $dries = Reception::where(function($query){
-                $query->orWhere('dossier_empotage_id', request('id_empotage'))->orWhere('dossier_empotage_id', 0)->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '');
+                $query->orWhere('dossier_empotage_id', request('id_empotage'))->orWhere('dossier_empotage_id', '0')->orWhere('dossier_empotage_id', NULL)->orWhere('dossier_empotage_id', '');
             })->where(function($query){
-                $query->orWhere('numero_contenaire', request('contenaireSelected'))->orWhere('numero_contenaire', 0)->orWhere('numero_contenaire', NULL)->orWhere('numero_contenaire', '');
+                $query->orWhere('numero_contenaire', request('contenaireSelected'))->orWhere('numero_contenaire', '0')->orWhere('numero_contenaire', NULL)->orWhere('numero_contenaire', '');
             })->leftJoin('empotages', 'empotages.id', '=', 'receptions.dossier_empotage_id')
             ->leftJoin('users as a', 'empotages.users_id', '=', 'a.id')
             ->leftJoin('users as b', 'receptions.users_id', '=', 'b.id')
             ->leftJoin('commande_retourner_motifs', 'receptions.reidre', '=', 'commande_retourner_motifs.idReception')
-            ->select('receptions.*','receptions.type_commandes_id as typeCmd','b.username as user_created','a.username as prechargeur', 'commande_retourner_motifs.idReception')->where('receptions.clients_id', request('id'))->groupBy('receptions.reidre')->where('receptions.type_commandes_id', request('typecmd')); 
+            ->select('receptions.*','receptions.type_commandes_id as typeCmd','b.username as user_created','a.username as prechargeur', 'commande_retourner_motifs.idReception')->where('receptions.clients_id', request('id'))->groupBy('receptions.reidre')->where('receptions.type_commandes_id', request('typecmd'));
 
             if(request('ref') != ""){
                 $dries = $dries->where('dossier_id', request('ref'));
             }else{
-                $dries = $dries->whereNotNull("dossier_id")->where("dossier_id",'!=' ,0)->whereNotNull("dossier_prechargements_id");
+                $dries = $dries->whereNotNull("dossier_id")->where("dossier_id",'!=' ,'0')->whereNotNull("dossier_prechargements_id");
             }
 
             if(request('idEntrepot') != ""){
