@@ -10,6 +10,7 @@ use App\Http\Resources\ClientResource;
 use App\Models\Client;
 use App\Models\Entite;
 use App\Models\TypActivity;
+use App\Models\Reception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
@@ -254,8 +255,20 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+
+        // verifier si le user a deja inserer des commandes avant la suppression
+        $hasResult = Reception::where('users_id', request('id'))->exists();
+
+        if ($hasResult) {
+            return response([
+                "code" => 1,
+                "message" => "Impossible de supprimer, contacter l'admin"
+            ]);
+        }
+
         $user = User::findOrFail(request('id'));
         $user->delete();
+
         //User::where('id', request('id'))->delete();
 
         return response([
